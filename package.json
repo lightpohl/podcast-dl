@@ -4,13 +4,12 @@
   "description": "A CLI for downloading podcasts.",
   "main": "./bin/bin.js",
   "scripts": {
-    "lint": "eslint --ext .js",
+    "lint": "eslint ./bin",
     "relase": "standard-version"
   },
   "lint-staged": {
     "*.{js,json,md}": [
-      "prettier --write",
-      "git add"
+      "prettier --write"
     ]
   },
   "husky": {
@@ -43,6 +42,7 @@
     "commander": "^5.1.0",
     "dayjs": "^1.8.25",
     "filenamify": "^4.1.0",
-    "got": "^11.0.2"
+    "got": "^11.0.2",
+    "rss-parser": "^3.7.6"
   }
 }
