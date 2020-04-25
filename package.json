@@ -24,6 +24,10 @@
     "downloader",
     "cli"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lightpohl/podcast-dl.git"
+  },
   "files": [
     "bin"
   ],
