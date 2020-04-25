@@ -10,7 +10,9 @@ let filenamify = require("filenamify");
 let dayjs = require("dayjs");
 let { version } = require("../package.json");
 
-let parser = new rssParser();
+let parser = new rssParser({
+  defaultRSS: 2.0,
+});
 
 commander
   .version(version)
@@ -83,18 +85,26 @@ let getDownloadUrl = ({ enclosure, link }) => {
 };
 
 let main = async () => {
-  let feed = await parser.parseURL(commander.url);
+  let feed;
+  try {
+    let encodedUrl = encodeURI(commander.url);
+    feed = await parser.parseURL(encodedUrl);
+  } catch (err) {
+    console.log("Unable to parse RSS URL");
+    console.log(err);
+    process.exit(1);
+  }
 
   if (commander.info) {
     console.log(`Title: ${feed.title}`);
     console.log(`Description: ${feed.description}`);
     console.log(`Total Episodes: ${feed.items.length}`);
-    return;
+    process.exit(0);
   }
 
   if (feed.items.length === 0) {
     console.log("No episodes found to download");
-    return;
+    process.exit(1);
   }
 
   console.log(`Starting download of ${feed.items.length} items`);
