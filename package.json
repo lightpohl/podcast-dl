@@ -1,0 +1,48 @@
+{
+  "name": "podcast-dl",
+  "version": "0.0.1",
+  "description": "A CLI for downloading podcasts.",
+  "main": "./bin/bin.js",
+  "scripts": {
+    "lint": "eslint --ext .js",
+    "relase": "standard-version"
+  },
+  "lint-staged": {
+    "*.{js,json,md}": [
+      "prettier --write",
+      "git add"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged",
+      "pre-push": "npm run lint"
+    }
+  },
+  "keywords": [
+    "podcast",
+    "podcasts",
+    "downloader",
+    "cli"
+  ],
+  "files": [
+    "bin"
+  ],
+  "author": "Joshua Pohl",
+  "license": "MIT",
+  "devDependencies": {
+    "eslint": "^6.8.0",
+    "eslint-config-defaults": "^9.0.0",
+    "eslint-config-prettier": "^6.11.0",
+    "husky": "^4.2.5",
+    "lint-staged": "^10.1.7",
+    "prettier": "^2.0.5",
+    "standard-version": "^7.1.0"
+  },
+  "dependencies": {
+    "commander": "^5.1.0",
+    "dayjs": "^1.8.25",
+    "filenamify": "^4.1.0",
+    "got": "^11.0.2"
+  }
+}
