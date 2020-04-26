@@ -3,3 +3,4 @@ npm-debug.log
 coverage/
 package-lock.json
 podcast-dl-cache.json
+test/

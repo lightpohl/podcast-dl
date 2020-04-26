@@ -9,6 +9,67 @@ let logFeedInfo = (feed) => {
   console.log(`Total Episodes: ${feed.items ? feed.items.length : 0}`);
 };
 
+let logItemInfo = (item) => {
+  let { title, pubDate } = item;
+
+  console.log(`Title: ${title}`);
+  console.log(`Publish Date: ${pubDate}`);
+};
+
+let writeFeedMeta = ({ outputPath, feed }) => {
+  let title = feed.title || null;
+  let description = feed.description || null;
+  let link = feed.link || null;
+  let feedUrl = feed.feedUrl || null;
+  let managingEditor = feed.managingEditor || null;
+
+  try {
+    fs.writeFileSync(
+      outputPath,
+      JSON.stringify(
+        {
+          title,
+          description,
+          link,
+          feedUrl,
+          managingEditor,
+        },
+        null,
+        4
+      )
+    );
+  } catch (error) {
+    console.error("Unable to save meta file for episode");
+    console.error(error);
+  }
+};
+
+let writeItemMeta = ({ outputPath, item }) => {
+  let title = item.title || null;
+  let descriptionText = item.contentSnippet || null;
+  let pubDate = item.pubDate || null;
+  let creator = item.creator || null;
+
+  try {
+    fs.writeFileSync(
+      outputPath,
+      JSON.stringify(
+        {
+          title,
+          pubDate,
+          creator,
+          descriptionText,
+        },
+        null,
+        4
+      )
+    );
+  } catch (error) {
+    console.error("Unable to save meta file for episode");
+    console.error(error);
+  }
+};
+
 let getUrlExt = (url) => {
   let pathname = _url.parse(url).pathname;
   let ext = path.extname(pathname);
@@ -21,13 +82,29 @@ let isAudioUrl = (url) => {
   return VALID_AUDIO_TYPES.includes(ext);
 };
 
-let getDownloadUrl = ({ enclosure, link }) => {
+let getEpisodeAudioUrl = ({ enclosure, link }) => {
   if (link && isAudioUrl(link)) {
     return link;
   }
 
   if (enclosure && isAudioUrl(enclosure.url)) {
     return enclosure.url;
+  }
+
+  return null;
+};
+
+let getImageUrl = ({ image, itunes }) => {
+  if (image && image.url) {
+    return image.url;
+  }
+
+  if (image && image.link) {
+    return image.link;
+  }
+
+  if (itunes && itunes.image) {
+    return itunes.image;
   }
 
   return null;
@@ -54,10 +131,10 @@ let printProgress = ({ percent, total }) => {
 };
 
 let endPrintProgress = () => {
-  process.stdout.write("\n\n");
+  process.stdout.write("\n");
 };
 
-let downloadPodcast = async ({ url, outputPath }) => {
+let download = async ({ url, outputPath }) => {
   return new Promise((resolve) => {
     got
       .stream(url)
@@ -73,8 +150,12 @@ let downloadPodcast = async ({ url, outputPath }) => {
 };
 
 module.exports = {
-  downloadPodcast,
-  getDownloadUrl,
+  download,
+  getEpisodeAudioUrl,
+  getImageUrl,
   getUrlExt,
   logFeedInfo,
+  logItemInfo,
+  writeFeedMeta,
+  writeItemMeta,
 };

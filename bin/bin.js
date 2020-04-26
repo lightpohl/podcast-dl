@@ -8,10 +8,14 @@ let dayjs = require("dayjs");
 
 let { version } = require("../package.json");
 let {
-  downloadPodcast,
-  getDownloadUrl,
+  download,
+  getEpisodeAudioUrl,
+  getImageUrl,
   getUrlExt,
   logFeedInfo,
+  logItemInfo,
+  writeFeedMeta,
+  writeItemMeta,
 } = require("./util");
 
 let parser = new rssParser({
@@ -21,11 +25,19 @@ let parser = new rssParser({
 commander
   .version(version)
   .option("--url <string>", "url to podcast rss feed")
-  .option("--info", "print retrieved podcast info instead of downloading")
   .option("--out-dir <path>", "specify output directory", "./")
+  .option("--include-meta", "write out podcast metadata")
+  .option("--include-episode-meta", "write out individual episode metadata")
+  .option(
+    "--ignore-episode-images",
+    "ignore downloading found images from --include-episode-meta"
+  )
+  .option("--info", "print retrieved podcast info instead of downloading")
   .parse(process.argv);
 
 let main = async () => {
+  let basePath = path.resolve(process.cwd(), commander.outDir);
+
   let feed;
   try {
     let encodedUrl = encodeURI(commander.url);
@@ -41,43 +53,117 @@ let main = async () => {
     process.exit(0);
   }
 
+  if (commander.includeMeta) {
+    let podcastImageUrl = getImageUrl(feed);
+
+    if (podcastImageUrl) {
+      let podcastImageFileExt = getUrlExt(podcastImageUrl);
+      let outputImagePath = path.resolve(
+        basePath,
+        `image${podcastImageFileExt}`
+      );
+
+      try {
+        console.log("Saving podcast image");
+        await download({
+          outputPath: outputImagePath,
+          url: podcastImageUrl,
+        });
+      } catch (error) {
+        console.error("Unable to download episode image");
+        console.error(error);
+      }
+    } else {
+      console.error("Unable to find podcast image");
+    }
+
+    let outputMetaPath = path.resolve(basePath, `meta.json`);
+
+    console.log("Saving podcast metadata");
+    writeFeedMeta({ outputPath: outputMetaPath, feed });
+  }
+
   if (!feed.items || feed.items.length === 0) {
     console.error("No episodes found to download");
     process.exit(1);
   }
 
-  console.log(`Starting download of ${feed.items.length} items`);
+  console.log(`Starting download of ${feed.items.length} items\n`);
   let counter = 1;
   for (let item of feed.items) {
-    let { enclosure, link, title, pubDate } = item;
+    let { title, pubDate } = item;
 
-    let url = getDownloadUrl({ enclosure, link });
+    let episodeAudioUrl = getEpisodeAudioUrl(item);
 
-    if (!url) {
-      console.error("Unable to find donwload URL. Skipping");
+    if (!episodeAudioUrl) {
+      console.error("Unable to find episode download URL. Skipping");
       break;
     }
 
-    let fileName = pubDate
-      ? `${dayjs(new Date(pubDate)).format("YYYYMMDD")}-${title}`
-      : title;
-    let safeFilename = filenamify(fileName, { replacement: "_" });
-    let fileExt = getUrlExt(url);
-    let outputPath = path.resolve(
-      process.cwd(),
-      commander.outDir,
-      `${safeFilename}${fileExt}`
-    );
+    let organizeDate = pubDate
+      ? dayjs(new Date(pubDate)).format("YYYYMMDD")
+      : null;
 
-    console.log(`Title: ${title}`);
-    console.log(`URL: ${url}`);
-    console.log(`${counter} of ${feed.items.length}`);
-
-    await downloadPodcast({
-      outputPath,
-      url,
+    let baseFileName = organizeDate ? `${organizeDate}-${title}` : title;
+    let baseSafeFilename = filenamify(baseFileName, {
+      replacement: "_",
     });
 
+    console.log(`${counter} of ${feed.items.length}`);
+    logItemInfo(item);
+
+    let audioFileExt = getUrlExt(episodeAudioUrl);
+    let outputPodcastPath = path.resolve(
+      basePath,
+      `${baseSafeFilename}${audioFileExt}`
+    );
+
+    try {
+      await download({
+        outputPath: outputPodcastPath,
+        url: episodeAudioUrl,
+      });
+    } catch (error) {
+      console.error("Unable to download episode");
+      console.error(error);
+    }
+
+    if (commander.includeEpisodeMeta) {
+      if (!commander.ignoreEpisodeImages) {
+        let episodeImageUrl = getImageUrl(item);
+
+        if (episodeImageUrl) {
+          let episodeImageFileExt = getUrlExt(episodeImageUrl);
+          let outputImagePath = path.resolve(
+            basePath,
+            `${baseSafeFilename}${episodeImageFileExt}`
+          );
+
+          console.log("Saving episode image");
+          try {
+            await download({
+              outputPath: outputImagePath,
+              url: episodeImageUrl,
+            });
+          } catch (error) {
+            console.error("Unable to download episode image");
+            console.error(error);
+          }
+        } else {
+          console.error("Unable to find episode image URL");
+        }
+      }
+
+      let outputEpisodeMetaPath = path.resolve(
+        basePath,
+        `${baseSafeFilename}.meta.json`
+      );
+
+      console.log("Saving episode metadata");
+      writeItemMeta({ outputPath: outputEpisodeMetaPath, item });
+    }
+
+    console.log("");
     counter += 1;
   }
 };
