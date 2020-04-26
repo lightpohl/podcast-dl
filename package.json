@@ -24,6 +24,9 @@
     "downloader",
     "cli"
   ],
+  "engines": {
+    "node": ">=12.16.2"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/lightpohl/podcast-dl.git"
