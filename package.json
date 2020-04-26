@@ -5,7 +5,7 @@
   "main": "./bin/bin.js",
   "scripts": {
     "lint": "eslint ./bin",
-    "relase": "standard-version"
+    "release": "standard-version"
   },
   "lint-staged": {
     "*.{js,json,md}": [
