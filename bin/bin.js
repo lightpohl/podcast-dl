@@ -31,8 +31,8 @@ let main = async () => {
     let encodedUrl = encodeURI(commander.url);
     feed = await parser.parseURL(encodedUrl);
   } catch (err) {
-    console.log("Unable to parse RSS URL");
-    console.log(err);
+    console.error("Unable to parse RSS URL");
+    console.error(err);
     process.exit(1);
   }
 
@@ -42,7 +42,7 @@ let main = async () => {
   }
 
   if (!feed.items || feed.items.length === 0) {
-    console.log("No episodes found to download");
+    console.error("No episodes found to download");
     process.exit(1);
   }
 
