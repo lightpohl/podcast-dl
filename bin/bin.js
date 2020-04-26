@@ -26,8 +26,11 @@ commander
   .version(version)
   .option("--url <string>", "url to podcast rss feed")
   .option("--out-dir <path>", "specify output directory", "./")
-  .option("--include-meta", "write out podcast metadata")
-  .option("--include-episode-meta", "write out individual episode metadata")
+  .option("--include-meta", "write out podcast metadata to json")
+  .option(
+    "--include-episode-meta",
+    "write out individual episode metadata to json"
+  )
   .option(
     "--ignore-episode-images",
     "ignore downloading found images from --include-episode-meta"
