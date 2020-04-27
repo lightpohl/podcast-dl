@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.1.0](https://github.com/lightpohl/podcast-dl/compare/v1.0.2...v1.1.0) (2020-04-27)
+
+
+### Features
+
+* add --offset and --limit options ([b71bc91](https://github.com/lightpohl/podcast-dl/commit/b71bc91e53ce2b6b8a32255afca6cc9b1cfa244e))
+
+
+### Bug Fixes
+
+* only pluralize episodes when not 1 item ([9449899](https://github.com/lightpohl/podcast-dl/commit/94498990569a81b6f06d37f2a2a0f64d72bdcc56))
+
 ### [1.0.2](https://github.com/lightpohl/podcast-dl/compare/v1.0.1...v1.0.2) (2020-04-26)
 
 
