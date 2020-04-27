@@ -118,7 +118,10 @@ let main = async () => {
     ? Math.min(offset + limit, feed.items.length)
     : feed.items.length;
   let numItemsToDownload = max - offset;
-  console.log(`Starting download of ${numItemsToDownload} episodes\n`);
+  let episodeText = numItemsToDownload === 1 ? "episode" : "episodes";
+
+  console.log(`Starting download of ${numItemsToDownload} ${episodeText}\n`);
+
   for (let i = offset; i < max; i++) {
     let item = feed.items[i];
     let { title, pubDate } = item;
