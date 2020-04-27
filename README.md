@@ -19,5 +19,7 @@
 | include-meta          |        | false    | Write out podcast metadata to JSON.                                                        |
 | include-episode-meta  |        | false    | Write out individual episode metadata to JSON.                                             |
 | ignore-episode-images |        | false    | Ignore downloading found images from --include-episode-meta                                |
+| offset                | Number | false    | Offset starting download position. Default is 0.                                           |
+| limit                 | Number | false    | Max number of episodes to download. Downloads all by default.                              |
 | version               |        | false    | Output the version number.                                                                 |
 | help                  |        | false    | Output usage information.                                                                  |
