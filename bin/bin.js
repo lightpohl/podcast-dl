@@ -17,57 +17,11 @@ let {
   writeFeedMeta,
   writeItemMeta,
 } = require("./util");
+let { createParseNumber, logError, logErrorAndExit } = require("./validate");
 
 let parser = new rssParser({
   defaultRSS: 2.0,
 });
-
-const parseOffset = (value) => {
-  try {
-    let offset = parseInt(value);
-
-    if (isNaN(offset)) {
-      console.error("--offset must be a number");
-      process.exit(1);
-    }
-
-    if (offset < 0) {
-      console.error("--offset must be >= 0");
-      process.exit(1);
-    }
-
-    return offset;
-  } catch (error) {
-    console.log(error);
-    console.error("Unable to parse --offset");
-    process.exit(1);
-  }
-};
-
-const parseLimit = (value) => {
-  if (!value) {
-    return undefined;
-  }
-
-  try {
-    let limit = parseInt(value);
-
-    if (isNaN(limit)) {
-      console.error("--limit must be a number");
-      process.exit(1);
-    }
-
-    if (limit < 1) {
-      console.error("--limit must be > 0");
-      process.exit(1);
-    }
-
-    return limit;
-  } catch (error) {
-    console.error("Unable to parse --limit");
-    process.exit(1);
-  }
-};
 
 commander
   .version(version)
@@ -85,14 +39,13 @@ commander
   .option(
     "--offset <number>",
     "offset episode to start downloading from (most recent = 0)",
-    parseOffset,
+    createParseNumber({ min: 0, name: "--offset" }),
     0
   )
   .option(
     "--limit <number>",
     "max amount of episodes to download",
-    parseLimit,
-    undefined
+    createParseNumber({ min: 1, name: "--limit", require: false })
   )
   .option("--info", "print retrieved podcast info instead of downloading")
   .parse(process.argv);
@@ -116,9 +69,7 @@ let main = async () => {
     let encodedUrl = encodeURI(url);
     feed = await parser.parseURL(encodedUrl);
   } catch (err) {
-    console.error("Unable to parse RSS URL");
-    console.error(err);
-    process.exit(1);
+    logErrorAndExit("Unable to parse RSS URL", err);
   }
 
   if (info) {
@@ -143,11 +94,10 @@ let main = async () => {
           url: podcastImageUrl,
         });
       } catch (error) {
-        console.error("Unable to download episode image");
-        console.error(error);
+        logError("Unable to download episode image", error);
       }
     } else {
-      console.error("Unable to find podcast image");
+      logError("Unable to find podcast image");
     }
 
     let outputMetaPath = path.resolve(basePath, `meta.json`);
@@ -157,13 +107,11 @@ let main = async () => {
   }
 
   if (!feed.items || feed.items.length === 0) {
-    console.error("No episodes found to download");
-    process.exit(1);
+    logErrorAndExit("No episodes found to download");
   }
 
   if (offset >= feed.items.length) {
-    console.error("--offset too large. No episodes to download.");
-    process.exit(1);
+    logErrorAndExit("--offset too large. No episodes to download.");
   }
 
   let max = limit
@@ -178,7 +126,7 @@ let main = async () => {
     let episodeAudioUrl = getEpisodeAudioUrl(item);
 
     if (!episodeAudioUrl) {
-      console.error("Unable to find episode download URL. Skipping");
+      logError("Unable to find episode download URL. Skipping");
       break;
     }
 
@@ -206,8 +154,7 @@ let main = async () => {
         url: episodeAudioUrl,
       });
     } catch (error) {
-      console.error("Unable to download episode");
-      console.error(error);
+      logError("Unable to download episode", error);
     }
 
     if (includeEpisodeMeta) {
@@ -222,17 +169,17 @@ let main = async () => {
           );
 
           console.log("Saving episode image");
+
           try {
             await download({
               outputPath: outputImagePath,
               url: episodeImageUrl,
             });
           } catch (error) {
-            console.error("Unable to download episode image");
-            console.error(error);
+            logError("Unable to download episode image", error);
           }
         } else {
-          console.error("Unable to find episode image URL");
+          logError("Unable to find episode image URL");
         }
       }
 
