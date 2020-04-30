@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+let _url = require("url");
 let path = require("path");
 let commander = require("commander");
 let rssParser = require("rss-parser");
@@ -63,11 +64,11 @@ let {
 
 let main = async () => {
   let basePath = path.resolve(process.cwd(), outDir);
+  let { href } = _url.parse(url);
 
   let feed;
   try {
-    let encodedUrl = encodeURI(url);
-    feed = await parser.parseURL(encodedUrl);
+    feed = await parser.parseURL(href);
   } catch (err) {
     logErrorAndExit("Unable to parse RSS URL", err);
   }
