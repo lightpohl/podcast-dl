@@ -1,7 +1,11 @@
 let _url = require("url");
+let { promisify } = require("util");
+let stream = require("stream");
 let path = require("path");
 let fs = require("fs");
 let got = require("got");
+
+let pipeline = promisify(stream.pipeline);
 
 let logFeedInfo = (feed) => {
   console.log(`Title: ${feed.title}`);
@@ -135,7 +139,7 @@ let endPrintProgress = () => {
 };
 
 let download = async ({ url, outputPath }) => {
-  return new Promise((resolve) => {
+  await pipeline(
     got
       .stream(url)
       .on("downloadProgress", (progress) => {
@@ -143,10 +147,9 @@ let download = async ({ url, outputPath }) => {
       })
       .on("end", () => {
         endPrintProgress();
-        resolve();
-      })
-      .pipe(fs.createWriteStream(outputPath));
-  });
+      }),
+    fs.createWriteStream(outputPath)
+  );
 };
 
 module.exports = {
