@@ -4,7 +4,9 @@
   "description": "A CLI for downloading podcasts.",
   "bin": "./bin/bin.js",
   "scripts": {
+    "build": "rimraf ./binaries && npm run pkg",
     "lint": "eslint ./bin",
+    "pkg": "npx pkg ./ --targets node12-linux-x64,node12-win-x64,node12-macos-x64 --out-path ./binaries",
     "release": "standard-version"
   },
   "lint-staged": {
@@ -43,6 +45,7 @@
     "husky": "^4.2.5",
     "lint-staged": "^10.1.7",
     "prettier": "^2.0.5",
+    "rimraf": "^3.0.2",
     "standard-version": "^7.1.0"
   },
   "dependencies": {
