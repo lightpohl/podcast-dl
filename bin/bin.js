@@ -12,6 +12,7 @@ let {
   download,
   getEpisodeAudioUrl,
   getImageUrl,
+  getLoopControls,
   getUrlExt,
   logFeedInfo,
   logItemInfo,
@@ -48,6 +49,7 @@ commander
     "max amount of episodes to download",
     createParseNumber({ min: 1, name: "--limit", require: false })
   )
+  .option("--reverse", "download episodes in reverse order")
   .option("--info", "print retrieved podcast info instead of downloading")
   .parse(process.argv);
 
@@ -59,6 +61,7 @@ let {
   ignoreEpisodeImages,
   offset,
   limit,
+  reverse,
   info,
 } = commander;
 
@@ -115,15 +118,20 @@ let main = async () => {
     logErrorAndExit("--offset too large. No episodes to download.");
   }
 
-  let max = limit
-    ? Math.min(offset + limit, feed.items.length)
-    : feed.items.length;
-  let numItemsToDownload = max - offset;
+  let { startIndex, numItemsToDownload, limitCheck, next } = getLoopControls({
+    limit,
+    offset,
+    reverse,
+    length: feed.items.length,
+  });
+
   let episodeText = numItemsToDownload === 1 ? "episode" : "episodes";
 
   console.log(`Starting download of ${numItemsToDownload} ${episodeText}\n`);
 
-  for (let i = offset; i < max; i++) {
+  let i = startIndex;
+  let counter = 1;
+  while (limitCheck(i)) {
     let item = feed.items[i];
     let { title, pubDate } = item;
 
@@ -143,7 +151,7 @@ let main = async () => {
       replacement: "_",
     });
 
-    console.log(`${i + 1 - offset} of ${numItemsToDownload}`);
+    console.log(`${counter} of ${numItemsToDownload}`);
     logItemInfo(item);
 
     let audioFileExt = getUrlExt(episodeAudioUrl);
@@ -197,6 +205,8 @@ let main = async () => {
     }
 
     console.log("");
+    counter += 1;
+    i = next(i);
   }
 };
 

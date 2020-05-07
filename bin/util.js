@@ -152,10 +152,41 @@ let download = async ({ url, outputPath }) => {
   );
 };
 
+let getLoopControls = ({ limit, offset, length, reverse }) => {
+  if (reverse) {
+    let startIndex = length - 1 - offset;
+    let min = limit ? Math.max(startIndex - limit, 0) : 0;
+    let numItemsToDownload = startIndex - min;
+    let limitCheck = (i) => i > min;
+    let decrement = (i) => i - 1;
+
+    return {
+      startIndex,
+      numItemsToDownload,
+      limitCheck,
+      next: decrement,
+    };
+  }
+
+  let startIndex = 0 + offset;
+  let max = limit ? Math.min(startIndex + limit, length) : length;
+  let numItemsToDownload = max - startIndex;
+  let limitCheck = (i) => i < max;
+  let increment = (i) => i + 1;
+
+  return {
+    startIndex,
+    numItemsToDownload,
+    limitCheck,
+    next: increment,
+  };
+};
+
 module.exports = {
   download,
   getEpisodeAudioUrl,
   getImageUrl,
+  getLoopControls,
   getUrlExt,
   logFeedInfo,
   logItemInfo,
