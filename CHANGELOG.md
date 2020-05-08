@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.3.1](https://github.com/lightpohl/podcast-dl/compare/v1.3.0...v1.3.1) (2020-05-08)
+
+
+### Bug Fixes
+
+* counter in prompt loop incorrect ([2f2f0ae](https://github.com/lightpohl/podcast-dl/commit/2f2f0aea8a4e3d28b0ae3915a3f087999d9b1763))
+
 ## [1.3.0](https://github.com/lightpohl/podcast-dl/compare/v1.2.0...v1.3.0) (2020-05-08)
 
 
