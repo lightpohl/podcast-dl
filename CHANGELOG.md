@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.3.0](https://github.com/lightpohl/podcast-dl/compare/v1.2.0...v1.3.0) (2020-05-08)
+
+
+### Features
+
+* add basic --prompt option ([225db58](https://github.com/lightpohl/podcast-dl/commit/225db58767112e39f28db5b859a9c9d61f7cafeb))
+
 ## [1.2.0](https://github.com/lightpohl/podcast-dl/compare/v1.1.1...v1.2.0) (2020-05-07)
 
 
