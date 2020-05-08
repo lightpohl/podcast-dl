@@ -16,6 +16,7 @@ let {
   getUrlExt,
   logFeedInfo,
   logItemInfo,
+  logItemsList,
   writeFeedMeta,
   writeItemMeta,
 } = require("./util");
@@ -51,6 +52,7 @@ commander
   )
   .option("--reverse", "download episodes in reverse order")
   .option("--info", "print retrieved podcast info instead of downloading")
+  .option("--list", "print episode info instead of downloading")
   .parse(process.argv);
 
 let {
@@ -63,6 +65,7 @@ let {
   limit,
   reverse,
   info,
+  list,
 } = commander;
 
 let main = async () => {
@@ -78,6 +81,17 @@ let main = async () => {
 
   if (info) {
     logFeedInfo(feed);
+  }
+
+  if (list) {
+    if (feed.items && feed.items.length) {
+      logItemsList(feed.items);
+    } else {
+      logErrorAndExit("No episodes found to list");
+    }
+  }
+
+  if (info || list) {
     process.exit(0);
   }
 

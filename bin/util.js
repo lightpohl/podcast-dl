@@ -13,6 +13,19 @@ let logFeedInfo = (feed) => {
   console.log(`Total Episodes: ${feed.items ? feed.items.length : 0}`);
 };
 
+let logItemsList = (items) => {
+  let tableData = items.map((item) => {
+    let { title, pubDate } = item;
+
+    return {
+      title,
+      pubDate,
+    };
+  });
+
+  console.table(tableData);
+};
+
 let logItemInfo = (item) => {
   let { title, pubDate } = item;
 
@@ -190,6 +203,7 @@ module.exports = {
   getUrlExt,
   logFeedInfo,
   logItemInfo,
+  logItemsList,
   writeFeedMeta,
   writeItemMeta,
 };
