@@ -88,6 +88,7 @@ let promptMain = async () => {
       logError("Unable to download episode", error);
     }
 
+    counter += 1;
     console.log("");
   }
 };
