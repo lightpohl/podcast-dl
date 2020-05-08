@@ -37,7 +37,7 @@ let promptMain = async () => {
   let { selectedEpisodes } = await inquirer.prompt([
     {
       type: "checkbox",
-      message: "Select epssodes",
+      message: "Select episodes",
       name: "selectedEpisodes",
       choices: getEpisodeOptions(feed.items),
     },
