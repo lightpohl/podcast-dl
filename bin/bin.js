@@ -1,16 +1,15 @@
 #!/usr/bin/env node
 
-let _url = require("url");
 let path = require("path");
 let commander = require("commander");
-let rssParser = require("rss-parser");
-let filenamify = require("filenamify");
-let dayjs = require("dayjs");
 
 let { version } = require("../package.json");
+let { startPrompt } = require("./prompt");
 let {
   download,
   getEpisodeAudioUrl,
+  getEpisodeFilename,
+  getFeed,
   getImageUrl,
   getLoopControls,
   getUrlExt,
@@ -21,10 +20,6 @@ let {
   writeItemMeta,
 } = require("./util");
 let { createParseNumber, logError, logErrorAndExit } = require("./validate");
-
-let parser = new rssParser({
-  defaultRSS: 2.0,
-});
 
 commander
   .version(version)
@@ -53,6 +48,7 @@ commander
   .option("--reverse", "download episodes in reverse order")
   .option("--info", "print retrieved podcast info instead of downloading")
   .option("--list", "print episode info instead of downloading")
+  .option("--prompt", "use CLI prompts to select options")
   .parse(process.argv);
 
 let {
@@ -66,18 +62,21 @@ let {
   reverse,
   info,
   list,
+  prompt,
 } = commander;
 
 let main = async () => {
-  let basePath = path.resolve(process.cwd(), outDir);
-  let { href } = _url.parse(url);
-
-  let feed;
-  try {
-    feed = await parser.parseURL(href);
-  } catch (err) {
-    logErrorAndExit("Unable to parse RSS URL", err);
+  if (prompt) {
+    await startPrompt();
+    process.exit(0);
   }
+
+  if (!url) {
+    logErrorAndExit("No URL provided");
+  }
+
+  let basePath = path.resolve(process.cwd(), outDir);
+  let feed = await getFeed(url);
 
   if (info) {
     logFeedInfo(feed);
@@ -147,27 +146,18 @@ let main = async () => {
   let counter = 1;
   while (limitCheck(i)) {
     let item = feed.items[i];
-    let { title, pubDate } = item;
 
     let episodeAudioUrl = getEpisodeAudioUrl(item);
 
     if (!episodeAudioUrl) {
       logError("Unable to find episode download URL. Skipping");
-      break;
+      continue;
     }
-
-    let organizeDate = pubDate
-      ? dayjs(new Date(pubDate)).format("YYYYMMDD")
-      : null;
-
-    let baseFileName = organizeDate ? `${organizeDate}-${title}` : title;
-    let baseSafeFilename = filenamify(baseFileName, {
-      replacement: "_",
-    });
 
     console.log(`${counter} of ${numItemsToDownload}`);
     logItemInfo(item);
 
+    let baseSafeFilename = getEpisodeFilename(item);
     let audioFileExt = getUrlExt(episodeAudioUrl);
     let outputPodcastPath = path.resolve(
       basePath,

@@ -32,5 +32,6 @@
 | --reverse               |        | false    | Reverse download direction and start at last RSS item.                                     |
 | --info                  |        | false    | Print retrieved podcast info instead of downloading.                                       |
 | --list                  |        | false    | Print episode list instead of downloading.                                                 |
+| --prompt                |        | false    | Use CLI prompt to select options. Ignores other provided options.                          |
 | --version               |        | false    | Output the version number.                                                                 |
 | --help                  |        | false    | Output usage information.                                                                  |

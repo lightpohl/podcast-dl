@@ -1,11 +1,19 @@
 let _url = require("url");
+let rssParser = require("rss-parser");
 let { promisify } = require("util");
 let stream = require("stream");
 let path = require("path");
 let fs = require("fs");
 let got = require("got");
+let filenamify = require("filenamify");
+let dayjs = require("dayjs");
+
+let { logError, logErrorAndExit } = require("./validate");
 
 let pipeline = promisify(stream.pipeline);
+let parser = new rssParser({
+  defaultRSS: 2.0,
+});
 
 let logFeedInfo = (feed) => {
   console.log(`Title: ${feed.title}`);
@@ -56,8 +64,7 @@ let writeFeedMeta = ({ outputPath, feed }) => {
       )
     );
   } catch (error) {
-    console.error("Unable to save meta file for episode");
-    console.error(error);
+    logError("Unable to save meta file for episode", error);
   }
 };
 
@@ -82,8 +89,7 @@ let writeItemMeta = ({ outputPath, item }) => {
       )
     );
   } catch (error) {
-    console.error("Unable to save meta file for episode");
-    console.error(error);
+    logError("Unable to save meta file for episode", error);
   }
 };
 
@@ -109,6 +115,19 @@ let getEpisodeAudioUrl = ({ enclosure, link }) => {
   }
 
   return null;
+};
+
+let getEpisodeFilename = ({ title, pubDate }) => {
+  let organizeDate = pubDate
+    ? dayjs(new Date(pubDate)).format("YYYYMMDD")
+    : null;
+
+  let baseFileName = organizeDate ? `${organizeDate}-${title}` : title;
+  let baseSafeFilename = filenamify(baseFileName, {
+    replacement: "_",
+  });
+
+  return baseSafeFilename;
 };
 
 let getImageUrl = ({ image, itunes }) => {
@@ -195,9 +214,24 @@ let getLoopControls = ({ limit, offset, length, reverse }) => {
   };
 };
 
+let getFeed = async (url) => {
+  let { href } = _url.parse(url);
+
+  let feed;
+  try {
+    feed = await parser.parseURL(href);
+  } catch (err) {
+    logErrorAndExit("Unable to parse RSS URL", err);
+  }
+
+  return feed;
+};
+
 module.exports = {
   download,
   getEpisodeAudioUrl,
+  getEpisodeFilename,
+  getFeed,
   getImageUrl,
   getLoopControls,
   getUrlExt,

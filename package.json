@@ -53,6 +53,7 @@
     "dayjs": "^1.8.25",
     "filenamify": "^4.1.0",
     "got": "^11.0.2",
+    "inquirer": "^7.1.0",
     "rss-parser": "^3.7.6"
   }
 }
