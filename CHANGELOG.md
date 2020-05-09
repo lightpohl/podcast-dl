@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.4.2](https://github.com/lightpohl/podcast-dl/compare/v1.4.1...v1.4.2) (2020-05-09)
+
+
+### Bug Fixes
+
+* add download cleanup on error: ([978db00](https://github.com/lightpohl/podcast-dl/commit/978db005148e5f44cb7f0341ca49b48b60848dfc))
+
 ### [1.4.1](https://github.com/lightpohl/podcast-dl/compare/v1.4.0...v1.4.1) (2020-05-09)
 
 
