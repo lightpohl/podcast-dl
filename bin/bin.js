@@ -201,7 +201,7 @@ let main = async () => {
         if (episodeImageUrl) {
           let episodeImageFileExt = getUrlExt(episodeImageUrl);
           let episodeImageName = `${baseSafeFilename}${episodeImageFileExt}`;
-          let outputImagePath = _path.resolve(basePath, episodeName);
+          let outputImagePath = _path.resolve(basePath, episodeImageName);
 
           console.log("Saving episode image");
           try {
