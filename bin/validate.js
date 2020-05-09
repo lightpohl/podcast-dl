@@ -2,7 +2,7 @@ const logError = (msg, error) => {
   console.error(msg);
 
   if (error) {
-    console.error(error);
+    console.error(error.message);
   }
 };
 

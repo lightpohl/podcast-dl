@@ -225,20 +225,28 @@ let download = async ({ url, outputPath, key, archive }) => {
     return;
   }
 
-  await pipeline(
-    got
-      .stream(url)
-      .on("downloadProgress", (progress) => {
-        printProgress(progress);
-      })
-      .on("end", () => {
-        endPrintProgress();
-      }),
-    fs.createWriteStream(outputPath)
-  );
+  try {
+    await pipeline(
+      got
+        .stream(url)
+        .on("downloadProgress", (progress) => {
+          printProgress(progress);
+        })
+        .on("end", () => {
+          endPrintProgress();
 
-  if (key && archive && !getIsInArchive({ key, archive })) {
-    writeToArchive({ key, archive });
+          if (key && archive && !getIsInArchive({ key, archive })) {
+            writeToArchive({ key, archive });
+          }
+        }),
+      fs.createWriteStream(outputPath)
+    );
+  } catch (error) {
+    if (fs.existsSync(outputPath)) {
+      fs.unlinkSync(outputPath);
+    }
+
+    throw error;
   }
 };
 
