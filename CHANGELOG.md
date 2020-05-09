@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.4.0](https://github.com/lightpohl/podcast-dl/compare/v1.3.1...v1.4.0) (2020-05-09)
+
+
+### Features
+
+* add --archive option ([29b6399](https://github.com/lightpohl/podcast-dl/commit/29b63996e07e44b142fda470904c12dbc948ba72)), closes [#2](https://github.com/lightpohl/podcast-dl/issues/2)
+
+
+### Bug Fixes
+
+* 'episodes' typo in prompt after selecting episodes ([6e06ec3](https://github.com/lightpohl/podcast-dl/commit/6e06ec37cea6b3a17c7607d5820955b389e81cc0))
+
 ### [1.3.1](https://github.com/lightpohl/podcast-dl/compare/v1.3.0...v1.3.1) (2020-05-08)
 
 
