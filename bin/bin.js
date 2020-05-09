@@ -1,12 +1,14 @@
 #!/usr/bin/env node
 
-let path = require("path");
+let _path = require("path");
+let _url = require("url");
 let commander = require("commander");
 
 let { version } = require("../package.json");
 let { startPrompt } = require("./prompt");
 let {
   download,
+  getArchiveKey,
   getEpisodeAudioUrl,
   getEpisodeFilename,
   getFeed,
@@ -19,12 +21,22 @@ let {
   writeFeedMeta,
   writeItemMeta,
 } = require("./util");
-let { createParseNumber, logError, logErrorAndExit } = require("./validate");
+let {
+  createParseNumber,
+  logError,
+  logErrorAndExit,
+  parseArchivePath,
+} = require("./validate");
 
 commander
   .version(version)
   .option("--url <string>", "url to podcast rss feed")
   .option("--out-dir <path>", "specify output directory", "./")
+  .option(
+    "--archive <path>",
+    "download or write only items not listed in archive file",
+    parseArchivePath
+  )
   .option("--include-meta", "write out podcast metadata to json")
   .option(
     "--include-episode-meta",
@@ -52,6 +64,7 @@ commander
   .parse(process.argv);
 
 let {
+  archive,
   url,
   outDir,
   includeMeta,
@@ -75,7 +88,9 @@ let main = async () => {
     logErrorAndExit("No URL provided");
   }
 
-  let basePath = path.resolve(process.cwd(), outDir);
+  let { hostname, pathname } = _url.parse(url);
+  let archiveUrl = `${hostname}${pathname}`;
+  let basePath = _path.resolve(process.cwd(), outDir);
   let feed = await getFeed(url);
 
   if (info) {
@@ -99,14 +114,14 @@ let main = async () => {
 
     if (podcastImageUrl) {
       let podcastImageFileExt = getUrlExt(podcastImageUrl);
-      let outputImagePath = path.resolve(
-        basePath,
-        `image${podcastImageFileExt}`
-      );
+      let podcastImageName = `image${podcastImageFileExt}`;
+      let outputImagePath = _path.resolve(basePath, podcastImageName);
 
       try {
         console.log("Saving podcast image");
         await download({
+          archive,
+          key: getArchiveKey({ prefix: archiveUrl, name: podcastImageName }),
           outputPath: outputImagePath,
           url: podcastImageUrl,
         });
@@ -117,10 +132,16 @@ let main = async () => {
       logError("Unable to find podcast image");
     }
 
-    let outputMetaPath = path.resolve(basePath, `meta.json`);
+    let outputMetaName = "meta.json";
+    let outputMetaPath = _path.resolve(basePath, outputMetaName);
 
     console.log("Saving podcast metadata");
-    writeFeedMeta({ outputPath: outputMetaPath, feed });
+    writeFeedMeta({
+      archive,
+      feed,
+      key: getArchiveKey({ prefix: archiveUrl, name: outputMetaName }),
+      outputPath: outputMetaPath,
+    });
   }
 
   if (!feed.items || feed.items.length === 0) {
@@ -159,13 +180,13 @@ let main = async () => {
 
     let baseSafeFilename = getEpisodeFilename(item);
     let audioFileExt = getUrlExt(episodeAudioUrl);
-    let outputPodcastPath = path.resolve(
-      basePath,
-      `${baseSafeFilename}${audioFileExt}`
-    );
+    let episodeName = `${baseSafeFilename}${audioFileExt}`;
+    let outputPodcastPath = _path.resolve(basePath, episodeName);
 
     try {
       await download({
+        archive,
+        key: getArchiveKey({ prefix: archiveUrl, name: episodeName }),
         outputPath: outputPodcastPath,
         url: episodeAudioUrl,
       });
@@ -179,15 +200,17 @@ let main = async () => {
 
         if (episodeImageUrl) {
           let episodeImageFileExt = getUrlExt(episodeImageUrl);
-          let outputImagePath = path.resolve(
-            basePath,
-            `${baseSafeFilename}${episodeImageFileExt}`
-          );
+          let episodeImageName = `${baseSafeFilename}${episodeImageFileExt}`;
+          let outputImagePath = _path.resolve(basePath, episodeName);
 
           console.log("Saving episode image");
-
           try {
             await download({
+              archive,
+              key: getArchiveKey({
+                prefix: archiveUrl,
+                name: episodeImageName,
+              }),
               outputPath: outputImagePath,
               url: episodeImageUrl,
             });
@@ -199,13 +222,16 @@ let main = async () => {
         }
       }
 
-      let outputEpisodeMetaPath = path.resolve(
-        basePath,
-        `${baseSafeFilename}.meta.json`
-      );
+      let episodeMetaName = `${baseSafeFilename}.meta.json`;
+      let outputEpisodeMetaPath = _path.resolve(basePath, episodeMetaName);
 
       console.log("Saving episode metadata");
-      writeItemMeta({ outputPath: outputEpisodeMetaPath, item });
+      writeItemMeta({
+        archive,
+        item,
+        key: getArchiveKey({ prefix: archiveUrl, name: episodeMetaName }),
+        outputPath: outputEpisodeMetaPath,
+      });
     }
 
     console.log("");

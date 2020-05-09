@@ -41,7 +41,42 @@ let logItemInfo = (item) => {
   console.log(`Publish Date: ${pubDate}`);
 };
 
-let writeFeedMeta = ({ outputPath, feed }) => {
+let getArchiveKey = ({ prefix, name }) => {
+  return `${prefix}-${name}`;
+};
+
+let writeToArchive = ({ key, archive }) => {
+  let archiveResult = [];
+  let archivePath = path.resolve(process.cwd(), archive);
+
+  if (fs.existsSync(archivePath)) {
+    archiveResult = JSON.parse(fs.readFileSync(archivePath));
+  }
+
+  if (!archiveResult.includes(key)) {
+    archiveResult.push(key);
+  }
+
+  fs.writeFileSync(archivePath, JSON.stringify(archiveResult, null, 4));
+};
+
+let getIsInArchive = ({ key, archive }) => {
+  let archivePath = path.resolve(process.cwd(), archive);
+
+  if (!fs.existsSync(archivePath)) {
+    return false;
+  }
+
+  let archiveResult = JSON.parse(fs.readFileSync(archivePath));
+  return archiveResult.includes(key);
+};
+
+let writeFeedMeta = ({ outputPath, feed, key, archive }) => {
+  if (key && archive && getIsInArchive({ key, archive })) {
+    console.log("Feed metadata exists in archive. Skipping write");
+    return;
+  }
+
   let title = feed.title || null;
   let description = feed.description || null;
   let link = feed.link || null;
@@ -63,12 +98,21 @@ let writeFeedMeta = ({ outputPath, feed }) => {
         4
       )
     );
+
+    if (key && archive && !getIsInArchive({ key, archive })) {
+      writeToArchive({ key, archive });
+    }
   } catch (error) {
-    logError("Unable to save meta file for episode", error);
+    logError("Unable to save metadata file for episode", error);
   }
 };
 
-let writeItemMeta = ({ outputPath, item }) => {
+let writeItemMeta = ({ outputPath, item, key, archive }) => {
+  if (key && archive && getIsInArchive({ key, archive })) {
+    console.log("Episode metadata exists in archive. Skipping write");
+    return;
+  }
+
   let title = item.title || null;
   let descriptionText = item.contentSnippet || null;
   let pubDate = item.pubDate || null;
@@ -88,29 +132,33 @@ let writeItemMeta = ({ outputPath, item }) => {
         4
       )
     );
+
+    if (key && archive && !getIsInArchive({ key, archive })) {
+      writeToArchive({ key, archive });
+    }
   } catch (error) {
     logError("Unable to save meta file for episode", error);
   }
 };
 
 let getUrlExt = (url) => {
-  let pathname = _url.parse(url).pathname;
+  let { pathname } = _url.parse(url);
   let ext = path.extname(pathname);
   return ext;
 };
 
 let VALID_AUDIO_TYPES = [".mp3", ".aac", ".m4a", ".wav", ".ogg", ".flac"];
-let isAudioUrl = (url) => {
+let getIsAudioUrl = (url) => {
   let ext = getUrlExt(url);
   return VALID_AUDIO_TYPES.includes(ext);
 };
 
 let getEpisodeAudioUrl = ({ enclosure, link }) => {
-  if (link && isAudioUrl(link)) {
+  if (link && getIsAudioUrl(link)) {
     return link;
   }
 
-  if (enclosure && isAudioUrl(enclosure.url)) {
+  if (enclosure && getIsAudioUrl(enclosure.url)) {
     return enclosure.url;
   }
 
@@ -168,9 +216,15 @@ let printProgress = ({ percent, total }) => {
 
 let endPrintProgress = () => {
   process.stdout.write("\n");
+  currentProgressLine = "";
 };
 
-let download = async ({ url, outputPath }) => {
+let download = async ({ url, outputPath, key, archive }) => {
+  if (key && archive && getIsInArchive({ key, archive })) {
+    console.log("Download exists in archive. Skipping");
+    return;
+  }
+
   await pipeline(
     got
       .stream(url)
@@ -182,6 +236,10 @@ let download = async ({ url, outputPath }) => {
       }),
     fs.createWriteStream(outputPath)
   );
+
+  if (key && archive && !getIsInArchive({ key, archive })) {
+    writeToArchive({ key, archive });
+  }
 };
 
 let getLoopControls = ({ limit, offset, length, reverse }) => {
@@ -229,6 +287,7 @@ let getFeed = async (url) => {
 
 module.exports = {
   download,
+  getArchiveKey,
   getEpisodeAudioUrl,
   getEpisodeFilename,
   getFeed,

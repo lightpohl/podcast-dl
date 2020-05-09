@@ -20,18 +20,24 @@
 
 ## Options
 
-| Option                  | Type   | Required | Description                                                                                |
-| ----------------------- | ------ | -------- | ------------------------------------------------------------------------------------------ |
-| --url                   | String | true     | URL to podcast RSS feed.                                                                   |
-| --out-dir               | String | false    | Specify output directory for episodes and metadata. Defaults to current working directory. |
-| --include-meta          |        | false    | Write out podcast metadata to JSON.                                                        |
-| --include-episode-meta  |        | false    | Write out individual episode metadata to JSON.                                             |
-| --ignore-episode-images |        | false    | Ignore downloading found images from --include-episode-meta.                               |
-| --offset                | Number | false    | Offset starting download position. Default is 0.                                           |
-| --limit                 | Number | false    | Max number of episodes to download. Downloads all by default.                              |
-| --reverse               |        | false    | Reverse download direction and start at last RSS item.                                     |
-| --info                  |        | false    | Print retrieved podcast info instead of downloading.                                       |
-| --list                  |        | false    | Print episode list instead of downloading.                                                 |
-| --prompt                |        | false    | Use CLI prompt to select options. Ignores other provided options.                          |
-| --version               |        | false    | Output the version number.                                                                 |
-| --help                  |        | false    | Output usage information.                                                                  |
+| Option                  | Type   | Required | Description                                                                                         |
+| ----------------------- | ------ | -------- | --------------------------------------------------------------------------------------------------- |
+| --url                   | String | true     | URL to podcast RSS feed.                                                                            |
+| --out-dir               | String | false    | Specify output directory for episodes and metadata. Defaults to current working directory.          |
+| --archive               | String | false    | Download or write out items not listed in archive file. Generates archive file at path if not found |
+| --include-meta          |        | false    | Write out podcast metadata to JSON.                                                                 |
+| --include-episode-meta  |        | false    | Write out individual episode metadata to JSON.                                                      |
+| --ignore-episode-images |        | false    | Ignore downloading found images from --include-episode-meta.                                        |
+| --offset                | Number | false    | Offset starting download position. Default is 0.                                                    |
+| --limit                 | Number | false    | Max number of episodes to download. Downloads all by default.                                       |
+| --reverse               |        | false    | Reverse download direction and start at last RSS item.                                              |
+| --info                  |        | false    | Print retrieved podcast info instead of downloading.                                                |
+| --list                  |        | false    | Print episode list instead of downloading.                                                          |
+| --prompt                |        | false    | Use CLI prompt to select options. Ignores other provided options.                                   |
+| --version               |        | false    | Output the version number.                                                                          |
+| --help                  |        | false    | Output usage information.                                                                           |
+
+## Archive
+
+- If passed the `--archive <path>` option, `podcast-dl` will generate/use a JSON archive at the provided path.
+- Before downloading an episode or writing out metadata, it'll check if the item was saved previously and abort the save if found.
