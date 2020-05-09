@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.4.1](https://github.com/lightpohl/podcast-dl/compare/v1.4.0...v1.4.1) (2020-05-09)
+
+
+### Bug Fixes
+
+* episode images should not override episodes ([7716bdc](https://github.com/lightpohl/podcast-dl/commit/7716bdc45629fc7a1f2fe84b13e3167a924117d0))
+
 ## [1.4.0](https://github.com/lightpohl/podcast-dl/compare/v1.3.1...v1.4.0) (2020-05-09)
 
 
