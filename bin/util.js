@@ -225,6 +225,12 @@ let download = async ({ url, outputPath, key, archive }) => {
     return;
   }
 
+  await got(url, {
+    timeout: 5000,
+    method: "HEAD",
+    responseType: "json",
+  });
+
   try {
     await pipeline(
       got
