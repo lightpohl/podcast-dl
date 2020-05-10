@@ -165,18 +165,25 @@ let main = async () => {
 
   let i = startIndex;
   let counter = 1;
+  let nextItem = () => {
+    i = next(i);
+    counter += 1;
+    console.log("");
+  };
+
   while (limitCheck(i)) {
     let item = feed.items[i];
+
+    console.log(`${counter} of ${numItemsToDownload}`);
+    logItemInfo(item);
 
     let episodeAudioUrl = getEpisodeAudioUrl(item);
 
     if (!episodeAudioUrl) {
       logError("Unable to find episode download URL. Skipping");
+      nextItem();
       continue;
     }
-
-    console.log(`${counter} of ${numItemsToDownload}`);
-    logItemInfo(item);
 
     let baseSafeFilename = getEpisodeFilename(item);
     let audioFileExt = getUrlExt(episodeAudioUrl);
@@ -234,9 +241,7 @@ let main = async () => {
       });
     }
 
-    console.log("");
-    counter += 1;
-    i = next(i);
+    nextItem();
   }
 };
 
