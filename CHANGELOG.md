@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.4.4](https://github.com/lightpohl/podcast-dl/compare/v1.4.3...v1.4.4) (2020-05-10)
+
+
+### Bug Fixes
+
+* add HEAD check before asset downloads ([2b6edf2](https://github.com/lightpohl/podcast-dl/commit/2b6edf27ac5d1a6602f33326daef7a3b597b78c7))
+
 ### [1.4.3](https://github.com/lightpohl/podcast-dl/compare/v1.4.2...v1.4.3) (2020-05-09)
 
 ### [1.4.2](https://github.com/lightpohl/podcast-dl/compare/v1.4.1...v1.4.2) (2020-05-09)
