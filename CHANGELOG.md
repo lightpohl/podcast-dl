@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.4.5](https://github.com/lightpohl/podcast-dl/compare/v1.4.4...v1.4.5) (2020-05-10)
+
+
+### Bug Fixes
+
+* infinite error after unable to find episode URL ([43817d6](https://github.com/lightpohl/podcast-dl/commit/43817d6e096fb1b7de7914e25ecf55ec77065b7a))
+
 ### [1.4.4](https://github.com/lightpohl/podcast-dl/compare/v1.4.3...v1.4.4) (2020-05-10)
 
 
