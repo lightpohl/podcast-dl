@@ -195,9 +195,8 @@ let getImageUrl = ({ image, itunes }) => {
 };
 
 let BYTES_IN_MB = 1000000;
-let currentProgressLine = "";
 let printProgress = ({ percent, total }) => {
-  let percentRounded = (percent * 100).toFixed(0);
+  let percentRounded = (percent * 100).toFixed(2);
   let line = `downloading... ${percentRounded}%`;
 
   if (total) {
@@ -206,17 +205,13 @@ let printProgress = ({ percent, total }) => {
     line += ` of ${roundedTotalMbs} MB`;
   }
 
-  if (line !== currentProgressLine) {
-    process.stdout.clearLine();
-    process.stdout.cursorTo(0);
-    process.stdout.write(line);
-    currentProgressLine = line;
-  }
+  process.stdout.clearLine();
+  process.stdout.cursorTo(0);
+  process.stdout.write(line);
 };
 
 let endPrintProgress = () => {
   process.stdout.write("\n");
-  currentProgressLine = "";
 };
 
 let download = async ({ url, outputPath, key, archive }) => {
@@ -225,11 +220,17 @@ let download = async ({ url, outputPath, key, archive }) => {
     return;
   }
 
-  await got(url, {
+  let headResponse = await got(url, {
     timeout: 5000,
     method: "HEAD",
     responseType: "json",
   });
+
+  let removeFile = () => {
+    if (fs.existsSync(outputPath)) {
+      fs.unlinkSync(outputPath);
+    }
+  };
 
   try {
     await pipeline(
@@ -240,19 +241,30 @@ let download = async ({ url, outputPath, key, archive }) => {
         })
         .on("end", () => {
           endPrintProgress();
-
-          if (key && archive && !getIsInArchive({ key, archive })) {
-            writeToArchive({ key, archive });
-          }
         }),
       fs.createWriteStream(outputPath)
     );
   } catch (error) {
-    if (fs.existsSync(outputPath)) {
-      fs.unlinkSync(outputPath);
-    }
-
+    removeFile();
     throw error;
+  }
+
+  let fileSize = fs.statSync(outputPath).size;
+  let expectedSize = parseInt(headResponse.headers["content-length"]);
+
+  if (fileSize === 0) {
+    removeFile();
+    throw new Error("Unable to write to file. Suggestion: verify permissions");
+  }
+
+  if (expectedSize && !isNaN(expectedSize) && expectedSize !== fileSize) {
+    logError(
+      "File size differs from expected content length. Suggestion: verify file works as expected"
+    );
+  }
+
+  if (key && archive && !getIsInArchive({ key, archive })) {
+    writeToArchive({ key, archive });
   }
 };
 
