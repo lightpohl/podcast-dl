@@ -10,7 +10,6 @@ let {
   download,
   getArchiveKey,
   getEpisodeAudioUrl,
-  getEpisodeFilename,
   getFeed,
   getImageUrl,
   getLoopControls,
@@ -27,6 +26,7 @@ let {
   logErrorAndExit,
   parseArchivePath,
 } = require("./validate");
+let { getFilename, getArchiveFilename } = require("./naming");
 
 commander
   .version(version)
@@ -36,6 +36,11 @@ commander
     "--archive <path>",
     "download or write only items not listed in archive file",
     parseArchivePath
+  )
+  .option(
+    "--episode-template <string>",
+    "template for generating episode related filenames",
+    "{{release_date}}-{{title}}"
   )
   .option("--include-meta", "write out podcast metadata to json")
   .option(
@@ -67,6 +72,7 @@ let {
   archive,
   url,
   outDir,
+  episodeTemplate,
   includeMeta,
   includeEpisodeMeta,
   ignoreEpisodeImages,
@@ -185,15 +191,27 @@ let main = async () => {
       continue;
     }
 
-    let baseSafeFilename = getEpisodeFilename(item);
     let audioFileExt = getUrlExt(episodeAudioUrl);
-    let episodeName = `${baseSafeFilename}${audioFileExt}`;
-    let outputPodcastPath = _path.resolve(basePath, episodeName);
+    let episodeFilename = getFilename({
+      item,
+      feed,
+      url: episodeAudioUrl,
+      ext: audioFileExt,
+      template: episodeTemplate,
+    });
+    let outputPodcastPath = _path.resolve(basePath, episodeFilename);
 
     try {
       await download({
         archive,
-        key: getArchiveKey({ prefix: archiveUrl, name: episodeName }),
+        key: getArchiveKey({
+          prefix: archiveUrl,
+          name: getArchiveFilename({
+            name: item.title,
+            pubDate: item.pubDate,
+            ext: audioFileExt,
+          }),
+        }),
         outputPath: outputPodcastPath,
         url: episodeAudioUrl,
       });
@@ -207,7 +225,13 @@ let main = async () => {
 
         if (episodeImageUrl) {
           let episodeImageFileExt = getUrlExt(episodeImageUrl);
-          let episodeImageName = `${baseSafeFilename}${episodeImageFileExt}`;
+          let episodeImageName = getFilename({
+            item,
+            feed,
+            url: episodeAudioUrl,
+            ext: episodeImageFileExt,
+            template: episodeTemplate,
+          });
           let outputImagePath = _path.resolve(basePath, episodeImageName);
 
           console.log("Saving episode image");
@@ -216,7 +240,11 @@ let main = async () => {
               archive,
               key: getArchiveKey({
                 prefix: archiveUrl,
-                name: episodeImageName,
+                name: getArchiveFilename({
+                  pubDate: item.pubDate,
+                  name: item.title,
+                  ext: episodeImageFileExt,
+                }),
               }),
               outputPath: outputImagePath,
               url: episodeImageUrl,
@@ -229,14 +257,28 @@ let main = async () => {
         }
       }
 
-      let episodeMetaName = `${baseSafeFilename}.meta.json`;
+      let episodeMetaExt = ".meta.json";
+      let episodeMetaName = getFilename({
+        item,
+        feed,
+        url: episodeAudioUrl,
+        ext: episodeMetaExt,
+        template: episodeTemplate,
+      });
       let outputEpisodeMetaPath = _path.resolve(basePath, episodeMetaName);
 
       console.log("Saving episode metadata");
       writeItemMeta({
         archive,
         item,
-        key: getArchiveKey({ prefix: archiveUrl, name: episodeMetaName }),
+        key: getArchiveKey({
+          prefix: archiveUrl,
+          name: getArchiveFilename({
+            pubDate: item.pubDate,
+            name: item.title,
+            ext: episodeMetaExt,
+          }),
+        }),
         outputPath: outputEpisodeMetaPath,
       });
     }
