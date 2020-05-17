@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.5.0](https://github.com/lightpohl/podcast-dl/compare/v1.4.6...v1.5.0) (2020-05-17)
+
+
+### Features
+
+* add '--episode-template' option ([93044d5](https://github.com/lightpohl/podcast-dl/commit/93044d5da53b05eddbc10ec4efda2711609916b8)), closes [#4](https://github.com/lightpohl/podcast-dl/issues/4)
+
 ### [1.4.6](https://github.com/lightpohl/podcast-dl/compare/v1.4.5...v1.4.6) (2020-05-11)
 
 
