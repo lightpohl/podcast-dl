@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.6.0](https://github.com/lightpohl/podcast-dl/compare/v1.5.0...v1.6.0) (2020-05-17)
+
+
+### Features
+
+* add podcast title/link templating options to '--out-dir' ([b4c526b](https://github.com/lightpohl/podcast-dl/commit/b4c526bf54c83863262c81b0e9a35c6a0adc411f))
+
 ## [1.5.0](https://github.com/lightpohl/podcast-dl/compare/v1.4.6...v1.5.0) (2020-05-17)
 
 
