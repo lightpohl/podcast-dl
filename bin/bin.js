@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+let fs = require("fs");
 let _path = require("path");
 let _url = require("url");
 let commander = require("commander");
@@ -26,7 +27,7 @@ let {
   logErrorAndExit,
   parseArchivePath,
 } = require("./validate");
-let { getFilename, getArchiveFilename } = require("./naming");
+let { getFilename, getFolderName, getArchiveFilename } = require("./naming");
 
 commander
   .version(version)
@@ -96,8 +97,16 @@ let main = async () => {
 
   let { hostname, pathname } = _url.parse(url);
   let archiveUrl = `${hostname}${pathname}`;
-  let basePath = _path.resolve(process.cwd(), outDir);
   let feed = await getFeed(url);
+  let basePath = _path.resolve(
+    process.cwd(),
+    getFolderName({ feed, template: outDir })
+  );
+
+  if (!fs.existsSync(basePath)) {
+    console.log(`${basePath} does not exist. Creating...`);
+    fs.mkdirSync(basePath);
+  }
 
   if (info) {
     logFeedInfo(feed);

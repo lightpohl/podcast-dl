@@ -24,36 +24,43 @@
 
 ## Options
 
-| Option                  | Type   | Required | Description                                                                                          |
-| ----------------------- | ------ | -------- | ---------------------------------------------------------------------------------------------------- |
-| --url                   | String | true     | URL to podcast RSS feed.                                                                             |
-| --out-dir               | String | false    | Specify output directory for episodes and metadata. Defaults to current working directory.           |
-| --archive               | String | false    | Download or write out items not listed in archive file. Generates archive file at path if not found. |
-| --episode-template      | String | false    | Template for generating episode related filenames. See "Episode Template" for details.               |
-| --include-meta          |        | false    | Write out podcast metadata to JSON.                                                                  |
-| --include-episode-meta  |        | false    | Write out individual episode metadata to JSON.                                                       |
-| --ignore-episode-images |        | false    | Ignore downloading found images from --include-episode-meta.                                         |
-| --offset                | Number | false    | Offset starting download position. Default is 0.                                                     |
-| --limit                 | Number | false    | Max number of episodes to download. Downloads all by default.                                        |
-| --reverse               |        | false    | Reverse download direction and start at last RSS item.                                               |
-| --info                  |        | false    | Print retrieved podcast info instead of downloading.                                                 |
-| --list                  |        | false    | Print episode list instead of downloading.                                                           |
-| --prompt                |        | false    | Use CLI prompt to select options. Ignores other provided options.                                    |
-| --version               |        | false    | Output the version number.                                                                           |
-| --help                  |        | false    | Output usage information.                                                                            |
+| Option                  | Type   | Required | Description                                                                                                                   |
+| ----------------------- | ------ | -------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| --url                   | String | true     | URL to podcast RSS feed.                                                                                                      |
+| --out-dir               | String | false    | Specify output directory for episodes and metadata. Defaults to current working directory. See "Templating" for more details. |
+| --archive               | String | false    | Download or write out items not listed in archive file. Generates archive file at path if not found.                          |
+| --episode-template      | String | false    | Template for generating episode related filenames. See "Templating" for details.                                              |
+| --include-meta          |        | false    | Write out podcast metadata to JSON.                                                                                           |
+| --include-episode-meta  |        | false    | Write out individual episode metadata to JSON.                                                                                |
+| --ignore-episode-images |        | false    | Ignore downloading found images from --include-episode-meta.                                                                  |
+| --offset                | Number | false    | Offset starting download position. Default is 0.                                                                              |
+| --limit                 | Number | false    | Max number of episodes to download. Downloads all by default.                                                                 |
+| --reverse               |        | false    | Reverse download direction and start at last RSS item.                                                                        |
+| --info                  |        | false    | Print retrieved podcast info instead of downloading.                                                                          |
+| --list                  |        | false    | Print episode list instead of downloading.                                                                                    |
+| --prompt                |        | false    | Use CLI prompt to select options. Ignores other provided options.                                                             |
+| --version               |        | false    | Output the version number.                                                                                                    |
+| --help                  |        | false    | Output usage information.                                                                                                     |
 
 ## Archive
 
 - If passed the `--archive <path>` option, `podcast-dl` will generate/use a JSON archive at the provided path.
 - Before downloading an episode or writing out metadata, it'll check if the item was saved previously and abort the save if found.
 
-## Episode Template
+## Templating
 
-The `--episode-template` option allows users to specify a template for filenames generated for each episode. The provided template will replace all matched keywords with the related data described below. Each keyword must be wrapped in two curly braces like so:
+Options that support templating allow users to specify a template for the generated filename(s). The provided template will replace all matched keywords with the related data described below. Each keyword must be wrapped in two braces like so:
+
+`--out-dir "./{{podcast_title}}"`
 
 `--episode-template "{{release_date}}-{{title}}"`
 
-Full list of supported keywords:
+### `--out-dir`
+
+- `podcast_title`: Title of the podcast feed.
+- `podcast_link`: `link` value provided for the podcast feed. Typically the homepage URL.
+
+### `--episode-template`
 
 - `title`: The title of the episode.
 - `release_date`: The release date of the episode in `YYYYMMDD` format.
