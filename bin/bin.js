@@ -37,7 +37,7 @@ let {
 commander
   .version(version)
   .option("--url <string>", "url to podcast rss feed")
-  .option("--out-dir <path>", "specify output directory", "./")
+  .option("--out-dir <path>", "specify output directory", "./{{podcast_title}}")
   .option(
     "--archive <path>",
     "download or write only items not listed in archive file",
