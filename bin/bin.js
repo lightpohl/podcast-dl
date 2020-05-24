@@ -157,8 +157,8 @@ let main = async () => {
       logError("Unable to find podcast image");
     }
 
-    let outputMetaName = "meta.json";
-    let outputMetaPath = _path.resolve(basePath, outputMetaName);
+    let outputMetaName = `${feed.title ? `${feed.title}.meta` : "meta"}.json`;
+    let outputMetaPath = _path.resolve(basePath, getSafeName(outputMetaName));
 
     console.log("Saving podcast metadata");
     writeFeedMeta({
