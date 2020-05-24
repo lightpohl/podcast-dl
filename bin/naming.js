@@ -71,4 +71,5 @@ module.exports = {
   getArchiveFilename,
   getFilename,
   getFolderName,
+  getSafeName,
 };

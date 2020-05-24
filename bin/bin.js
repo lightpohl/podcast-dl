@@ -27,7 +27,12 @@ let {
   logErrorAndExit,
   parseArchivePath,
 } = require("./validate");
-let { getFilename, getFolderName, getArchiveFilename } = require("./naming");
+let {
+  getFilename,
+  getFolderName,
+  getArchiveFilename,
+  getSafeName,
+} = require("./naming");
 
 commander
   .version(version)
@@ -129,8 +134,13 @@ let main = async () => {
 
     if (podcastImageUrl) {
       let podcastImageFileExt = getUrlExt(podcastImageUrl);
-      let podcastImageName = `image${podcastImageFileExt}`;
-      let outputImagePath = _path.resolve(basePath, podcastImageName);
+      let podcastImageName = `${
+        feed.title ? `${feed.title}.image` : "image"
+      }${podcastImageFileExt}`;
+      let outputImagePath = _path.resolve(
+        basePath,
+        getSafeName(podcastImageName)
+      );
 
       try {
         console.log("Saving podcast image");
