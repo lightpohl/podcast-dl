@@ -180,14 +180,22 @@ let getImageUrl = ({ image, itunes }) => {
 };
 
 let BYTES_IN_MB = 1000000;
-let printProgress = ({ percent, total }) => {
+let printProgress = ({ percent, total, transferred }) => {
+  let line = "downloading...";
   let percentRounded = (percent * 100).toFixed(2);
-  let line = `downloading... ${percentRounded}%`;
 
-  if (total) {
-    let totalMBs = total / BYTES_IN_MB;
-    let roundedTotalMbs = totalMBs.toFixed(2);
-    line += ` of ${roundedTotalMbs} MB`;
+  if (transferred > 0) {
+    /*
+     * Got has a bug where it'll set percent to 1 when the download first starts.
+     * Ignore percent until transfer has started.
+     */
+    line += ` ${percentRounded}%`;
+
+    if (total) {
+      let totalMBs = total / BYTES_IN_MB;
+      let roundedTotalMbs = totalMBs.toFixed(2);
+      line += ` of ${roundedTotalMbs} MB`;
+    }
   }
 
   process.stdout.clearLine();
