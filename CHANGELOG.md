@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.6.1](https://github.com/lightpohl/podcast-dl/compare/v1.6.0...v1.6.1) (2020-05-24)
+
+
+### Bug Fixes
+
+* do not show "100%" progress when dowload first starts ([3bc3152](https://github.com/lightpohl/podcast-dl/commit/3bc315265e95fee54464e6125598d668b9f3f27e))
+
 ## [1.6.0](https://github.com/lightpohl/podcast-dl/compare/v1.5.0...v1.6.0) (2020-05-17)
 
 
