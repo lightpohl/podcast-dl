@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## [2.0.0](https://github.com/lightpohl/podcast-dl/compare/v1.6.1...v2.0.0) (2020-06-06)
 
+### Breaking Changes
+
+* add recursive flag to mkdir for '--out-dir'
+* use podcast title in meta file name if available
+* default '--out-dir' to podcast specific folder
+* include podcast title name in feed image
+
 ### [1.6.1](https://github.com/lightpohl/podcast-dl/compare/v1.6.0...v1.6.1) (2020-05-24)
 
 
