@@ -110,7 +110,7 @@ let main = async () => {
 
   if (!fs.existsSync(basePath)) {
     console.log(`${basePath} does not exist. Creating...`);
-    fs.mkdirSync(basePath);
+    fs.mkdirSync(basePath, { recursive: true });
   }
 
   if (info) {
