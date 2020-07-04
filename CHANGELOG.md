@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## [3.0.0](https://github.com/lightpohl/podcast-dl/compare/v2.0.0...v3.0.0) (2020-07-04)
 
+### Breaking Changes
+
+* guard against overriding local files
+* add '--override' flag for previous behavior
+
 ## [2.0.0](https://github.com/lightpohl/podcast-dl/compare/v1.6.1...v2.0.0) (2020-06-06)
 
 ### Breaking Changes
