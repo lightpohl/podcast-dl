@@ -68,6 +68,7 @@ commander
     "max amount of episodes to download",
     createParseNumber({ min: 1, name: "--limit", require: false })
   )
+  .option("--override", "override local files on collision")
   .option("--reverse", "download episodes in reverse order")
   .option("--info", "print retrieved podcast info instead of downloading")
   .option("--list", "print episode info instead of downloading")
@@ -84,6 +85,7 @@ let {
   ignoreEpisodeImages,
   offset,
   limit,
+  override,
   reverse,
   info,
   list,
@@ -146,6 +148,7 @@ let main = async () => {
         console.log("Saving podcast image");
         await download({
           archive,
+          override,
           key: getArchiveKey({ prefix: archiveUrl, name: podcastImageName }),
           outputPath: outputImagePath,
           url: podcastImageUrl,
@@ -163,6 +166,7 @@ let main = async () => {
     console.log("Saving podcast metadata");
     writeFeedMeta({
       archive,
+      override,
       feed,
       key: getArchiveKey({ prefix: archiveUrl, name: outputMetaName }),
       outputPath: outputMetaPath,
@@ -223,6 +227,7 @@ let main = async () => {
     try {
       await download({
         archive,
+        override,
         key: getArchiveKey({
           prefix: archiveUrl,
           name: getArchiveFilename({
@@ -257,6 +262,7 @@ let main = async () => {
           try {
             await download({
               archive,
+              override,
               key: getArchiveKey({
                 prefix: archiveUrl,
                 name: getArchiveFilename({
@@ -289,6 +295,7 @@ let main = async () => {
       console.log("Saving episode metadata");
       writeItemMeta({
         archive,
+        override,
         item,
         key: getArchiveKey({
           prefix: archiveUrl,

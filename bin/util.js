@@ -69,7 +69,7 @@ let getIsInArchive = ({ key, archive }) => {
   return archiveResult.includes(key);
 };
 
-let writeFeedMeta = ({ outputPath, feed, key, archive }) => {
+let writeFeedMeta = ({ outputPath, feed, key, archive, override }) => {
   if (key && archive && getIsInArchive({ key, archive })) {
     console.log("Feed metadata exists in archive. Skipping write");
     return;
@@ -82,20 +82,24 @@ let writeFeedMeta = ({ outputPath, feed, key, archive }) => {
   let managingEditor = feed.managingEditor || null;
 
   try {
-    fs.writeFileSync(
-      outputPath,
-      JSON.stringify(
-        {
-          title,
-          description,
-          link,
-          feedUrl,
-          managingEditor,
-        },
-        null,
-        4
-      )
-    );
+    if (override || !fs.existsSync(outputPath)) {
+      fs.writeFileSync(
+        outputPath,
+        JSON.stringify(
+          {
+            title,
+            description,
+            link,
+            feedUrl,
+            managingEditor,
+          },
+          null,
+          4
+        )
+      );
+    } else {
+      console.log("Feed metadata exists locally. Skipping write");
+    }
 
     if (key && archive && !getIsInArchive({ key, archive })) {
       writeToArchive({ key, archive });
@@ -105,7 +109,7 @@ let writeFeedMeta = ({ outputPath, feed, key, archive }) => {
   }
 };
 
-let writeItemMeta = ({ outputPath, item, key, archive }) => {
+let writeItemMeta = ({ outputPath, item, key, archive, override }) => {
   if (key && archive && getIsInArchive({ key, archive })) {
     console.log("Episode metadata exists in archive. Skipping write");
     return;
@@ -117,19 +121,23 @@ let writeItemMeta = ({ outputPath, item, key, archive }) => {
   let creator = item.creator || null;
 
   try {
-    fs.writeFileSync(
-      outputPath,
-      JSON.stringify(
-        {
-          title,
-          pubDate,
-          creator,
-          descriptionText,
-        },
-        null,
-        4
-      )
-    );
+    if (override || !fs.existsSync(outputPath)) {
+      fs.writeFileSync(
+        outputPath,
+        JSON.stringify(
+          {
+            title,
+            pubDate,
+            creator,
+            descriptionText,
+          },
+          null,
+          4
+        )
+      );
+    } else {
+      console.log("Episode metadata exists locally. Skipping write");
+    }
 
     if (key && archive && !getIsInArchive({ key, archive })) {
       writeToArchive({ key, archive });
@@ -207,9 +215,14 @@ let endPrintProgress = () => {
   process.stdout.write("\n");
 };
 
-let download = async ({ url, outputPath, key, archive }) => {
+let download = async ({ url, outputPath, key, archive, override }) => {
   if (key && archive && getIsInArchive({ key, archive })) {
     console.log("Download exists in archive. Skipping");
+    return;
+  }
+
+  if (!override && fs.existsSync(outputPath)) {
+    console.log("Download exists locally. Skipping");
     return;
   }
 

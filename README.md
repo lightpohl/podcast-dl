@@ -35,6 +35,7 @@
 | --ignore-episode-images |        | false    | Ignore downloading found images from --include-episode-meta.                                                              |
 | --offset                | Number | false    | Offset starting download position. Default is 0.                                                                          |
 | --limit                 | Number | false    | Max number of episodes to download. Downloads all by default.                                                             |
+| --override              |        | false    | Override local files on collision.                                                                                        |
 | --reverse               |        | false    | Reverse download direction and start at last RSS item.                                                                    |
 | --info                  |        | false    | Print retrieved podcast info instead of downloading.                                                                      |
 | --list                  |        | false    | Print episode list instead of downloading.                                                                                |
