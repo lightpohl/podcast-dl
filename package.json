@@ -7,6 +7,7 @@
     "build": "rimraf ./binaries && npm run pkg",
     "lint": "eslint ./bin",
     "pkg": "npx pkg ./ --targets node12-linux-x64,node12-win-x64,node12-macos-x64 --out-path ./binaries",
+    "publish": "git push --follow-tags origin master && npm publish",
     "release": "standard-version"
   },
   "lint-staged": {
