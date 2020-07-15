@@ -17,12 +17,12 @@ let getFilename = ({ item, ext, url, feed, template }) => {
     : null;
 
   let templateReplacementsTuples = [
-    ["title", item.title],
-    ["release_date", formattedPubDate],
+    ["title", item.title || ""],
+    ["release_date", formattedPubDate || ""],
     ["url", url],
-    ["podcast_title", feed.title],
-    ["podcast_link", feed.link],
-    ["duration", item.itunes && item.itunes.duration],
+    ["podcast_title", feed.title || ""],
+    ["podcast_link", feed.link || ""],
+    ["duration", (item.itunes && item.itunes.duration) || ""],
   ];
 
   let name = template;
@@ -41,8 +41,8 @@ let getFilename = ({ item, ext, url, feed, template }) => {
 
 let getFolderName = ({ feed, template }) => {
   let templateReplacementsTuples = [
-    ["podcast_title", getSafeName(feed.title)],
-    ["podcast_link", getSafeName(feed.link)],
+    ["podcast_title", feed.title ? getSafeName(feed.title) : ""],
+    ["podcast_link", feed.link ? getSafeName(feed.link) : ""],
   ];
 
   let name = template;
