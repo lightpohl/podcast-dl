@@ -67,6 +67,10 @@ commander
     "max amount of episodes to download",
     createParseNumber({ min: 1, name: "--limit", require: false })
   )
+  .option(
+    "--episode-regex <string>",
+    "match episode title against regex before downloading"
+  )
   .option("--override", "override local files on collision")
   .option("--reverse", "download episodes in reverse order")
   .option("--info", "print retrieved podcast info instead of downloading")
@@ -83,6 +87,7 @@ let {
   ignoreEpisodeImages,
   offset,
   limit,
+  episodeRegex,
   override,
   reverse,
   info,
@@ -197,6 +202,17 @@ let main = async () => {
 
     console.log(`${counter} of ${numItemsToDownload}`);
     logItemInfo(item);
+
+    let generatedEpisodeRegex = episodeRegex ? new RegExp(episodeRegex) : null;
+
+    if (
+      generatedEpisodeRegex &&
+      (!item.title || !generatedEpisodeRegex.test(item.title))
+    ) {
+      console.log("Episode title does not match provided regex. Skipping");
+      nextItem();
+      continue;
+    }
 
     let episodeAudioUrl = getEpisodeAudioUrl(item);
 
