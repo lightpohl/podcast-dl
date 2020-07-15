@@ -6,7 +6,6 @@ let _url = require("url");
 let commander = require("commander");
 
 let { version } = require("../package.json");
-let { startPrompt } = require("./prompt");
 let {
   download,
   getArchiveKey,
@@ -72,7 +71,6 @@ commander
   .option("--reverse", "download episodes in reverse order")
   .option("--info", "print retrieved podcast info instead of downloading")
   .option("--list", "print episode info instead of downloading")
-  .option("--prompt", "use CLI prompts to select options")
   .parse(process.argv);
 
 let {
@@ -89,15 +87,9 @@ let {
   reverse,
   info,
   list,
-  prompt,
 } = commander;
 
 let main = async () => {
-  if (prompt) {
-    await startPrompt();
-    process.exit(0);
-  }
-
   if (!url) {
     logErrorAndExit("No URL provided");
   }
