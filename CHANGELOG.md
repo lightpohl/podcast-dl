@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.0.0](https://github.com/lightpohl/podcast-dl/compare/v3.0.0...v4.0.0) (2020-08-01)
+
+
+### Features
+
+* add '--episode-regex' option ([24c74ba](https://github.com/lightpohl/podcast-dl/commit/24c74ba822e2dde5cc63ee24770c1cf8dc1b0a44))
+
+
+### Bug Fixes
+
+* better handle missing properties for name templating ([c1990df](https://github.com/lightpohl/podcast-dl/commit/c1990df4c1c9f48ff2bac35205d0a486ef65d562)), closes [#10](https://github.com/lightpohl/podcast-dl/issues/10)
+
 ### [3.0.1](https://github.com/lightpohl/podcast-dl/compare/v3.0.0...v3.0.1) (2020-07-15)
 
 
