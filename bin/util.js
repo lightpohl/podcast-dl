@@ -230,6 +230,9 @@ let download = async ({ url, outputPath, key, archive, override }) => {
     timeout: 5000,
     method: "HEAD",
     responseType: "json",
+    headers: {
+      accept: "*/*",
+    },
   });
 
   let removeFile = () => {
@@ -256,7 +259,12 @@ let download = async ({ url, outputPath, key, archive, override }) => {
   }
 
   let fileSize = fs.statSync(outputPath).size;
-  let expectedSize = parseInt(headResponse.headers["content-length"]);
+  let expectedSize =
+    headResponse &&
+    headResponse.headers &&
+    headResponse.headers["content-length"]
+      ? parseInt(headResponse.headers["content-length"])
+      : 0;
 
   if (fileSize === 0) {
     removeFile();
