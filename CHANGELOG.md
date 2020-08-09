@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.0.1](https://github.com/lightpohl/podcast-dl/compare/v4.0.0...v4.0.1) (2020-08-09)
+
+
+### Bug Fixes
+
+* include generic accept header for compatibility with some podcast servers ([a12b1da](https://github.com/lightpohl/podcast-dl/commit/a12b1da11418c5dc3180885376b1d87b8db43f93)), closes [#13](https://github.com/lightpohl/podcast-dl/issues/13)
+
 ## [4.0.0](https://github.com/lightpohl/podcast-dl/compare/v3.0.0...v4.0.0) (2020-08-01)
 
 ### Breaking Changes
