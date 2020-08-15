@@ -128,6 +128,10 @@ let main = async () => {
     process.exit(0);
   }
 
+  if (archive) {
+    archive = getFolderName({ feed, template: archive });
+  }
+
   if (includeMeta) {
     let podcastImageUrl = getImageUrl(feed);
 
