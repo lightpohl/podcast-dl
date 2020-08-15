@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.1.0](https://github.com/lightpohl/podcast-dl/compare/v4.0.1...v4.1.0) (2020-08-15)
+
+
+### Features
+
+* add templating support to '--archive' option ([f8ed4fb](https://github.com/lightpohl/podcast-dl/commit/f8ed4fb7192b5d9441516c8ce262d568a76992b5)), closes [#15](https://github.com/lightpohl/podcast-dl/issues/15)
+
 ### [4.0.1](https://github.com/lightpohl/podcast-dl/compare/v4.0.0...v4.0.1) (2020-08-09)
 
 
