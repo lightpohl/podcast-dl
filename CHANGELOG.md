@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.1.1](https://github.com/lightpohl/podcast-dl/compare/v4.1.0...v4.1.1) (2020-12-29)
+
+
+### Bug Fixes
+
+* the most recent episode should be downloaded when using '--reverse' ([709312b](https://github.com/lightpohl/podcast-dl/commit/709312b1307d35e6082447719fc786892700f3e8)), closes [#16](https://github.com/lightpohl/podcast-dl/issues/16)
+
 ## [4.1.0](https://github.com/lightpohl/podcast-dl/compare/v4.0.1...v4.1.0) (2020-08-15)
 
 
