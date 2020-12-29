@@ -285,8 +285,8 @@ let download = async ({ url, outputPath, key, archive, override }) => {
 let getLoopControls = ({ limit, offset, length, reverse }) => {
   if (reverse) {
     let startIndex = length - 1 - offset;
-    let min = limit ? Math.max(startIndex - limit, 0) : 0;
-    let numItemsToDownload = startIndex - min;
+    let min = limit ? Math.max(startIndex - limit, -1) : -1;
+    let numItemsToDownload = min > -1 ? startIndex - min : startIndex + 1;
     let limitCheck = (i) => i > min;
     let decrement = (i) => i - 1;
 
