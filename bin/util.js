@@ -205,10 +205,13 @@ let printProgress = ({ percent, total, transferred }) => {
       line += ` of ${roundedTotalMbs} MB`;
     }
   }
-
-  process.stdout.clearLine();
-  process.stdout.cursorTo(0);
-  process.stdout.write(line);
+  try {
+      process.stdout.clearLine();
+      process.stdout.cursorTo(0);
+      process.stdout.write(line);
+  } catch (e) {
+      console.debug(e);
+  }
 };
 
 let endPrintProgress = () => {
