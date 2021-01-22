@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.1.2](https://github.com/lightpohl/podcast-dl/compare/v4.1.1...v4.1.2) (2021-01-22)
+
+
+### Bug Fixes
+
+* disable download progress logging in non-TTY envs ([c0f0dde](https://github.com/lightpohl/podcast-dl/commit/c0f0ddebc5635e0c9b162cadecab8760c4b00e17))
+
 ### [4.1.1](https://github.com/lightpohl/podcast-dl/compare/v4.1.0...v4.1.1) (2020-12-29)
 
 
