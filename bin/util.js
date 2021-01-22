@@ -189,6 +189,14 @@ let getImageUrl = ({ image, itunes }) => {
 
 let BYTES_IN_MB = 1000000;
 let printProgress = ({ percent, total, transferred }) => {
+  if (!process.stdout.isTTY) {
+    /*
+      Non-TTY environments do not have access to `stdout.clearLine` and
+      `stdout.cursorTo`. Skip download progress logging in these environments.
+    */
+    return;
+  }
+
   let line = "downloading...";
   let percentRounded = (percent * 100).toFixed(2);
 
