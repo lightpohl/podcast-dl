@@ -153,22 +153,45 @@ let getUrlExt = (url) => {
   return ext;
 };
 
-let VALID_AUDIO_TYPES = [".mp3", ".aac", ".m4a", ".wav", ".ogg", ".flac"];
-let getIsAudioUrl = (url) => {
-  let ext = getUrlExt(url);
-  return VALID_AUDIO_TYPES.includes(ext);
+let AUDIO_TYPES_TO_EXTS = {
+  "audio/mpeg": ".mp3",
+  "audio/mp3": ".mp3",
+  "audio/flac": ".flac",
+  "audio/ogg": ".ogg",
+  "audio/vorbis": ".ogg",
+  "audio/mp4": ".m4a",
+  "audio/wav": ".wav",
+  "audio/x-wav": ".wav",
+  "audio/aac": ".aac",
 };
 
-let getEpisodeAudioUrl = ({ enclosure, link }) => {
+let VALID_AUDIO_EXTS = [
+  ...new Set(
+    Object.keys(AUDIO_TYPES_TO_EXTS).map((key) => {
+      return AUDIO_TYPES_TO_EXTS[key];
+    })
+  ),
+];
+
+let getIsAudioUrl = (url) => {
+  let ext = getUrlExt(url);
+  return VALID_AUDIO_EXTS.includes(ext);
+};
+
+let getEpisodeAudioUrlAndExt = ({ enclosure, link }) => {
   if (link && getIsAudioUrl(link)) {
-    return link;
+    return { url: link, ext: getUrlExt(link) };
   }
 
   if (enclosure && getIsAudioUrl(enclosure.url)) {
-    return enclosure.url;
+    return { url: enclosure.url, ext: getUrlExt(enclosure.url) };
   }
 
-  return null;
+  if (enclosure && enclosure.url && AUDIO_TYPES_TO_EXTS[enclosure.type]) {
+    return { url: enclosure.url, ext: AUDIO_TYPES_TO_EXTS[enclosure.type] };
+  }
+
+  return { url: null, ext: null };
 };
 
 let getImageUrl = ({ image, itunes }) => {
@@ -336,7 +359,7 @@ let getFeed = async (url) => {
 module.exports = {
   download,
   getArchiveKey,
-  getEpisodeAudioUrl,
+  getEpisodeAudioUrlAndExt,
   getFeed,
   getImageUrl,
   getLoopControls,

@@ -9,7 +9,7 @@ let { version } = require("../package.json");
 let {
   download,
   getArchiveKey,
-  getEpisodeAudioUrl,
+  getEpisodeAudioUrlAndExt,
   getFeed,
   getImageUrl,
   getLoopControls,
@@ -218,7 +218,9 @@ let main = async () => {
       continue;
     }
 
-    let episodeAudioUrl = getEpisodeAudioUrl(item);
+    let { url: episodeAudioUrl, ext: audioFileExt } = getEpisodeAudioUrlAndExt(
+      item
+    );
 
     if (!episodeAudioUrl) {
       logError("Unable to find episode download URL. Skipping");
@@ -226,7 +228,6 @@ let main = async () => {
       continue;
     }
 
-    let audioFileExt = getUrlExt(episodeAudioUrl);
     let episodeFilename = getFilename({
       item,
       feed,
