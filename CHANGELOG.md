@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.1.4](https://github.com/lightpohl/podcast-dl/compare/v4.1.3...v4.1.4) (2021-02-20)
+
+
+### Bug Fixes
+
+* check enclosure for audio type/ext if file is missing ext ([58bcc4b](https://github.com/lightpohl/podcast-dl/commit/58bcc4b97eac8ea662fa8da0e05ddc0a630f2a99))
+
 ### [4.1.3](https://github.com/lightpohl/podcast-dl/compare/v4.1.2...v4.1.3) (2021-01-27)
 
 ### [4.1.2](https://github.com/lightpohl/podcast-dl/compare/v4.1.1...v4.1.2) (2021-01-22)
