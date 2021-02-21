@@ -165,13 +165,7 @@ let AUDIO_TYPES_TO_EXTS = {
   "audio/aac": ".aac",
 };
 
-let VALID_AUDIO_EXTS = [
-  ...new Set(
-    Object.keys(AUDIO_TYPES_TO_EXTS).map((key) => {
-      return AUDIO_TYPES_TO_EXTS[key];
-    })
-  ),
-];
+let VALID_AUDIO_EXTS = [...new Set(Object.values(AUDIO_TYPES_TO_EXTS))];
 
 let getIsAudioUrl = (url) => {
   let ext = getUrlExt(url);
