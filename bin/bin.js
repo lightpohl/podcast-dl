@@ -19,6 +19,7 @@ let {
   logItemsList,
   writeFeedMeta,
   writeItemMeta,
+  addMp3Metadata,
 } = require("./util");
 let {
   createParseNumber,
@@ -71,6 +72,10 @@ commander
     "--episode-regex <string>",
     "match episode title against regex before downloading"
   )
+  .option(
+    "--add-mp3-metadata",
+    "attempts to add a base level of metadata to .mp3 files using ffmpeg"
+  )
   .option("--override", "override local files on collision")
   .option("--reverse", "download episodes in reverse order")
   .option("--info", "print retrieved podcast info instead of downloading")
@@ -92,6 +97,7 @@ let {
   reverse,
   info,
   list,
+  addMp3Metadata: addMp3MetadataFlag,
 } = commander;
 
 let main = async () => {
@@ -254,6 +260,19 @@ let main = async () => {
       });
     } catch (error) {
       logError("Unable to download episode", error);
+    }
+
+    if (addMp3MetadataFlag) {
+      try {
+        addMp3Metadata({
+          feed,
+          item,
+          itemIndex: i,
+          outputPath: outputPodcastPath,
+        });
+      } catch (error) {
+        logError("Unable to add episode metadata", error);
+      }
     }
 
     if (includeEpisodeMeta) {
