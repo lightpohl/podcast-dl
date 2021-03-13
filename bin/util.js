@@ -5,6 +5,8 @@ let stream = require("stream");
 let path = require("path");
 let fs = require("fs");
 let got = require("got");
+let dayjs = require("dayjs");
+let { execSync } = require("child_process");
 
 let { logError, logErrorAndExit } = require("./validate");
 
@@ -350,6 +352,55 @@ let getFeed = async (url) => {
   return feed;
 };
 
+let addMp3Metadata = ({ feed, item, itemIndex, outputPath }) => {
+  if (!fs.existsSync(outputPath)) {
+    return;
+  }
+
+  if (!outputPath.endsWith(".mp3")) {
+    console.log("Not an .mp3 file. Unable to add metadata.");
+    return;
+  }
+
+  let album = feed.title || "";
+  let title = item.title || "";
+  let artist =
+    item.itunes && item.itunes.author ? item.itunes.author : item.author || "";
+  let track =
+    item.itunes && item.itunes.episode
+      ? item.itunes.episode
+      : `${feed.items.length - itemIndex}`;
+  let date = item.pubDate
+    ? dayjs(new Date(item.pubDate)).format("YYYY-MM-DD")
+    : "";
+
+  let metaKeysToVales = {
+    album,
+    artist,
+    title,
+    track,
+    date,
+    album_artist: album,
+  };
+
+  let metadataString = Object.keys(metaKeysToVales)
+    .map((key) =>
+      metaKeysToVales[key]
+        ? `-metadata ${key}="${metaKeysToVales[key].replace(/"/g, '\\"')}"`
+        : null
+    )
+    .filter((segment) => !!segment)
+    .join(" ");
+
+  let tmpMp3Path = `${outputPath}.tmp.mp3`;
+  execSync(
+    `ffmpeg -loglevel quiet -i "${outputPath}" -map_metadata 0 ${metadataString} -codec copy "${tmpMp3Path}"`
+  );
+
+  fs.unlinkSync(outputPath);
+  fs.renameSync(tmpMp3Path, outputPath);
+};
+
 module.exports = {
   download,
   getArchiveKey,
@@ -361,6 +412,7 @@ module.exports = {
   logFeedInfo,
   logItemInfo,
   logItemsList,
+  addMp3Metadata,
   writeFeedMeta,
   writeItemMeta,
 };
