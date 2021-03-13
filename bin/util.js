@@ -374,7 +374,7 @@ let addMp3Metadata = ({ feed, item, itemIndex, outputPath }) => {
     ? dayjs(new Date(item.pubDate)).format("YYYY-MM-DD")
     : "";
 
-  let metaKeysToVales = {
+  let metaKeysToValues = {
     album,
     artist,
     title,
@@ -383,10 +383,10 @@ let addMp3Metadata = ({ feed, item, itemIndex, outputPath }) => {
     album_artist: album,
   };
 
-  let metadataString = Object.keys(metaKeysToVales)
+  let metadataString = Object.keys(metaKeysToValues)
     .map((key) =>
-      metaKeysToVales[key]
-        ? `-metadata ${key}="${metaKeysToVales[key].replace(/"/g, '\\"')}"`
+      metaKeysToValues[key]
+        ? `-metadata ${key}="${metaKeysToValues[key].replace(/"/g, '\\"')}"`
         : null
     )
     .filter((segment) => !!segment)
