@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.2.0](https://github.com/lightpohl/podcast-dl/compare/v4.1.4...v4.2.0) (2021-03-13)
+
+
+### Features
+
+* add --add-mp3-metadata option ([#21](https://github.com/lightpohl/podcast-dl/issues/21)) ([2825a36](https://github.com/lightpohl/podcast-dl/commit/2825a360ffe9ea59d6fbad6fd8b68413731a9e45))
+
 ### [4.1.4](https://github.com/lightpohl/podcast-dl/compare/v4.1.3...v4.1.4) (2021-02-20)
 
 
