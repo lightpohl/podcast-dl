@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.3.0](https://github.com/lightpohl/podcast-dl/compare/v4.2.0...v4.3.0) (2021-04-10)
+
+
+### Features
+
+* add support for LOG_LEVEL env variable ([3a2deb0](https://github.com/lightpohl/podcast-dl/commit/3a2deb05425352d870b0824cddd404751ab0dcbc)), closes [#22](https://github.com/lightpohl/podcast-dl/issues/22)
+
 ## [4.2.0](https://github.com/lightpohl/podcast-dl/compare/v4.1.4...v4.2.0) (2021-03-13)
 
 
