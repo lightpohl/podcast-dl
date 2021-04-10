@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 
-let fs = require("fs");
-let _path = require("path");
-let _url = require("url");
-let commander = require("commander");
+const fs = require("fs");
+const _path = require("path");
+const _url = require("url");
+const commander = require("commander");
 
-let { version } = require("../package.json");
-let {
+const { version } = require("../package.json");
+const {
   download,
   getArchiveKey,
   getEpisodeAudioUrlAndExt,
@@ -21,13 +21,13 @@ let {
   writeItemMeta,
   addMp3Metadata,
 } = require("./util");
-let {
+const {
   createParseNumber,
   logError,
   logErrorAndExit,
   parseArchivePath,
 } = require("./validate");
-let {
+const {
   getFilename,
   getFolderName,
   getArchiveFilename,
@@ -82,8 +82,7 @@ commander
   .option("--list", "print episode info instead of downloading")
   .parse(process.argv);
 
-let {
-  archive,
+const {
   url,
   outDir,
   episodeTemplate,
@@ -100,15 +99,17 @@ let {
   addMp3Metadata: addMp3MetadataFlag,
 } = commander;
 
-let main = async () => {
+let { archive } = commander;
+
+const main = async () => {
   if (!url) {
     logErrorAndExit("No URL provided");
   }
 
-  let { hostname, pathname } = _url.parse(url);
-  let archiveUrl = `${hostname}${pathname}`;
-  let feed = await getFeed(url);
-  let basePath = _path.resolve(
+  const { hostname, pathname } = _url.parse(url);
+  const archiveUrl = `${hostname}${pathname}`;
+  const feed = await getFeed(url);
+  const basePath = _path.resolve(
     process.cwd(),
     getFolderName({ feed, template: outDir })
   );
@@ -139,14 +140,14 @@ let main = async () => {
   }
 
   if (includeMeta) {
-    let podcastImageUrl = getImageUrl(feed);
+    const podcastImageUrl = getImageUrl(feed);
 
     if (podcastImageUrl) {
-      let podcastImageFileExt = getUrlExt(podcastImageUrl);
-      let podcastImageName = `${
+      const podcastImageFileExt = getUrlExt(podcastImageUrl);
+      const podcastImageName = `${
         feed.title ? `${feed.title}.image` : "image"
       }${podcastImageFileExt}`;
-      let outputImagePath = _path.resolve(
+      const outputImagePath = _path.resolve(
         basePath,
         getSafeName(podcastImageName)
       );
@@ -167,8 +168,8 @@ let main = async () => {
       logError("Unable to find podcast image");
     }
 
-    let outputMetaName = `${feed.title ? `${feed.title}.meta` : "meta"}.json`;
-    let outputMetaPath = _path.resolve(basePath, getSafeName(outputMetaName));
+    const outputMetaName = `${feed.title ? `${feed.title}.meta` : "meta"}.json`;
+    const outputMetaPath = _path.resolve(basePath, getSafeName(outputMetaName));
 
     console.log("Saving podcast metadata");
     writeFeedMeta({
@@ -188,32 +189,34 @@ let main = async () => {
     logErrorAndExit("--offset too large. No episodes to download.");
   }
 
-  let { startIndex, numItemsToDownload, limitCheck, next } = getLoopControls({
+  const { startIndex, numItemsToDownload, limitCheck, next } = getLoopControls({
     limit,
     offset,
     reverse,
     length: feed.items.length,
   });
 
-  let episodeText = numItemsToDownload === 1 ? "episode" : "episodes";
+  const episodeText = numItemsToDownload === 1 ? "episode" : "episodes";
 
   console.log(`Starting download of ${numItemsToDownload} ${episodeText}\n`);
 
   let i = startIndex;
   let counter = 1;
-  let nextItem = () => {
+  const nextItem = () => {
     i = next(i);
     counter += 1;
     console.log("");
   };
 
   while (limitCheck(i)) {
-    let item = feed.items[i];
+    const item = feed.items[i];
 
     console.log(`${counter} of ${numItemsToDownload}`);
     logItemInfo(item);
 
-    let generatedEpisodeRegex = episodeRegex ? new RegExp(episodeRegex) : null;
+    const generatedEpisodeRegex = episodeRegex
+      ? new RegExp(episodeRegex)
+      : null;
 
     if (
       generatedEpisodeRegex &&
@@ -224,9 +227,10 @@ let main = async () => {
       continue;
     }
 
-    let { url: episodeAudioUrl, ext: audioFileExt } = getEpisodeAudioUrlAndExt(
-      item
-    );
+    const {
+      url: episodeAudioUrl,
+      ext: audioFileExt,
+    } = getEpisodeAudioUrlAndExt(item);
 
     if (!episodeAudioUrl) {
       logError("Unable to find episode download URL. Skipping");
@@ -234,14 +238,14 @@ let main = async () => {
       continue;
     }
 
-    let episodeFilename = getFilename({
+    const episodeFilename = getFilename({
       item,
       feed,
       url: episodeAudioUrl,
       ext: audioFileExt,
       template: episodeTemplate,
     });
-    let outputPodcastPath = _path.resolve(basePath, episodeFilename);
+    const outputPodcastPath = _path.resolve(basePath, episodeFilename);
 
     try {
       await download({
@@ -277,18 +281,18 @@ let main = async () => {
 
     if (includeEpisodeMeta) {
       if (!ignoreEpisodeImages) {
-        let episodeImageUrl = getImageUrl(item);
+        const episodeImageUrl = getImageUrl(item);
 
         if (episodeImageUrl) {
-          let episodeImageFileExt = getUrlExt(episodeImageUrl);
-          let episodeImageName = getFilename({
+          const episodeImageFileExt = getUrlExt(episodeImageUrl);
+          const episodeImageName = getFilename({
             item,
             feed,
             url: episodeAudioUrl,
             ext: episodeImageFileExt,
             template: episodeTemplate,
           });
-          let outputImagePath = _path.resolve(basePath, episodeImageName);
+          const outputImagePath = _path.resolve(basePath, episodeImageName);
 
           console.log("Saving episode image");
           try {
@@ -314,15 +318,15 @@ let main = async () => {
         }
       }
 
-      let episodeMetaExt = ".meta.json";
-      let episodeMetaName = getFilename({
+      const episodeMetaExt = ".meta.json";
+      const episodeMetaName = getFilename({
         item,
         feed,
         url: episodeAudioUrl,
         ext: episodeMetaExt,
         template: episodeTemplate,
       });
-      let outputEpisodeMetaPath = _path.resolve(basePath, episodeMetaName);
+      const outputEpisodeMetaPath = _path.resolve(basePath, episodeMetaName);
 
       console.log("Saving episode metadata");
       writeItemMeta({

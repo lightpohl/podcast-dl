@@ -1,29 +1,29 @@
-let _url = require("url");
-let rssParser = require("rss-parser");
-let { promisify } = require("util");
-let stream = require("stream");
-let path = require("path");
-let fs = require("fs");
-let got = require("got");
-let dayjs = require("dayjs");
-let { execSync } = require("child_process");
+const _url = require("url");
+const rssParser = require("rss-parser");
+const { promisify } = require("util");
+const stream = require("stream");
+const path = require("path");
+const fs = require("fs");
+const got = require("got");
+const dayjs = require("dayjs");
+const { execSync } = require("child_process");
 
-let { logError, logErrorAndExit } = require("./validate");
+const { logError, logErrorAndExit } = require("./validate");
 
-let pipeline = promisify(stream.pipeline);
-let parser = new rssParser({
+const pipeline = promisify(stream.pipeline);
+const parser = new rssParser({
   defaultRSS: 2.0,
 });
 
-let logFeedInfo = (feed) => {
+const logFeedInfo = (feed) => {
   console.log(`Title: ${feed.title}`);
   console.log(`Description: ${feed.description}`);
   console.log(`Total Episodes: ${feed.items ? feed.items.length : 0}`);
 };
 
-let logItemsList = (items) => {
-  let tableData = items.map((item) => {
-    let { title, pubDate } = item;
+const logItemsList = (items) => {
+  const tableData = items.map((item) => {
+    const { title, pubDate } = item;
 
     return {
       title,
@@ -34,20 +34,20 @@ let logItemsList = (items) => {
   console.table(tableData);
 };
 
-let logItemInfo = (item) => {
-  let { title, pubDate } = item;
+const logItemInfo = (item) => {
+  const { title, pubDate } = item;
 
   console.log(`Title: ${title}`);
   console.log(`Publish Date: ${pubDate}`);
 };
 
-let getArchiveKey = ({ prefix, name }) => {
+const getArchiveKey = ({ prefix, name }) => {
   return `${prefix}-${name}`;
 };
 
-let writeToArchive = ({ key, archive }) => {
+const writeToArchive = ({ key, archive }) => {
   let archiveResult = [];
-  let archivePath = path.resolve(process.cwd(), archive);
+  const archivePath = path.resolve(process.cwd(), archive);
 
   if (fs.existsSync(archivePath)) {
     archiveResult = JSON.parse(fs.readFileSync(archivePath));
@@ -60,28 +60,28 @@ let writeToArchive = ({ key, archive }) => {
   fs.writeFileSync(archivePath, JSON.stringify(archiveResult, null, 4));
 };
 
-let getIsInArchive = ({ key, archive }) => {
-  let archivePath = path.resolve(process.cwd(), archive);
+const getIsInArchive = ({ key, archive }) => {
+  const archivePath = path.resolve(process.cwd(), archive);
 
   if (!fs.existsSync(archivePath)) {
     return false;
   }
 
-  let archiveResult = JSON.parse(fs.readFileSync(archivePath));
+  const archiveResult = JSON.parse(fs.readFileSync(archivePath));
   return archiveResult.includes(key);
 };
 
-let writeFeedMeta = ({ outputPath, feed, key, archive, override }) => {
+const writeFeedMeta = ({ outputPath, feed, key, archive, override }) => {
   if (key && archive && getIsInArchive({ key, archive })) {
     console.log("Feed metadata exists in archive. Skipping write");
     return;
   }
 
-  let title = feed.title || null;
-  let description = feed.description || null;
-  let link = feed.link || null;
-  let feedUrl = feed.feedUrl || null;
-  let managingEditor = feed.managingEditor || null;
+  const title = feed.title || null;
+  const description = feed.description || null;
+  const link = feed.link || null;
+  const feedUrl = feed.feedUrl || null;
+  const managingEditor = feed.managingEditor || null;
 
   try {
     if (override || !fs.existsSync(outputPath)) {
@@ -111,16 +111,16 @@ let writeFeedMeta = ({ outputPath, feed, key, archive, override }) => {
   }
 };
 
-let writeItemMeta = ({ outputPath, item, key, archive, override }) => {
+const writeItemMeta = ({ outputPath, item, key, archive, override }) => {
   if (key && archive && getIsInArchive({ key, archive })) {
     console.log("Episode metadata exists in archive. Skipping write");
     return;
   }
 
-  let title = item.title || null;
-  let descriptionText = item.contentSnippet || null;
-  let pubDate = item.pubDate || null;
-  let creator = item.creator || null;
+  const title = item.title || null;
+  const descriptionText = item.contentSnippet || null;
+  const pubDate = item.pubDate || null;
+  const creator = item.creator || null;
 
   try {
     if (override || !fs.existsSync(outputPath)) {
@@ -149,13 +149,13 @@ let writeItemMeta = ({ outputPath, item, key, archive, override }) => {
   }
 };
 
-let getUrlExt = (url) => {
-  let { pathname } = _url.parse(url);
-  let ext = path.extname(pathname);
+const getUrlExt = (url) => {
+  const { pathname } = _url.parse(url);
+  const ext = path.extname(pathname);
   return ext;
 };
 
-let AUDIO_TYPES_TO_EXTS = {
+const AUDIO_TYPES_TO_EXTS = {
   "audio/mpeg": ".mp3",
   "audio/mp3": ".mp3",
   "audio/flac": ".flac",
@@ -167,14 +167,14 @@ let AUDIO_TYPES_TO_EXTS = {
   "audio/aac": ".aac",
 };
 
-let VALID_AUDIO_EXTS = [...new Set(Object.values(AUDIO_TYPES_TO_EXTS))];
+const VALID_AUDIO_EXTS = [...new Set(Object.values(AUDIO_TYPES_TO_EXTS))];
 
-let getIsAudioUrl = (url) => {
-  let ext = getUrlExt(url);
+const getIsAudioUrl = (url) => {
+  const ext = getUrlExt(url);
   return VALID_AUDIO_EXTS.includes(ext);
 };
 
-let getEpisodeAudioUrlAndExt = ({ enclosure, link }) => {
+const getEpisodeAudioUrlAndExt = ({ enclosure, link }) => {
   if (link && getIsAudioUrl(link)) {
     return { url: link, ext: getUrlExt(link) };
   }
@@ -190,7 +190,7 @@ let getEpisodeAudioUrlAndExt = ({ enclosure, link }) => {
   return { url: null, ext: null };
 };
 
-let getImageUrl = ({ image, itunes }) => {
+const getImageUrl = ({ image, itunes }) => {
   if (image && image.url) {
     return image.url;
   }
@@ -206,8 +206,8 @@ let getImageUrl = ({ image, itunes }) => {
   return null;
 };
 
-let BYTES_IN_MB = 1000000;
-let printProgress = ({ percent, total, transferred }) => {
+const BYTES_IN_MB = 1000000;
+const printProgress = ({ percent, total, transferred }) => {
   if (!process.stdout.isTTY) {
     /*
       Non-TTY environments do not have access to `stdout.clearLine` and
@@ -217,7 +217,7 @@ let printProgress = ({ percent, total, transferred }) => {
   }
 
   let line = "downloading...";
-  let percentRounded = (percent * 100).toFixed(2);
+  const percentRounded = (percent * 100).toFixed(2);
 
   if (transferred > 0) {
     /*
@@ -227,8 +227,8 @@ let printProgress = ({ percent, total, transferred }) => {
     line += ` ${percentRounded}%`;
 
     if (total) {
-      let totalMBs = total / BYTES_IN_MB;
-      let roundedTotalMbs = totalMBs.toFixed(2);
+      const totalMBs = total / BYTES_IN_MB;
+      const roundedTotalMbs = totalMBs.toFixed(2);
       line += ` of ${roundedTotalMbs} MB`;
     }
   }
@@ -238,11 +238,11 @@ let printProgress = ({ percent, total, transferred }) => {
   process.stdout.write(line);
 };
 
-let endPrintProgress = () => {
+const endPrintProgress = () => {
   process.stdout.write("\n");
 };
 
-let download = async ({ url, outputPath, key, archive, override }) => {
+const download = async ({ url, outputPath, key, archive, override }) => {
   if (key && archive && getIsInArchive({ key, archive })) {
     console.log("Download exists in archive. Skipping");
     return;
@@ -253,7 +253,7 @@ let download = async ({ url, outputPath, key, archive, override }) => {
     return;
   }
 
-  let headResponse = await got(url, {
+  const headResponse = await got(url, {
     timeout: 5000,
     method: "HEAD",
     responseType: "json",
@@ -262,7 +262,7 @@ let download = async ({ url, outputPath, key, archive, override }) => {
     },
   });
 
-  let removeFile = () => {
+  const removeFile = () => {
     if (fs.existsSync(outputPath)) {
       fs.unlinkSync(outputPath);
     }
@@ -285,8 +285,8 @@ let download = async ({ url, outputPath, key, archive, override }) => {
     throw error;
   }
 
-  let fileSize = fs.statSync(outputPath).size;
-  let expectedSize =
+  const fileSize = fs.statSync(outputPath).size;
+  const expectedSize =
     headResponse &&
     headResponse.headers &&
     headResponse.headers["content-length"]
@@ -309,13 +309,13 @@ let download = async ({ url, outputPath, key, archive, override }) => {
   }
 };
 
-let getLoopControls = ({ limit, offset, length, reverse }) => {
+const getLoopControls = ({ limit, offset, length, reverse }) => {
   if (reverse) {
-    let startIndex = length - 1 - offset;
-    let min = limit ? Math.max(startIndex - limit, -1) : -1;
-    let numItemsToDownload = min > -1 ? startIndex - min : startIndex + 1;
-    let limitCheck = (i) => i > min;
-    let decrement = (i) => i - 1;
+    const startIndex = length - 1 - offset;
+    const min = limit ? Math.max(startIndex - limit, -1) : -1;
+    const numItemsToDownload = min > -1 ? startIndex - min : startIndex + 1;
+    const limitCheck = (i) => i > min;
+    const decrement = (i) => i - 1;
 
     return {
       startIndex,
@@ -325,11 +325,11 @@ let getLoopControls = ({ limit, offset, length, reverse }) => {
     };
   }
 
-  let startIndex = 0 + offset;
-  let max = limit ? Math.min(startIndex + limit, length) : length;
-  let numItemsToDownload = max - startIndex;
-  let limitCheck = (i) => i < max;
-  let increment = (i) => i + 1;
+  const startIndex = 0 + offset;
+  const max = limit ? Math.min(startIndex + limit, length) : length;
+  const numItemsToDownload = max - startIndex;
+  const limitCheck = (i) => i < max;
+  const increment = (i) => i + 1;
 
   return {
     startIndex,
@@ -339,8 +339,8 @@ let getLoopControls = ({ limit, offset, length, reverse }) => {
   };
 };
 
-let getFeed = async (url) => {
-  let { href } = _url.parse(url);
+const getFeed = async (url) => {
+  const { href } = _url.parse(url);
 
   let feed;
   try {
@@ -352,7 +352,7 @@ let getFeed = async (url) => {
   return feed;
 };
 
-let addMp3Metadata = ({ feed, item, itemIndex, outputPath }) => {
+const addMp3Metadata = ({ feed, item, itemIndex, outputPath }) => {
   if (!fs.existsSync(outputPath)) {
     return;
   }
@@ -362,19 +362,19 @@ let addMp3Metadata = ({ feed, item, itemIndex, outputPath }) => {
     return;
   }
 
-  let album = feed.title || "";
-  let title = item.title || "";
-  let artist =
+  const album = feed.title || "";
+  const title = item.title || "";
+  const artist =
     item.itunes && item.itunes.author ? item.itunes.author : item.author || "";
-  let track =
+  const track =
     item.itunes && item.itunes.episode
       ? item.itunes.episode
       : `${feed.items.length - itemIndex}`;
-  let date = item.pubDate
+  const date = item.pubDate
     ? dayjs(new Date(item.pubDate)).format("YYYY-MM-DD")
     : "";
 
-  let metaKeysToValues = {
+  const metaKeysToValues = {
     album,
     artist,
     title,
@@ -383,7 +383,7 @@ let addMp3Metadata = ({ feed, item, itemIndex, outputPath }) => {
     album_artist: album,
   };
 
-  let metadataString = Object.keys(metaKeysToValues)
+  const metadataString = Object.keys(metaKeysToValues)
     .map((key) =>
       metaKeysToValues[key]
         ? `-metadata ${key}="${metaKeysToValues[key].replace(/"/g, '\\"')}"`
@@ -392,7 +392,7 @@ let addMp3Metadata = ({ feed, item, itemIndex, outputPath }) => {
     .filter((segment) => !!segment)
     .join(" ");
 
-  let tmpMp3Path = `${outputPath}.tmp.mp3`;
+  const tmpMp3Path = `${outputPath}.tmp.mp3`;
   execSync(
     `ffmpeg -loglevel quiet -i "${outputPath}" -map_metadata 0 ${metadataString} -codec copy "${tmpMp3Path}"`
   );

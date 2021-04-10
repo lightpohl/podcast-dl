@@ -1,22 +1,22 @@
-let filenamify = require("filenamify");
-let dayjs = require("dayjs");
+const filenamify = require("filenamify");
+const dayjs = require("dayjs");
 
-let INVALID_CHAR_REPLACE = "_";
-let MAX_LENGTH_FILENAME = 255;
+const INVALID_CHAR_REPLACE = "_";
+const MAX_LENGTH_FILENAME = 255;
 
-let getSafeName = (name) => {
+const getSafeName = (name) => {
   return filenamify(name, {
     replacement: INVALID_CHAR_REPLACE,
     maxLength: MAX_LENGTH_FILENAME,
   });
 };
 
-let getFilename = ({ item, ext, url, feed, template }) => {
-  let formattedPubDate = item.pubDate
+const getFilename = ({ item, ext, url, feed, template }) => {
+  const formattedPubDate = item.pubDate
     ? dayjs(new Date(item.pubDate)).format("YYYYMMDD")
     : null;
 
-  let templateReplacementsTuples = [
+  const templateReplacementsTuples = [
     ["title", item.title || ""],
     ["release_date", formattedPubDate || ""],
     ["url", url],
@@ -27,8 +27,8 @@ let getFilename = ({ item, ext, url, feed, template }) => {
 
   let name = template;
   templateReplacementsTuples.forEach((replacementTuple) => {
-    let [matcher, replacement] = replacementTuple;
-    let replaceRegex = new RegExp(`{{${matcher}}}`, "g");
+    const [matcher, replacement] = replacementTuple;
+    const replaceRegex = new RegExp(`{{${matcher}}}`, "g");
 
     name = replacement
       ? name.replace(replaceRegex, replacement)
@@ -39,16 +39,16 @@ let getFilename = ({ item, ext, url, feed, template }) => {
   return getSafeName(name);
 };
 
-let getFolderName = ({ feed, template }) => {
-  let templateReplacementsTuples = [
+const getFolderName = ({ feed, template }) => {
+  const templateReplacementsTuples = [
     ["podcast_title", feed.title ? getSafeName(feed.title) : ""],
     ["podcast_link", feed.link ? getSafeName(feed.link) : ""],
   ];
 
   let name = template;
   templateReplacementsTuples.forEach((replacementTuple) => {
-    let [matcher, replacement] = replacementTuple;
-    let replaceRegex = new RegExp(`{{${matcher}}}`, "g");
+    const [matcher, replacement] = replacementTuple;
+    const replaceRegex = new RegExp(`{{${matcher}}}`, "g");
 
     name = replacement
       ? name.replace(replaceRegex, replacement)
@@ -58,12 +58,12 @@ let getFolderName = ({ feed, template }) => {
   return name;
 };
 
-let getArchiveFilename = ({ pubDate, name, ext }) => {
-  let formattedPubDate = pubDate
+const getArchiveFilename = ({ pubDate, name, ext }) => {
+  const formattedPubDate = pubDate
     ? dayjs(new Date(pubDate)).format("YYYYMMDD")
     : null;
 
-  let baseName = formattedPubDate ? `${formattedPubDate}-${name}` : name;
+  const baseName = formattedPubDate ? `${formattedPubDate}-${name}` : name;
   return getSafeName(`${baseName}${ext}`);
 };
 
