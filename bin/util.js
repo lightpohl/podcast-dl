@@ -8,7 +8,13 @@ const got = require("got");
 const dayjs = require("dayjs");
 const { execSync } = require("child_process");
 
-const { logError, logErrorAndExit } = require("./validate");
+const {
+  getShouldOutputProgressIndicator,
+  logMessage,
+  logError,
+  logErrorAndExit,
+  LOG_LEVELS,
+} = require("./logger");
 
 const pipeline = promisify(stream.pipeline);
 const parser = new rssParser({
@@ -34,11 +40,11 @@ const logItemsList = (items) => {
   console.table(tableData);
 };
 
-const logItemInfo = (item) => {
+const logItemInfo = (item, logLevel) => {
   const { title, pubDate } = item;
 
-  console.log(`Title: ${title}`);
-  console.log(`Publish Date: ${pubDate}`);
+  logMessage(`Title: ${title}`, logLevel);
+  logMessage(`Publish Date: ${pubDate}`, logLevel);
 };
 
 const getArchiveKey = ({ prefix, name }) => {
@@ -73,7 +79,7 @@ const getIsInArchive = ({ key, archive }) => {
 
 const writeFeedMeta = ({ outputPath, feed, key, archive, override }) => {
   if (key && archive && getIsInArchive({ key, archive })) {
-    console.log("Feed metadata exists in archive. Skipping write");
+    logMessage("Feed metadata exists in archive. Skipping write");
     return;
   }
 
@@ -100,7 +106,7 @@ const writeFeedMeta = ({ outputPath, feed, key, archive, override }) => {
         )
       );
     } else {
-      console.log("Feed metadata exists locally. Skipping write");
+      logMessage("Feed metadata exists locally. Skipping write");
     }
 
     if (key && archive && !getIsInArchive({ key, archive })) {
@@ -113,7 +119,7 @@ const writeFeedMeta = ({ outputPath, feed, key, archive, override }) => {
 
 const writeItemMeta = ({ outputPath, item, key, archive, override }) => {
   if (key && archive && getIsInArchive({ key, archive })) {
-    console.log("Episode metadata exists in archive. Skipping write");
+    logMessage("Episode metadata exists in archive. Skipping write");
     return;
   }
 
@@ -138,7 +144,7 @@ const writeItemMeta = ({ outputPath, item, key, archive, override }) => {
         )
       );
     } else {
-      console.log("Episode metadata exists locally. Skipping write");
+      logMessage("Episode metadata exists locally. Skipping write");
     }
 
     if (key && archive && !getIsInArchive({ key, archive })) {
@@ -208,7 +214,7 @@ const getImageUrl = ({ image, itunes }) => {
 
 const BYTES_IN_MB = 1000000;
 const printProgress = ({ percent, total, transferred }) => {
-  if (!process.stdout.isTTY) {
+  if (!getShouldOutputProgressIndicator()) {
     /*
       Non-TTY environments do not have access to `stdout.clearLine` and
       `stdout.cursorTo`. Skip download progress logging in these environments.
@@ -238,19 +244,27 @@ const printProgress = ({ percent, total, transferred }) => {
   process.stdout.write(line);
 };
 
-const endPrintProgress = () => {
-  process.stdout.write("\n");
-};
-
-const download = async ({ url, outputPath, key, archive, override }) => {
+const download = async ({
+  url,
+  outputPath,
+  key,
+  archive,
+  override,
+  onBeforeDownload,
+  onAfterDownload,
+}) => {
   if (key && archive && getIsInArchive({ key, archive })) {
-    console.log("Download exists in archive. Skipping");
+    logMessage("Download exists in archive. Skipping");
     return;
   }
 
   if (!override && fs.existsSync(outputPath)) {
-    console.log("Download exists locally. Skipping");
+    logMessage("Download exists locally. Skipping");
     return;
+  }
+
+  if (onBeforeDownload) {
+    onBeforeDownload();
   }
 
   const headResponse = await got(url, {
@@ -270,19 +284,18 @@ const download = async ({ url, outputPath, key, archive, override }) => {
 
   try {
     await pipeline(
-      got
-        .stream(url)
-        .on("downloadProgress", (progress) => {
-          printProgress(progress);
-        })
-        .on("end", () => {
-          endPrintProgress();
-        }),
+      got.stream(url).on("downloadProgress", (progress) => {
+        printProgress(progress);
+      }),
       fs.createWriteStream(outputPath)
     );
   } catch (error) {
     removeFile();
     throw error;
+  }
+
+  if (onAfterDownload) {
+    onAfterDownload();
   }
 
   const fileSize = fs.statSync(outputPath).size;
@@ -299,9 +312,11 @@ const download = async ({ url, outputPath, key, archive, override }) => {
   }
 
   if (expectedSize && !isNaN(expectedSize) && expectedSize !== fileSize) {
-    logError(
-      "File size differs from expected content length. Suggestion: verify file works as expected"
+    logMessage(
+      "File size differs from expected content length. Suggestion: verify file works as expected",
+      LOG_LEVELS.important
     );
+    logMessage(outputPath, LOG_LEVELS.important);
   }
 
   if (key && archive && !getIsInArchive({ key, archive })) {
@@ -358,7 +373,7 @@ const addMp3Metadata = ({ feed, item, itemIndex, outputPath }) => {
   }
 
   if (!outputPath.endsWith(".mp3")) {
-    console.log("Not an .mp3 file. Unable to add metadata.");
+    logError("Not an .mp3 file. Unable to add metadata.");
     return;
   }
 

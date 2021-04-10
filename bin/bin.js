@@ -21,12 +21,13 @@ const {
   writeItemMeta,
   addMp3Metadata,
 } = require("./util");
+const { createParseNumber, parseArchivePath } = require("./validate");
 const {
-  createParseNumber,
+  LOG_LEVELS,
+  logMessage,
   logError,
   logErrorAndExit,
-  parseArchivePath,
-} = require("./validate");
+} = require("./logger");
 const {
   getFilename,
   getFolderName,
@@ -115,7 +116,7 @@ const main = async () => {
   );
 
   if (!fs.existsSync(basePath)) {
-    console.log(`${basePath} does not exist. Creating...`);
+    logMessage(`${basePath} does not exist. Creating...`, LOG_LEVELS.important);
     fs.mkdirSync(basePath, { recursive: true });
   }
 
@@ -153,7 +154,7 @@ const main = async () => {
       );
 
       try {
-        console.log("Saving podcast image");
+        logMessage("Saving podcast image");
         await download({
           archive,
           override,
@@ -165,13 +166,13 @@ const main = async () => {
         logError("Unable to download episode image", error);
       }
     } else {
-      logError("Unable to find podcast image");
+      logMessage("Unable to find podcast image");
     }
 
     const outputMetaName = `${feed.title ? `${feed.title}.meta` : "meta"}.json`;
     const outputMetaPath = _path.resolve(basePath, getSafeName(outputMetaName));
 
-    console.log("Saving podcast metadata");
+    logMessage("Saving podcast metadata");
     writeFeedMeta({
       archive,
       override,
@@ -198,21 +199,20 @@ const main = async () => {
 
   const episodeText = numItemsToDownload === 1 ? "episode" : "episodes";
 
-  console.log(`Starting download of ${numItemsToDownload} ${episodeText}\n`);
+  logMessage(`Starting download of ${numItemsToDownload} ${episodeText}\n`);
 
   let i = startIndex;
   let counter = 1;
   const nextItem = () => {
     i = next(i);
     counter += 1;
-    console.log("");
+    logMessage("");
   };
 
   while (limitCheck(i)) {
     const item = feed.items[i];
 
-    console.log(`${counter} of ${numItemsToDownload}`);
-    logItemInfo(item);
+    logMessage(`${counter} of ${numItemsToDownload}`);
 
     const generatedEpisodeRegex = episodeRegex
       ? new RegExp(episodeRegex)
@@ -222,7 +222,8 @@ const main = async () => {
       generatedEpisodeRegex &&
       (!item.title || !generatedEpisodeRegex.test(item.title))
     ) {
-      console.log("Episode title does not match provided regex. Skipping");
+      logItemInfo(item);
+      logMessage("Episode title does not match provided regex. Skipping");
       nextItem();
       continue;
     }
@@ -233,6 +234,7 @@ const main = async () => {
     } = getEpisodeAudioUrlAndExt(item);
 
     if (!episodeAudioUrl) {
+      logItemInfo(item, LOG_LEVELS.critical);
       logError("Unable to find episode download URL. Skipping");
       nextItem();
       continue;
@@ -261,6 +263,12 @@ const main = async () => {
         }),
         outputPath: outputPodcastPath,
         url: episodeAudioUrl,
+        onBeforeDownload: () => {
+          logItemInfo(item, LOG_LEVELS.important);
+        },
+        onAfterDownload: () => {
+          logMessage("", LOG_LEVELS.important);
+        },
       });
     } catch (error) {
       logError("Unable to download episode", error);
@@ -294,7 +302,7 @@ const main = async () => {
           });
           const outputImagePath = _path.resolve(basePath, episodeImageName);
 
-          console.log("Saving episode image");
+          logMessage("Saving episode image");
           try {
             await download({
               archive,
@@ -314,7 +322,7 @@ const main = async () => {
             logError("Unable to download episode image", error);
           }
         } else {
-          logError("Unable to find episode image URL");
+          logMessage("Unable to find episode image URL");
         }
       }
 
@@ -328,7 +336,7 @@ const main = async () => {
       });
       const outputEpisodeMetaPath = _path.resolve(basePath, episodeMetaName);
 
-      console.log("Saving episode metadata");
+      logMessage("Saving episode metadata");
       writeItemMeta({
         archive,
         override,

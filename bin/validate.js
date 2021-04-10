@@ -1,15 +1,4 @@
-const logError = (msg, error) => {
-  console.error(msg);
-
-  if (error) {
-    console.error(error.message);
-  }
-};
-
-const logErrorAndExit = (msg, error) => {
-  logError(msg, error);
-  process.exit(1);
-};
+const { logErrorAndExit } = require("./logger");
 
 const createParseNumber = ({ min, name, required = true }) => {
   return (value) => {
@@ -45,7 +34,5 @@ const parseArchivePath = (value) => {
 
 module.exports = {
   createParseNumber,
-  logError,
-  logErrorAndExit,
   parseArchivePath,
 };

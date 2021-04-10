@@ -70,3 +70,10 @@ Options that support templating allow users to specify a template for the genera
 - `duration`: Provided `mm:ss` duration (if found).
 - `podcast_title`: Title of the podcast feed.
 - `podcast_link`: `link` value provided for the podcast feed. Typically the homepage URL.
+
+## Log Levels
+
+By default, all logs and errors are outputted to the console. The amount of logs can be controlled using the environment variable `LOG_LEVEL` with the following options:
+
+- `quiet`: Only important info and non-critical errors will be logged (e.g. episode download started).
+- `silent`: Only critical error messages will be be logged.
