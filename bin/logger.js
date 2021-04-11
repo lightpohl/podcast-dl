@@ -51,7 +51,12 @@ const logError = (msg, error) => {
 };
 
 const logErrorAndExit = (msg, error) => {
-  logError(msg, error);
+  console.error(msg);
+
+  if (error) {
+    console.error(error.message);
+  }
+
   process.exit(1);
 };
 
