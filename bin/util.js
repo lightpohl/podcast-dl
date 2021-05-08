@@ -291,6 +291,11 @@ const download = async ({
     );
   } catch (error) {
     removeFile();
+
+    if (getShouldOutputProgressIndicator()) {
+      console.log();
+    }
+
     throw error;
   }
 
