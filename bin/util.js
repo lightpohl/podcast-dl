@@ -157,6 +157,11 @@ const writeItemMeta = ({ outputPath, item, key, archive, override }) => {
 
 const getUrlExt = (url) => {
   const { pathname } = _url.parse(url);
+
+  if (!pathname) {
+    return "";
+  }
+
   const ext = path.extname(pathname);
   return ext;
 };
@@ -177,6 +182,11 @@ const VALID_AUDIO_EXTS = [...new Set(Object.values(AUDIO_TYPES_TO_EXTS))];
 
 const getIsAudioUrl = (url) => {
   const ext = getUrlExt(url);
+
+  if (!ext) {
+    return false;
+  }
+
   return VALID_AUDIO_EXTS.includes(ext);
 };
 
