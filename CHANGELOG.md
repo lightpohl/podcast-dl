@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.3.1](https://github.com/lightpohl/podcast-dl/compare/v4.3.0...v4.3.1) (2021-05-09)
+
+
+### Bug Fixes
+
+* always log error messages that trigger an exit ([e856f3c](https://github.com/lightpohl/podcast-dl/commit/e856f3c7fca1afb9c7d4e49fdcd30a84181f1ea7))
+* gracefully handle feed items missing audio extensions ([b0a03de](https://github.com/lightpohl/podcast-dl/commit/b0a03ded86b2d87e64edd29fc2e51d64cb5597a7)), closes [#24](https://github.com/lightpohl/podcast-dl/issues/24)
+* missing newline when download exits on error ([2672676](https://github.com/lightpohl/podcast-dl/commit/267267667414ec17300ca2db07f148010f4be1f1))
+
 ## [4.3.0](https://github.com/lightpohl/podcast-dl/compare/v4.2.0...v4.3.0) (2021-04-10)
 
 
