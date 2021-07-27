@@ -76,7 +76,8 @@ Options that support templating allow users to specify a template for the genera
 
 Option to execute command after downloading episode with `{}` being a placeholder for the downloaded episode and `{filenameBase}` for the filename without extension.
 
-Example to convert all episodes to mp3 with 192k: `ffmpeg -i {} -b:a 192k -f mp3 {filenameBase}.mp3`
+- Example to convert all episodes to mp3 with 192k: `ffmpeg -i {} -b:a 192k -f mp3 {filenameBase}.mp3`
+- Example to move all episodes to folder: `mv {} /mnt/media_server/`
 
 ## Log Levels
 
