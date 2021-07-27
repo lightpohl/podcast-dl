@@ -41,6 +41,7 @@
 | --reverse               |        | false    | Reverse download direction and start at last RSS item.                                                                                                        |
 | --info                  |        | false    | Print retrieved podcast info instead of downloading.                                                                                                          |
 | --list                  |        | false    | Print episode list instead of downloading.                                                                                                                    |
+| --exec                  | String | false    | Execute a command after files are downloaded.                                                                                                                 |
 | --version               |        | false    | Output the version number.                                                                                                                                    |
 | --help                  |        | false    | Output usage information.                                                                                                                                     |
 
@@ -70,6 +71,12 @@ Options that support templating allow users to specify a template for the genera
 - `duration`: Provided `mm:ss` duration (if found).
 - `podcast_title`: Title of the podcast feed.
 - `podcast_link`: `link` value provided for the podcast feed. Typically the homepage URL.
+
+## Executing process after downloading episode
+
+Option to execute command after downloading episode with `{}` being a placeholder for the downloaded episode and `{filenameBase}` for the filename without extension.
+
+Example to convert all episodes to mp3 with 192k: `ffmpeg -i {} -b:a 192k -f mp3 {filenameBase}.mp3`
 
 ## Log Levels
 

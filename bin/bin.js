@@ -4,6 +4,7 @@ const fs = require("fs");
 const _path = require("path");
 const _url = require("url");
 const commander = require("commander");
+const child = require("child_process");
 
 const { version } = require("../package.json");
 const {
@@ -81,6 +82,8 @@ commander
   .option("--reverse", "download episodes in reverse order")
   .option("--info", "print retrieved podcast info instead of downloading")
   .option("--list", "print episode info instead of downloading")
+  .option("--exec <string>", "Execute a command after files are downloaded.")
+
   .parse(process.argv);
 
 const {
@@ -97,6 +100,7 @@ const {
   reverse,
   info,
   list,
+  exec,
   addMp3Metadata: addMp3MetadataFlag,
 } = commander;
 
@@ -228,10 +232,8 @@ const main = async () => {
       continue;
     }
 
-    const {
-      url: episodeAudioUrl,
-      ext: audioFileExt,
-    } = getEpisodeAudioUrlAndExt(item);
+    const { url: episodeAudioUrl, ext: audioFileExt } =
+      getEpisodeAudioUrlAndExt(item);
 
     if (!episodeAudioUrl) {
       logItemInfo(item, LOG_LEVELS.critical);
@@ -285,6 +287,20 @@ const main = async () => {
       } catch (error) {
         logError("Unable to add episode metadata", error);
       }
+    }
+
+    if (exec) {
+      const execCmd = exec
+        .replace("{}", outputPodcastPath)
+        .replace(
+          "{filenameBase}",
+          episodeFilename.substring(0, episodeFilename.lastIndexOf("."))
+        );
+      child.exec(execCmd).on("exit", (code) => {
+        if (code != 0) {
+          logError("--exec process error: ", code.toString());
+        }
+      });
     }
 
     if (includeEpisodeMeta) {
