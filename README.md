@@ -41,6 +41,7 @@
 | --reverse               |        | false    | Reverse download direction and start at last RSS item.                                                                                                        |
 | --info                  |        | false    | Print retrieved podcast info instead of downloading.                                                                                                          |
 | --list                  |        | false    | Print episode list instead of downloading.                                                                                                                    |
+| --exit-with-error       |        | false    | When episode could not be downloaded exit with error code 1                                                                                                   |
 | --version               |        | false    | Output the version number.                                                                                                                                    |
 | --help                  |        | false    | Output usage information.                                                                                                                                     |
 
