@@ -81,10 +81,7 @@ commander
   .option("--reverse", "download episodes in reverse order")
   .option("--info", "print retrieved podcast info instead of downloading")
   .option("--list", "print episode info instead of downloading")
-  .option(
-    "--exit-with-error",
-    "When episode could not be downloaded exit with error code 1"
-  )
+  .option("--exit-with-error", "When episode could not be downloaded exit with error code 1")
   .parse(process.argv);
 
 const {
