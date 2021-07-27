@@ -291,10 +291,12 @@ const main = async () => {
 
     if (exec) {
       const execCmd = exec
-        .replace("{}", outputPodcastPath)
+        .replace("{}", _path.resolve(outputPodcastPath))
         .replace(
           "{filenameBase}",
-          episodeFilename.substring(0, episodeFilename.lastIndexOf("."))
+          _path.resolve(
+            episodeFilename.substring(0, episodeFilename.lastIndexOf("."))
+          )
         );
       child.exec(execCmd).on("exit", (code) => {
         if (code != 0) {
