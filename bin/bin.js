@@ -81,6 +81,10 @@ commander
   .option("--reverse", "download episodes in reverse order")
   .option("--info", "print retrieved podcast info instead of downloading")
   .option("--list", "print episode info instead of downloading")
+  .option(
+    "--exit-with-error",
+    "When episode could not be downloaded exit with error code 1"
+  )
   .parse(process.argv);
 
 const {
@@ -97,6 +101,7 @@ const {
   reverse,
   info,
   list,
+  exitWithError,
   addMp3Metadata: addMp3MetadataFlag,
 } = commander;
 
@@ -228,10 +233,8 @@ const main = async () => {
       continue;
     }
 
-    const {
-      url: episodeAudioUrl,
-      ext: audioFileExt,
-    } = getEpisodeAudioUrlAndExt(item);
+    const { url: episodeAudioUrl, ext: audioFileExt } =
+      getEpisodeAudioUrlAndExt(item);
 
     if (!episodeAudioUrl) {
       logItemInfo(item, LOG_LEVELS.critical);
@@ -271,7 +274,11 @@ const main = async () => {
         },
       });
     } catch (error) {
-      logError("Unable to download episode", error);
+      if (exitWithError) {
+        logErrorAndExit("Unable to download episode", error);
+      } else {
+        logError("Unable to download episode", error);
+      }
     }
 
     if (addMp3MetadataFlag) {
