@@ -300,7 +300,7 @@ const main = async () => {
         );
       child.exec(execCmd).on("exit", (code) => {
         if (code != 0) {
-          logError("--exec process error: ", code.toString());
+          logError(`--exec process error: exit code ${code}`);
         }
       });
     }
