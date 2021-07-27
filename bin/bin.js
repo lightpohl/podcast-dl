@@ -208,6 +208,7 @@ const main = async () => {
     counter += 1;
     logMessage("");
   };
+  let dlCounter = 0;
 
   while (limitCheck(i)) {
     const item = feed.items[i];
@@ -268,6 +269,7 @@ const main = async () => {
         },
         onAfterDownload: () => {
           logMessage("", LOG_LEVELS.important);
+          dlCounter += 1;
         },
       });
     } catch (error) {
@@ -355,6 +357,10 @@ const main = async () => {
 
     nextItem();
   }
+  const dlEpisodeText = dlCounter === 1 ? "episode" : "episodes";
+  dlCounter == 0
+    ? logErrorAndExit("No episode downloaded")
+    : logMessage(`${dlCounter} ${dlEpisodeText} downloaded.`);
 };
 
 main();
