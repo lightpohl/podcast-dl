@@ -82,7 +82,7 @@ commander
   .option("--reverse", "download episodes in reverse order")
   .option("--info", "print retrieved podcast info instead of downloading")
   .option("--list", "print episode info instead of downloading")
-  .option("--exec <string>", "Execute a command after files are downloaded.")
+  .option("--exec <string>", "Execute a command after each episode is downloaded")
 
   .parse(process.argv);
 
