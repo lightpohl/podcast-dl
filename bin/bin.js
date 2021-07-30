@@ -299,8 +299,8 @@ const main = async () => {
         episodeFilename.lastIndexOf(".")
       );
       const execCmd = exec
-        .replace("{}", `"${outputPodcastPath}"`)
-        .replace("{filenameBase}", `"${filenameBase}"`);
+        .replace(/{}/g, `"${outputPodcastPath}"`)
+        .replace(/{filenameBase}/g, `"${filenameBase}"`);
       try {
         child.execSync(execCmd, { stdio: "ignore" });
       } catch (error) {
