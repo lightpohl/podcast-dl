@@ -41,7 +41,7 @@
 | --reverse               |        | false    | Reverse download direction and start at last RSS item.                                                                                                        |
 | --info                  |        | false    | Print retrieved podcast info instead of downloading.                                                                                                          |
 | --list                  |        | false    | Print episode list instead of downloading.                                                                                                                    |
-| --exec                  | String | false    | Execute a command after files are downloaded.                                                                                                                 |
+| --exec                  | String | false    | Execute a command after each episode is downloaded                                                                                                                 |
 | --version               |        | false    | Output the version number.                                                                                                                                    |
 | --help                  |        | false    | Output usage information.                                                                                                                                     |
 
