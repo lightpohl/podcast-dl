@@ -255,8 +255,9 @@ const main = async () => {
     });
     const outputPodcastPath = _path.resolve(basePath, episodeFilename);
 
+    let downloadStatus;
     try {
-      await download({
+      downloadStatus = await download({
         archive,
         override,
         key: getArchiveKey({
@@ -278,6 +279,7 @@ const main = async () => {
       });
     } catch (error) {
       logError("Unable to download episode", error);
+      downloadStatus = "notDownloaded";
     }
 
     if (addMp3MetadataFlag) {
@@ -293,7 +295,7 @@ const main = async () => {
       }
     }
 
-    if (exec) {
+    if (exec && downloadStatus === "downloaded") {
       const filenameBase = episodeFilename.substring(
         0,
         episodeFilename.lastIndexOf(".")

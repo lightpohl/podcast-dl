@@ -265,12 +265,12 @@ const download = async ({
 }) => {
   if (key && archive && getIsInArchive({ key, archive })) {
     logMessage("Download exists in archive. Skipping");
-    return;
+    return "skipped";
   }
 
   if (!override && fs.existsSync(outputPath)) {
     logMessage("Download exists locally. Skipping");
-    return;
+    return "skipped";
   }
 
   if (onBeforeDownload) {
@@ -336,6 +336,7 @@ const download = async ({
 
   if (key && archive && !getIsInArchive({ key, archive })) {
     writeToArchive({ key, archive });
+    return "downloaded";
   }
 };
 
