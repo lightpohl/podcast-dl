@@ -290,19 +290,18 @@ const main = async () => {
     }
 
     if (exec) {
+      const filenameBase = episodeFilename.substring(
+        0,
+        episodeFilename.lastIndexOf(".")
+      );
       const execCmd = exec
-        .replace("{}", _path.resolve(outputPodcastPath))
-        .replace(
-          "{filenameBase}",
-          _path.resolve(
-            episodeFilename.substring(0, episodeFilename.lastIndexOf("."))
-          )
-        );
-      child.exec(execCmd).on("exit", (code) => {
-        if (code != 0) {
-          logError(`--exec process error: exit code ${code}`);
-        }
-      });
+        .replace("{}", `"${outputPodcastPath}"`)
+        .replace("{filenameBase}", `"${filenameBase}"`);
+      try {
+        child.execSync(execCmd, { stdio: "ignore" });
+      } catch (error) {
+        logError(`--exec process error: exit code ${error.status}`, error);
+      }
     }
 
     if (includeEpisodeMeta) {
