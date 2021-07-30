@@ -208,7 +208,7 @@ const main = async () => {
     counter += 1;
     logMessage("");
   };
-  let dlCounter = 0;
+  let episodesDownloadedCounter = 0;
 
   while (limitCheck(i)) {
     const item = feed.items[i];
@@ -229,10 +229,8 @@ const main = async () => {
       continue;
     }
 
-    const {
-      url: episodeAudioUrl,
-      ext: audioFileExt,
-    } = getEpisodeAudioUrlAndExt(item);
+    const { url: episodeAudioUrl, ext: audioFileExt } =
+      getEpisodeAudioUrlAndExt(item);
 
     if (!episodeAudioUrl) {
       logItemInfo(item, LOG_LEVELS.critical);
@@ -269,7 +267,7 @@ const main = async () => {
         },
         onAfterDownload: () => {
           logMessage("", LOG_LEVELS.important);
-          dlCounter += 1;
+          episodesDownloadedCounter += 1;
         },
       });
     } catch (error) {
@@ -357,10 +355,11 @@ const main = async () => {
 
     nextItem();
   }
-  const dlEpisodeText = dlCounter === 1 ? "episode" : "episodes";
-  dlCounter == 0
+  const dlEpisodeText =
+    episodesDownloadedCounter === 1 ? "episode" : "episodes";
+  episodesDownloadedCounter == 0
     ? logErrorAndExit("No episode downloaded")
-    : logMessage(`${dlCounter} ${dlEpisodeText} downloaded.`);
+    : logMessage(`${episodesDownloadedCounter} ${dlEpisodeText} downloaded.`);
 };
 
 main();
