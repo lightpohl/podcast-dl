@@ -355,11 +355,9 @@ const main = async () => {
 
     nextItem();
   }
-  const dlEpisodeText =
-    episodesDownloadedCounter === 1 ? "episode" : "episodes";
-  episodesDownloadedCounter == 0
-    ? logErrorAndExit("No episode downloaded")
-    : logMessage(`${episodesDownloadedCounter} ${dlEpisodeText} downloaded.`);
+  if (episodesDownloadedCounter === 0) {
+    process.exit(2);
+  }
 };
 
 main();
