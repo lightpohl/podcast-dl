@@ -208,6 +208,7 @@ const main = async () => {
     counter += 1;
     logMessage("");
   };
+  let episodesDownloadedCounter = 0;
 
   while (limitCheck(i)) {
     const item = feed.items[i];
@@ -228,10 +229,8 @@ const main = async () => {
       continue;
     }
 
-    const {
-      url: episodeAudioUrl,
-      ext: audioFileExt,
-    } = getEpisodeAudioUrlAndExt(item);
+    const { url: episodeAudioUrl, ext: audioFileExt } =
+      getEpisodeAudioUrlAndExt(item);
 
     if (!episodeAudioUrl) {
       logItemInfo(item, LOG_LEVELS.critical);
@@ -268,6 +267,7 @@ const main = async () => {
         },
         onAfterDownload: () => {
           logMessage("", LOG_LEVELS.important);
+          episodesDownloadedCounter += 1;
         },
       });
     } catch (error) {
@@ -354,6 +354,9 @@ const main = async () => {
     }
 
     nextItem();
+  }
+  if (episodesDownloadedCounter === 0) {
+    process.exit(2);
   }
 };
 
