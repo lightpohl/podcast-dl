@@ -266,7 +266,6 @@ const main = async () => {
           logItemInfo(item, LOG_LEVELS.important);
         },
         onAfterDownload: () => {
-          logMessage("", LOG_LEVELS.important);
           episodesDownloadedCounter += 1;
         },
       });
