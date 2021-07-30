@@ -82,7 +82,10 @@ commander
   .option("--reverse", "download episodes in reverse order")
   .option("--info", "print retrieved podcast info instead of downloading")
   .option("--list", "print episode info instead of downloading")
-  .option("--exec <string>", "Execute a command after each episode is downloaded")
+  .option(
+    "--exec <string>",
+    "Execute a command after each episode is downloaded"
+  )
 
   .parse(process.argv);
 
@@ -207,6 +210,7 @@ const main = async () => {
 
   let i = startIndex;
   let counter = 1;
+  let execErrors = 0;
   const nextItem = () => {
     i = next(i);
     counter += 1;
@@ -301,6 +305,7 @@ const main = async () => {
         child.execSync(execCmd, { stdio: "ignore" });
       } catch (error) {
         logError(`--exec process error: exit code ${error.status}`, error);
+        execErrors += 1;
       }
     }
 
@@ -371,6 +376,9 @@ const main = async () => {
     }
 
     nextItem();
+  }
+  if (execErrors != 0) {
+    process.exit(2);
   }
 };
 
