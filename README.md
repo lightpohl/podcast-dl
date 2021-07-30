@@ -72,7 +72,7 @@ Options that support templating allow users to specify a template for the genera
 - `podcast_title`: Title of the podcast feed.
 - `podcast_link`: `link` value provided for the podcast feed. Typically the homepage URL.
 
-## Executing process after downloading episode
+## Executing Process After Downloading Episode
 
 Option to execute command after downloading episode with `{}` being a placeholder for the downloaded episode and `{filenameBase}` for the filename without extension.
 
