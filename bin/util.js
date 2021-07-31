@@ -302,15 +302,11 @@ const download = async ({
   } catch (error) {
     removeFile();
 
+    throw error;
+  } finally {
     if (getShouldOutputProgressIndicator()) {
       console.log();
     }
-
-    throw error;
-  }
-
-  if (onAfterDownload) {
-    onAfterDownload();
   }
 
   const fileSize = fs.statSync(outputPath).size;
@@ -332,6 +328,10 @@ const download = async ({
       LOG_LEVELS.important
     );
     logMessage(outputPath, LOG_LEVELS.important);
+  }
+
+  if (onAfterDownload) {
+    onAfterDownload();
   }
 
   if (key && archive && !getIsInArchive({ key, archive })) {
