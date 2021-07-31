@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [5.0.0](https://github.com/lightpohl/podcast-dl/compare/v4.3.1...v5.0.0) (2021-07-31)
+
+
+### ⚠ BREAKING CHANGES
+
+* exit with error code 2 when no episodes are downloaded (#27)
+
+### Features
+
+* add --exec option ([#25](https://github.com/lightpohl/podcast-dl/issues/25)) ([f39966f](https://github.com/lightpohl/podcast-dl/commit/f39966f7b015807bf061b47276495b8671e66cb3))
+* exit with error code 2 when no episodes are downloaded ([#27](https://github.com/lightpohl/podcast-dl/issues/27)) ([0ef921e](https://github.com/lightpohl/podcast-dl/commit/0ef921e00c960be971228ea2845d6b134015aca4))
+
+
+### Bug Fixes
+
+* move onAfterDownload to after error checks ([f148041](https://github.com/lightpohl/podcast-dl/commit/f148041930118d4246ab9016bbfb0f949bbba355))
+* only run --add-mp3-metadata on new downloads ([e06a7e9](https://github.com/lightpohl/podcast-dl/commit/e06a7e90a54ed3b74d6e53dc88a6ee7265895166))
+
 ### [4.3.1](https://github.com/lightpohl/podcast-dl/compare/v4.3.0...v4.3.1) (2021-05-09)
 
 
