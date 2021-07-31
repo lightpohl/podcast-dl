@@ -431,6 +431,21 @@ const addMp3Metadata = ({ feed, item, itemIndex, outputPath }) => {
   fs.renameSync(tmpMp3Path, outputPath);
 };
 
+const runExec = ({ exec, outputPodcastPath, episodeFilename }) => {
+  const filenameBase = episodeFilename.substring(
+    0,
+    episodeFilename.lastIndexOf(".")
+  );
+  const execCmd = exec
+    .replace(/{}/g, `"${outputPodcastPath}"`)
+    .replace(/{filenameBase}/g, `"${filenameBase}"`);
+  try {
+    execSync(execCmd, { stdio: "ignore" });
+  } catch (error) {
+    logError(`--exec process error: exit code ${error.status}`, error);
+  }
+};
+
 module.exports = {
   download,
   getArchiveKey,
@@ -445,4 +460,5 @@ module.exports = {
   addMp3Metadata,
   writeFeedMeta,
   writeItemMeta,
+  runExec,
 };

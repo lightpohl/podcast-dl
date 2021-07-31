@@ -20,6 +20,7 @@ const {
   writeFeedMeta,
   writeItemMeta,
   addMp3Metadata,
+  runExec,
 } = require("./util");
 const { createParseNumber, parseArchivePath } = require("./validate");
 const {
@@ -81,6 +82,11 @@ commander
   .option("--reverse", "download episodes in reverse order")
   .option("--info", "print retrieved podcast info instead of downloading")
   .option("--list", "print episode info instead of downloading")
+  .option(
+    "--exec <string>",
+    "Execute a command after each episode is downloaded"
+  )
+
   .parse(process.argv);
 
 const {
@@ -97,6 +103,7 @@ const {
   reverse,
   info,
   list,
+  exec,
   addMp3Metadata: addMp3MetadataFlag,
 } = commander;
 
@@ -266,6 +273,10 @@ const main = async () => {
           logItemInfo(item, LOG_LEVELS.important);
         },
         onAfterDownload: () => {
+          if (exec) {
+            runExec({ exec, outputPodcastPath, episodeFilename });
+          }
+
           episodesDownloadedCounter += 1;
         },
       });
