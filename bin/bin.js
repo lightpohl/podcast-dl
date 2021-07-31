@@ -86,7 +86,6 @@ commander
     "--exec <string>",
     "Execute a command after each episode is downloaded"
   )
-
   .parse(process.argv);
 
 const {
@@ -273,6 +272,19 @@ const main = async () => {
           logItemInfo(item, LOG_LEVELS.important);
         },
         onAfterDownload: () => {
+          if (addMp3MetadataFlag) {
+            try {
+              addMp3Metadata({
+                feed,
+                item,
+                itemIndex: i,
+                outputPath: outputPodcastPath,
+              });
+            } catch (error) {
+              logError("Unable to add episode metadata", error);
+            }
+          }
+
           if (exec) {
             runExec({ exec, outputPodcastPath, episodeFilename });
           }
@@ -282,19 +294,6 @@ const main = async () => {
       });
     } catch (error) {
       logError("Unable to download episode", error);
-    }
-
-    if (addMp3MetadataFlag) {
-      try {
-        addMp3Metadata({
-          feed,
-          item,
-          itemIndex: i,
-          outputPath: outputPodcastPath,
-        });
-      } catch (error) {
-        logError("Unable to add episode metadata", error);
-      }
     }
 
     if (includeEpisodeMeta) {
