@@ -1,3 +1,8 @@
+const ERROR_STATUSES = {
+  general: 1,
+  nothingDownloaded: 2,
+};
+
 const LOG_LEVEL_TYPES = {
   debug: "debug",
   quiet: "quiet",
@@ -57,10 +62,11 @@ const logErrorAndExit = (msg, error) => {
     console.error(error.message);
   }
 
-  process.exit(1);
+  process.exit(ERROR_STATUSES.general);
 };
 
 module.exports = {
+  ERROR_STATUSES,
   getShouldOutputProgressIndicator,
   LOG_LEVELS,
   logMessage,

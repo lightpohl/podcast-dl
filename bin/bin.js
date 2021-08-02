@@ -24,6 +24,7 @@ const {
 } = require("./util");
 const { createParseNumber, parseArchivePath } = require("./validate");
 const {
+  ERROR_STATUSES,
   LOG_LEVELS,
   logMessage,
   logError,
@@ -369,7 +370,7 @@ const main = async () => {
   }
 
   if (episodesDownloadedCounter === 0) {
-    process.exit(2);
+    process.exit(ERROR_STATUSES.nothingDownloaded);
   }
 };
 
