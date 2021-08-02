@@ -245,6 +245,7 @@ const main = async () => {
       continue;
     }
 
+    const outputPodcastPath = _path.resolve(basePath, episodeFilename);
     const episodeFilename = getFilename({
       item,
       feed,
@@ -252,7 +253,6 @@ const main = async () => {
       ext: audioFileExt,
       template: episodeTemplate,
     });
-    const outputPodcastPath = _path.resolve(basePath, episodeFilename);
 
     try {
       await download({
@@ -268,6 +268,9 @@ const main = async () => {
         }),
         outputPath: outputPodcastPath,
         url: episodeAudioUrl,
+        onAbandon: () => {
+          logItemInfo(item);
+        },
         onBeforeDownload: () => {
           logItemInfo(item, LOG_LEVELS.important);
         },
@@ -364,6 +367,7 @@ const main = async () => {
 
     nextItem();
   }
+
   if (episodesDownloadedCounter === 0) {
     process.exit(2);
   }
