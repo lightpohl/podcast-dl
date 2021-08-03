@@ -269,7 +269,7 @@ const main = async () => {
         }),
         outputPath: outputPodcastPath,
         url: episodeAudioUrl,
-        onAbandon: () => {
+        onSkip: () => {
           logItemInfo(item);
         },
         onBeforeDownload: () => {
