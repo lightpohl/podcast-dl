@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [5.0.1](https://github.com/lightpohl/podcast-dl/compare/v5.0.0...v5.0.1) (2021-08-03)
+
+
+### Bug Fixes
+
+* log item info when skipped due to conflict or existing in archive ([7a324e6](https://github.com/lightpohl/podcast-dl/commit/7a324e65fcf031d94039c5b6a2ee76c1eafd9470))
+
 ## [5.0.0](https://github.com/lightpohl/podcast-dl/compare/v4.3.1...v5.0.0) (2021-07-31)
 
 
