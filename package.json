@@ -1,6 +1,6 @@
 {
   "name": "podcast-dl",
-  "version": "5.0.1",
+  "version": "5.0.2",
   "description": "A CLI for downloading podcasts.",
   "bin": "./bin/bin.js",
   "scripts": {
