@@ -21,6 +21,7 @@ const {
   writeItemMeta,
   addMp3Metadata,
   runExec,
+  ITEM_LIST_FORMATS,
 } = require("./util");
 const { createParseNumber, parseArchivePath } = require("./validate");
 const {
@@ -84,6 +85,25 @@ commander
   .option("--info", "print retrieved podcast info instead of downloading")
   .option("--list", "print episode info instead of downloading")
   .option(
+    "--list-format <table|json>",
+    "how to structure list data when logged",
+    (value) => {
+      if (!value) {
+        return undefined;
+      }
+
+      if (
+        value !== ITEM_LIST_FORMATS.table &&
+        value !== ITEM_LIST_FORMATS.json
+      ) {
+        logErrorAndExit(`${value} is an invalid format for --list`);
+      }
+
+      return value;
+    },
+    "table"
+  )
+  .option(
     "--exec <string>",
     "Execute a command after each episode is downloaded"
   )
@@ -103,6 +123,7 @@ const {
   reverse,
   info,
   list,
+  listFormat,
   exec,
   addMp3Metadata: addMp3MetadataFlag,
 } = commander;
@@ -134,6 +155,7 @@ const main = async () => {
   if (list) {
     if (feed.items && feed.items.length) {
       logItemsList({
+        type: listFormat,
         items: feed.items,
         limit,
         offset,

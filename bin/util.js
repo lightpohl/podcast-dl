@@ -53,7 +53,19 @@ const logFeedInfo = (feed) => {
   console.log(`Total Episodes: ${feed.items ? feed.items.length : 0}`);
 };
 
-const logItemsList = ({ items, limit, offset, reverse, episodeRegex }) => {
+const ITEM_LIST_FORMATS = {
+  table: "table",
+  json: "json",
+};
+
+const logItemsList = ({
+  type,
+  items,
+  limit,
+  offset,
+  reverse,
+  episodeRegex,
+}) => {
   const { startIndex, limitCheck, next } = getLoopControls({
     limit,
     offset,
@@ -72,12 +84,14 @@ const logItemsList = ({ items, limit, offset, reverse, episodeRegex }) => {
 
       if (title && generatedEpisodeRegex.test(title)) {
         tableData.push({
+          episodeNum: items.length - i,
           title,
           pubDate,
         });
       }
     } else {
       tableData.push({
+        episodeNum: items.length - i,
         title,
         pubDate,
       });
@@ -90,7 +104,11 @@ const logItemsList = ({ items, limit, offset, reverse, episodeRegex }) => {
     logErrorAndExit("No episodes found with provided criteria to list");
   }
 
-  console.table(tableData);
+  if (type === ITEM_LIST_FORMATS.json) {
+    console.log(JSON.stringify(tableData));
+  } else {
+    console.table(tableData);
+  }
 };
 
 const logItemInfo = (item, logLevel) => {
@@ -488,6 +506,7 @@ module.exports = {
   getUrlExt,
   logFeedInfo,
   logItemInfo,
+  ITEM_LIST_FORMATS,
   logItemsList,
   addMp3Metadata,
   writeFeedMeta,
