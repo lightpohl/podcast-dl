@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [5.1.0](https://github.com/lightpohl/podcast-dl/compare/v5.0.2...v5.1.0) (2021-08-08)
+
+
+### Features
+
+* add '--list-format' options ([c68aa43](https://github.com/lightpohl/podcast-dl/commit/c68aa43ba9c6eafcb667fac9b530b06aa2141f9c)), closes [#29](https://github.com/lightpohl/podcast-dl/issues/29)
+* allow '--list' to support filtering options ([0dda386](https://github.com/lightpohl/podcast-dl/commit/0dda386b2881bf5c4114f52f9ae49772a12fae94)), closes [#28](https://github.com/lightpohl/podcast-dl/issues/28)
+* filter with '--episode-regex' before starting downloads ([6690a82](https://github.com/lightpohl/podcast-dl/commit/6690a82f1c650b513c27bf8d24cac036c68b4f1a))
+
 ### [5.0.2](https://github.com/lightpohl/podcast-dl/compare/v5.0.1...v5.0.2) (2021-08-03)
 
 
