@@ -21,21 +21,78 @@ const parser = new rssParser({
   defaultRSS: 2.0,
 });
 
+const getLoopControls = ({ limit, offset, length, reverse }) => {
+  if (reverse) {
+    const startIndex = length - 1 - offset;
+    const min = limit ? Math.max(startIndex - limit, -1) : -1;
+    const numItemsToDownload = min > -1 ? startIndex - min : startIndex + 1;
+    const limitCheck = (i) => i > min;
+    const decrement = (i) => i - 1;
+
+    return {
+      startIndex,
+      numItemsToDownload,
+      limitCheck,
+      next: decrement,
+    };
+  }
+
+  const startIndex = 0 + offset;
+  const max = limit ? Math.min(startIndex + limit, length) : length;
+  const numItemsToDownload = max - startIndex;
+  const limitCheck = (i) => i < max;
+  const increment = (i) => i + 1;
+
+  return {
+    startIndex,
+    numItemsToDownload,
+    limitCheck,
+    next: increment,
+  };
+};
+
 const logFeedInfo = (feed) => {
   console.log(`Title: ${feed.title}`);
   console.log(`Description: ${feed.description}`);
   console.log(`Total Episodes: ${feed.items ? feed.items.length : 0}`);
 };
 
-const logItemsList = (items) => {
-  const tableData = items.map((item) => {
-    const { title, pubDate } = item;
-
-    return {
-      title,
-      pubDate,
-    };
+const logItemsList = ({ items, limit, offset, reverse, episodeRegex }) => {
+  const { startIndex, limitCheck, next } = getLoopControls({
+    limit,
+    offset,
+    reverse,
+    length: items.length,
   });
+
+  let i = startIndex;
+  const tableData = [];
+
+  while (limitCheck(i)) {
+    const { title, pubDate } = items[i];
+
+    if (episodeRegex) {
+      const generatedEpisodeRegex = new RegExp(episodeRegex);
+
+      if (title && generatedEpisodeRegex.test(title)) {
+        tableData.push({
+          title,
+          pubDate,
+        });
+      }
+    } else {
+      tableData.push({
+        title,
+        pubDate,
+      });
+    }
+
+    i = next(i);
+  }
+
+  if (!tableData.length) {
+    logErrorAndExit("No episodes found with provided criteria to list");
+  }
 
   console.table(tableData);
 };
@@ -346,36 +403,6 @@ const download = async ({
   if (key && archive && !getIsInArchive({ key, archive })) {
     writeToArchive({ key, archive });
   }
-};
-
-const getLoopControls = ({ limit, offset, length, reverse }) => {
-  if (reverse) {
-    const startIndex = length - 1 - offset;
-    const min = limit ? Math.max(startIndex - limit, -1) : -1;
-    const numItemsToDownload = min > -1 ? startIndex - min : startIndex + 1;
-    const limitCheck = (i) => i > min;
-    const decrement = (i) => i - 1;
-
-    return {
-      startIndex,
-      numItemsToDownload,
-      limitCheck,
-      next: decrement,
-    };
-  }
-
-  const startIndex = 0 + offset;
-  const max = limit ? Math.min(startIndex + limit, length) : length;
-  const numItemsToDownload = max - startIndex;
-  const limitCheck = (i) => i < max;
-  const increment = (i) => i + 1;
-
-  return {
-    startIndex,
-    numItemsToDownload,
-    limitCheck,
-    next: increment,
-  };
 };
 
 const getFeed = async (url) => {

@@ -133,7 +133,13 @@ const main = async () => {
 
   if (list) {
     if (feed.items && feed.items.length) {
-      logItemsList(feed.items);
+      logItemsList({
+        items: feed.items,
+        limit,
+        offset,
+        reverse,
+        episodeRegex,
+      });
     } else {
       logErrorAndExit("No episodes found to list");
     }
