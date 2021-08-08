@@ -203,44 +203,51 @@ const main = async () => {
     logErrorAndExit("--offset too large. No episodes to download.");
   }
 
-  const { startIndex, numItemsToDownload, limitCheck, next } = getLoopControls({
+  const { startIndex, limitCheck, next } = getLoopControls({
     limit,
     offset,
     reverse,
     length: feed.items.length,
   });
 
-  const episodeText = numItemsToDownload === 1 ? "episode" : "episodes";
+  let limitCheckIndex = startIndex;
+  const targetItems = [];
+  while (limitCheck(limitCheckIndex)) {
+    const item = feed.items[limitCheckIndex];
+    item._originalIndex = limitCheckIndex;
 
-  logMessage(`Starting download of ${numItemsToDownload} ${episodeText}\n`);
+    if (episodeRegex) {
+      const generatedEpisodeRegex = episodeRegex
+        ? new RegExp(episodeRegex)
+        : null;
 
-  let i = startIndex;
-  let counter = 1;
+      if (item.title && generatedEpisodeRegex.test(item.title)) {
+        targetItems.push(item);
+      }
+    } else {
+      targetItems.push(item);
+    }
+
+    limitCheckIndex = next(limitCheckIndex);
+  }
+
+  if (!targetItems.length) {
+    logErrorAndExit("No episodes found with provided criteria to download");
+  }
+
   const nextItem = () => {
-    i = next(i);
     counter += 1;
     logMessage("");
   };
+
+  const episodeText = targetItems.length === 1 ? "episode" : "episodes";
+  logMessage(`Starting download of ${targetItems.length} ${episodeText}\n`);
+
+  let counter = 1;
   let episodesDownloadedCounter = 0;
 
-  while (limitCheck(i)) {
-    const item = feed.items[i];
-
-    logMessage(`${counter} of ${numItemsToDownload}`);
-
-    const generatedEpisodeRegex = episodeRegex
-      ? new RegExp(episodeRegex)
-      : null;
-
-    if (
-      generatedEpisodeRegex &&
-      (!item.title || !generatedEpisodeRegex.test(item.title))
-    ) {
-      logItemInfo(item);
-      logMessage("Episode title does not match provided regex. Skipping");
-      nextItem();
-      continue;
-    }
+  for (const item of targetItems) {
+    logMessage(`${counter} of ${targetItems.length}`);
 
     const { url: episodeAudioUrl, ext: audioFileExt } =
       getEpisodeAudioUrlAndExt(item);
@@ -287,7 +294,7 @@ const main = async () => {
               addMp3Metadata({
                 feed,
                 item,
-                itemIndex: i,
+                itemIndex: item._originalIndex,
                 outputPath: outputPodcastPath,
               });
             } catch (error) {

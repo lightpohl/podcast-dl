@@ -25,13 +25,11 @@ const getLoopControls = ({ limit, offset, length, reverse }) => {
   if (reverse) {
     const startIndex = length - 1 - offset;
     const min = limit ? Math.max(startIndex - limit, -1) : -1;
-    const numItemsToDownload = min > -1 ? startIndex - min : startIndex + 1;
     const limitCheck = (i) => i > min;
     const decrement = (i) => i - 1;
 
     return {
       startIndex,
-      numItemsToDownload,
       limitCheck,
       next: decrement,
     };
@@ -39,13 +37,11 @@ const getLoopControls = ({ limit, offset, length, reverse }) => {
 
   const startIndex = 0 + offset;
   const max = limit ? Math.min(startIndex + limit, length) : length;
-  const numItemsToDownload = max - startIndex;
   const limitCheck = (i) => i < max;
   const increment = (i) => i + 1;
 
   return {
     startIndex,
-    numItemsToDownload,
     limitCheck,
     next: increment,
   };
