@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [5.3.0](https://github.com/lightpohl/podcast-dl/compare/v5.2.0...v5.3.0) (2021-08-11)
+
+
+### Features
+
+* add '--mono' option ([ade68aa](https://github.com/lightpohl/podcast-dl/commit/ade68aa6e7612a21e1354143b4d6bf673b20aad4))
+
 ## [5.2.0](https://github.com/lightpohl/podcast-dl/compare/v5.1.0...v5.2.0) (2021-08-11)
 
 
