@@ -5,3 +5,4 @@ package-lock.json
 podcast-dl-cache.json
 test/
 binaries/
+.DS_STORE
