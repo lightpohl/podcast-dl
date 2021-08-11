@@ -432,69 +432,74 @@ const getFeed = async (url) => {
   return feed;
 };
 
-const adjustBitrate = ({ outputPath, bitrate }) => {
+const runFfmpeg = ({
+  feed,
+  item,
+  itemIndex,
+  outputPath,
+  bitrate,
+  mono,
+  addMp3Metadata,
+}) => {
   if (!fs.existsSync(outputPath)) {
     return;
   }
 
   if (!outputPath.endsWith(".mp3")) {
-    logError("Not an .mp3 file. Unable to adjust bitrate.");
+    logError("Not an .mp3 file. Unable to run ffmpeg.");
     return;
+  }
+
+  let command = `ffmpeg -loglevel quiet -i "${outputPath}"`;
+
+  if (bitrate) {
+    command += ` -b:a ${bitrate}`;
+  }
+
+  if (mono) {
+    command += " -ac 1";
+  }
+
+  if (addMp3Metadata) {
+    const album = feed.title || "";
+    const title = item.title || "";
+    const artist =
+      item.itunes && item.itunes.author
+        ? item.itunes.author
+        : item.author || "";
+    const track =
+      item.itunes && item.itunes.episode
+        ? item.itunes.episode
+        : `${feed.items.length - itemIndex}`;
+    const date = item.pubDate
+      ? dayjs(new Date(item.pubDate)).format("YYYY-MM-DD")
+      : "";
+
+    const metaKeysToValues = {
+      album,
+      artist,
+      title,
+      track,
+      date,
+      album_artist: album,
+    };
+
+    const metadataString = Object.keys(metaKeysToValues)
+      .map((key) =>
+        metaKeysToValues[key]
+          ? `-metadata ${key}="${metaKeysToValues[key].replace(/"/g, '\\"')}"`
+          : null
+      )
+      .filter((segment) => !!segment)
+      .join(" ");
+
+    command += ` -map_metadata 0 ${metadataString} -codec copy`;
   }
 
   const tmpMp3Path = `${outputPath}.tmp.mp3`;
-  execSync(
-    `ffmpeg -loglevel quiet -i "${outputPath}" -b:a ${bitrate} "${tmpMp3Path}"`
-  );
+  command += ` "${tmpMp3Path}"`;
 
-  fs.unlinkSync(outputPath);
-  fs.renameSync(tmpMp3Path, outputPath);
-};
-
-const addMp3Metadata = ({ feed, item, itemIndex, outputPath }) => {
-  if (!fs.existsSync(outputPath)) {
-    return;
-  }
-
-  if (!outputPath.endsWith(".mp3")) {
-    logError("Not an .mp3 file. Unable to add metadata.");
-    return;
-  }
-
-  const album = feed.title || "";
-  const title = item.title || "";
-  const artist =
-    item.itunes && item.itunes.author ? item.itunes.author : item.author || "";
-  const track =
-    item.itunes && item.itunes.episode
-      ? item.itunes.episode
-      : `${feed.items.length - itemIndex}`;
-  const date = item.pubDate
-    ? dayjs(new Date(item.pubDate)).format("YYYY-MM-DD")
-    : "";
-
-  const metaKeysToValues = {
-    album,
-    artist,
-    title,
-    track,
-    date,
-    album_artist: album,
-  };
-
-  const metadataString = Object.keys(metaKeysToValues)
-    .map((key) =>
-      metaKeysToValues[key]
-        ? `-metadata ${key}="${metaKeysToValues[key].replace(/"/g, '\\"')}"`
-        : null
-    )
-    .filter((segment) => !!segment)
-    .join(" ");
-
-  const tmpMp3Path = `${outputPath}.tmp.mp3`;
-  execSync(
-    `ffmpeg -loglevel quiet -i "${outputPath}" -map_metadata 0 ${metadataString} -codec copy "${tmpMp3Path}"`
-  );
+  execSync(command);
 
   fs.unlinkSync(outputPath);
   fs.renameSync(tmpMp3Path, outputPath);
@@ -527,9 +532,8 @@ module.exports = {
   logItemInfo,
   ITEM_LIST_FORMATS,
   logItemsList,
-  addMp3Metadata,
-  adjustBitrate,
   writeFeedMeta,
   writeItemMeta,
+  runFfmpeg,
   runExec,
 };

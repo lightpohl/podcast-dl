@@ -19,10 +19,9 @@ const {
   logItemsList,
   writeFeedMeta,
   writeItemMeta,
-  addMp3Metadata,
-  adjustBitrate,
   runExec,
   ITEM_LIST_FORMATS,
+  runFfmpeg,
 } = require("./util");
 const { createParseNumber, parseArchivePath } = require("./validate");
 const {
@@ -85,6 +84,7 @@ commander
     "--adjust-bitrate <string>",
     "attempts to adjust bitrate of .mp3 files using ffmpeg"
   )
+  .option("--mono", "attempts to force .mp3 files into mono using ffmpeg")
   .option("--override", "override local files on collision")
   .option("--reverse", "download episodes in reverse order")
   .option("--info", "print retrieved podcast info instead of downloading")
@@ -130,6 +130,7 @@ const {
   list,
   listFormat,
   exec,
+  mono,
   addMp3Metadata: addMp3MetadataFlag,
   adjustBitrate: bitrate,
 } = commander;
@@ -317,24 +318,18 @@ const main = async () => {
           logItemInfo(item, LOG_LEVELS.important);
         },
         onAfterDownload: () => {
-          if (bitrate) {
+          if (addMp3MetadataFlag || bitrate || mono) {
             try {
-              adjustBitrate({ outputPath: outputPodcastPath, bitrate });
-            } catch (error) {
-              logError("Unable to adjust bitrate", error);
-            }
-          }
-
-          if (addMp3MetadataFlag) {
-            try {
-              addMp3Metadata({
+              runFfmpeg({
                 feed,
                 item,
+                bitrate,
+                mono,
                 itemIndex: item._originalIndex,
                 outputPath: outputPodcastPath,
               });
             } catch (error) {
-              logError("Unable to add episode metadata", error);
+              logError("Error running ffmpeg", error);
             }
           }
 
