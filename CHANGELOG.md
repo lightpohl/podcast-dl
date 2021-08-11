@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [5.2.0](https://github.com/lightpohl/podcast-dl/compare/v5.1.0...v5.2.0) (2021-08-11)
+
+
+### Features
+
+* add '--adjust-bitrate' option ([029ef66](https://github.com/lightpohl/podcast-dl/commit/029ef66143031ff51be748f68c2fb667bb6f3384))
+
 ## [5.1.0](https://github.com/lightpohl/podcast-dl/compare/v5.0.2...v5.1.0) (2021-08-08)
 
 
