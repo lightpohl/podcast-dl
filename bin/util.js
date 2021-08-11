@@ -432,6 +432,25 @@ const getFeed = async (url) => {
   return feed;
 };
 
+const adjustBitrate = ({ outputPath, bitrate }) => {
+  if (!fs.existsSync(outputPath)) {
+    return;
+  }
+
+  if (!outputPath.endsWith(".mp3")) {
+    logError("Not an .mp3 file. Unable to adjust bitrate.");
+    return;
+  }
+
+  const tmpMp3Path = `${outputPath}.tmp.mp3`;
+  execSync(
+    `ffmpeg -loglevel quiet -i "${outputPath}" -b:a ${bitrate} "${tmpMp3Path}"`
+  );
+
+  fs.unlinkSync(outputPath);
+  fs.renameSync(tmpMp3Path, outputPath);
+};
+
 const addMp3Metadata = ({ feed, item, itemIndex, outputPath }) => {
   if (!fs.existsSync(outputPath)) {
     return;
@@ -509,6 +528,7 @@ module.exports = {
   ITEM_LIST_FORMATS,
   logItemsList,
   addMp3Metadata,
+  adjustBitrate,
   writeFeedMeta,
   writeItemMeta,
   runExec,

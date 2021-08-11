@@ -20,6 +20,7 @@ const {
   writeFeedMeta,
   writeItemMeta,
   addMp3Metadata,
+  adjustBitrate,
   runExec,
   ITEM_LIST_FORMATS,
 } = require("./util");
@@ -80,6 +81,10 @@ commander
     "--add-mp3-metadata",
     "attempts to add a base level of metadata to .mp3 files using ffmpeg"
   )
+  .option(
+    "--adjust-bitrate <string>",
+    "attempts to adjust bitrate of .mp3 files using ffmpeg"
+  )
   .option("--override", "override local files on collision")
   .option("--reverse", "download episodes in reverse order")
   .option("--info", "print retrieved podcast info instead of downloading")
@@ -126,6 +131,7 @@ const {
   listFormat,
   exec,
   addMp3Metadata: addMp3MetadataFlag,
+  adjustBitrate: bitrate,
 } = commander;
 
 let { archive } = commander;
@@ -311,6 +317,14 @@ const main = async () => {
           logItemInfo(item, LOG_LEVELS.important);
         },
         onAfterDownload: () => {
+          if (bitrate) {
+            try {
+              adjustBitrate({ outputPath: outputPodcastPath, bitrate });
+            } catch (error) {
+              logError("Unable to adjust bitrate", error);
+            }
+          }
+
           if (addMp3MetadataFlag) {
             try {
               addMp3Metadata({
