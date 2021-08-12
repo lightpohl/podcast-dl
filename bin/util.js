@@ -499,6 +499,7 @@ const runFfmpeg = ({
   const tmpMp3Path = `${outputPath}.tmp.mp3`;
   command += ` "${tmpMp3Path}"`;
 
+  logMessage("Running ffmpeg...");
   execSync(command);
 
   fs.unlinkSync(outputPath);
