@@ -150,7 +150,7 @@ const main = async () => {
     getFolderName({ feed, template: outDir })
   );
 
-  if (!fs.existsSync(basePath)) {
+  if (!fs.existsSync(basePath) && !info && !list) {
     logMessage(`${basePath} does not exist. Creating...`, LOG_LEVELS.important);
     fs.mkdirSync(basePath, { recursive: true });
   }
