@@ -23,7 +23,7 @@ const {
   ITEM_LIST_FORMATS,
   runFfmpeg,
 } = require("./util");
-const { createParseNumber, parseArchivePath } = require("./validate");
+const { createParseNumber } = require("./validate");
 const {
   ERROR_STATUSES,
   LOG_LEVELS,
@@ -45,7 +45,7 @@ commander
   .option(
     "--archive <path>",
     "download or write only items not listed in archive file",
-    parseArchivePath
+    "./{{podcast_title}}/archive.json"
   )
   .option(
     "--episode-template <string>",

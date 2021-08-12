@@ -24,15 +24,6 @@ const createParseNumber = ({ min, name, required = true }) => {
   };
 };
 
-const parseArchivePath = (value) => {
-  if (!value.length) {
-    logErrorAndExit("Must provide --archive path");
-  }
-
-  return value;
-};
-
 module.exports = {
   createParseNumber,
-  parseArchivePath,
 };
