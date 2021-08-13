@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [5.4.0](https://github.com/lightpohl/podcast-dl/compare/v5.3.0...v5.4.0) (2021-08-13)
+
+
+### Features
+
+* add '--before' and '--after' options ([a45e95a](https://github.com/lightpohl/podcast-dl/commit/a45e95a892ee939ab3b3eb8e5d36133b1bf9e1f0)), closes [#31](https://github.com/lightpohl/podcast-dl/issues/31)
+* add default path when '--archive' is enabled ([8100739](https://github.com/lightpohl/podcast-dl/commit/8100739dfc887da3a943823dd26bd5c46dcd5430))
+
+
+### Bug Fixes
+
+* don't create folder when running info commands ([0a3e884](https://github.com/lightpohl/podcast-dl/commit/0a3e88484a66627d739039fce160185c39e8bfa6))
+* log a message when ffmpeg starts ([037f448](https://github.com/lightpohl/podcast-dl/commit/037f448e00164bcc48298bbb8a9df9f5596f5b41))
+
 ## [5.3.0](https://github.com/lightpohl/podcast-dl/compare/v5.2.0...v5.3.0) (2021-08-11)
 
 
