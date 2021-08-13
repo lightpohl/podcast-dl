@@ -12,7 +12,7 @@ const {
   getEpisodeAudioUrlAndExt,
   getFeed,
   getImageUrl,
-  getLoopControls,
+  getItemsToDownload,
   getUrlExt,
   logFeedInfo,
   logItemInfo,
@@ -77,6 +77,14 @@ commander
     "match episode title against regex before downloading"
   )
   .option(
+    "--after <string>",
+    "download episodes only after this date (inclusive)"
+  )
+  .option(
+    "--before <string>",
+    "download episodes only before this date (inclusive)"
+  )
+  .option(
     "--add-mp3-metadata",
     "attempts to add a base level of metadata to .mp3 files using ffmpeg"
   )
@@ -124,6 +132,8 @@ const {
   offset,
   limit,
   episodeRegex,
+  after,
+  before,
   override,
   reverse,
   info,
@@ -158,10 +168,12 @@ const main = async () => {
     if (feed.items && feed.items.length) {
       logItemsList({
         type: listFormat,
-        items: feed.items,
+        feed,
         limit,
         offset,
         reverse,
+        after,
+        before,
         episodeRegex,
       });
     } else {
@@ -232,33 +244,15 @@ const main = async () => {
     logErrorAndExit("--offset too large. No episodes to download.");
   }
 
-  const { startIndex, limitCheck, next } = getLoopControls({
+  const targetItems = getItemsToDownload({
+    feed,
     limit,
     offset,
     reverse,
-    length: feed.items.length,
+    after,
+    before,
+    episodeRegex,
   });
-
-  let limitCheckIndex = startIndex;
-  const targetItems = [];
-  while (limitCheck(limitCheckIndex)) {
-    const item = feed.items[limitCheckIndex];
-    item._originalIndex = limitCheckIndex;
-
-    if (episodeRegex) {
-      const generatedEpisodeRegex = episodeRegex
-        ? new RegExp(episodeRegex)
-        : null;
-
-      if (item.title && generatedEpisodeRegex.test(item.title)) {
-        targetItems.push(item);
-      }
-    } else {
-      targetItems.push(item);
-    }
-
-    limitCheckIndex = next(limitCheckIndex);
-  }
 
   if (!targetItems.length) {
     logErrorAndExit("No episodes found with provided criteria to download");

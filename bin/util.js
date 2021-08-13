@@ -47,6 +47,69 @@ const getLoopControls = ({ limit, offset, length, reverse }) => {
   };
 };
 
+const getItemsToDownload = ({
+  feed,
+  limit,
+  offset,
+  reverse,
+  before,
+  after,
+  episodeRegex,
+}) => {
+  const { startIndex, limitCheck, next } = getLoopControls({
+    limit,
+    offset,
+    reverse,
+    length: feed.items.length,
+  });
+
+  let i = startIndex;
+  const items = [];
+
+  while (limitCheck(i)) {
+    const { title, pubDate } = feed.items[i];
+    const pubDateDay = dayjs(new Date(pubDate));
+    let isValid = true;
+
+    if (episodeRegex) {
+      const generatedEpisodeRegex = new RegExp(episodeRegex);
+      if (title && !generatedEpisodeRegex.test(title)) {
+        isValid = false;
+      }
+    }
+
+    if (before) {
+      const beforeDateDay = dayjs(new Date(before));
+      if (
+        !pubDateDay.isSame(beforeDateDay, "day") &&
+        !pubDateDay.isBefore(beforeDateDay, "day")
+      ) {
+        isValid = false;
+      }
+    }
+
+    if (after) {
+      const afterDateDay = dayjs(new Date(after));
+      if (
+        !pubDateDay.isSame(afterDateDay, "day") &&
+        !pubDateDay.isAfter(afterDateDay, "day")
+      ) {
+        isValid = false;
+      }
+    }
+
+    if (isValid) {
+      const item = feed.items[i];
+      item._originalIndex = i;
+      items.push(item);
+    }
+
+    i = next(i);
+  }
+
+  return items;
+};
+
 const logFeedInfo = (feed) => {
   console.log(`Title: ${feed.title}`);
   console.log(`Description: ${feed.description}`);
@@ -60,46 +123,31 @@ const ITEM_LIST_FORMATS = {
 
 const logItemsList = ({
   type,
-  items,
+  feed,
   limit,
   offset,
   reverse,
+  before,
+  after,
   episodeRegex,
 }) => {
-  const { startIndex, limitCheck, next } = getLoopControls({
+  const items = getItemsToDownload({
+    feed,
     limit,
     offset,
     reverse,
-    length: items.length,
+    before,
+    after,
+    episodeRegex,
   });
 
-  let i = startIndex;
-  const tableData = [];
-
-  while (limitCheck(i)) {
-    const { title, pubDate } = items[i];
-
-    if (episodeRegex) {
-      const generatedEpisodeRegex = new RegExp(episodeRegex);
-
-      if (title && generatedEpisodeRegex.test(title)) {
-        tableData.push({
-          episodeNum: items.length - i,
-          title,
-          pubDate,
-        });
-      }
-    } else {
-      tableData.push({
-        episodeNum: items.length - i,
-        title,
-        pubDate,
-      });
-    }
-
-    i = next(i);
-  }
-
+  const tableData = items.map((item) => {
+    return {
+      episodeNum: feed.items.length - item._originalIndex,
+      title: item.title,
+      pubDate: item.pubDate,
+    };
+  });
   if (!tableData.length) {
     logErrorAndExit("No episodes found with provided criteria to list");
   }
@@ -527,7 +575,7 @@ module.exports = {
   getEpisodeAudioUrlAndExt,
   getFeed,
   getImageUrl,
-  getLoopControls,
+  getItemsToDownload,
   getUrlExt,
   logFeedInfo,
   logItemInfo,
