@@ -22,7 +22,7 @@
 
 ## Options
 
-**Type values surrounded in square brackets `[]` can be used as used as boolean options (no argument required).**
+Type values surrounded in square brackets (`[]`) can be used as used as boolean options (no argument required).
 
 | Option                  | Type                | Required | Description                                                                                                                                                                                                           |
 | ----------------------- | ------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
