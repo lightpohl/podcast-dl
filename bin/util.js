@@ -229,7 +229,11 @@ const writeFeedMeta = ({ outputPath, feed, key, archive, override }) => {
     }
 
     if (key && archive && !getIsInArchive({ key, archive })) {
-      writeToArchive({ key, archive });
+      try {
+        writeToArchive({ key, archive });
+      } catch (error) {
+        logError("Error writing to archive", error);
+      }
     }
   } catch (error) {
     logError("Unable to save metadata file for episode", error);
@@ -267,7 +271,11 @@ const writeItemMeta = ({ outputPath, item, key, archive, override }) => {
     }
 
     if (key && archive && !getIsInArchive({ key, archive })) {
-      writeToArchive({ key, archive });
+      try {
+        writeToArchive({ key, archive });
+      } catch (error) {
+        logError("Error writing to archive", error);
+      }
     }
   } catch (error) {
     logError("Unable to save meta file for episode", error);
@@ -463,7 +471,11 @@ const download = async ({
   }
 
   if (key && archive && !getIsInArchive({ key, archive })) {
-    writeToArchive({ key, archive });
+    try {
+      writeToArchive({ key, archive });
+    } catch (error) {
+      logError("Error writing to archive", error);
+    }
   }
 };
 
