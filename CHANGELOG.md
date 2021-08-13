@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [6.0.0](https://github.com/lightpohl/podcast-dl/compare/v5.4.0...v6.0.0) (2021-08-13)
+
+
+### ⚠ BREAKING CHANGES
+
+* consolidate '--list' and '--list-format'
+
+### Features
+
+* consolidate '--list' and '--list-format' ([ce47051](https://github.com/lightpohl/podcast-dl/commit/ce47051475cb212c0460bcad4071d4166b9633ca))
+
+
+### Bug Fixes
+
+* better error message when archive write fails ([42de1f0](https://github.com/lightpohl/podcast-dl/commit/42de1f029d118de7a936e40d205459d674d76592))
+* issue with '--archive' default ([551c0a8](https://github.com/lightpohl/podcast-dl/commit/551c0a891423d5d4e1458f35c17161dd386c30f4))
+
 ## [5.4.0](https://github.com/lightpohl/podcast-dl/compare/v5.3.0...v5.4.0) (2021-08-13)
 
 
