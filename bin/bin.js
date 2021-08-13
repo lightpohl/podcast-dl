@@ -95,25 +95,21 @@ commander
   .option("--override", "override local files on collision")
   .option("--reverse", "download episodes in reverse order")
   .option("--info", "print retrieved podcast info instead of downloading")
-  .option("--list", "print episode info instead of downloading")
   .option(
-    "--list-format <table|json>",
-    "how to structure list data when logged",
+    "--list [table|json]",
+    "print episode info instead of downloading",
     (value) => {
-      if (!value) {
-        return undefined;
-      }
-
       if (
         value !== ITEM_LIST_FORMATS.table &&
         value !== ITEM_LIST_FORMATS.json
       ) {
-        logErrorAndExit(`${value} is an invalid format for --list`);
+        logErrorAndExit(
+          `${value} is an invalid format for --list\nUse "table" or "json"`
+        );
       }
 
       return value;
-    },
-    "table"
+    }
   )
   .option(
     "--exec <string>",
@@ -137,7 +133,6 @@ const {
   reverse,
   info,
   list,
-  listFormat,
   exec,
   mono,
   addMp3Metadata: addMp3MetadataFlag,
@@ -165,6 +160,7 @@ const main = async () => {
 
   if (list) {
     if (feed.items && feed.items.length) {
+      const listFormat = typeof list === "boolean" ? "table" : list;
       logItemsList({
         type: listFormat,
         feed,
