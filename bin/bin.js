@@ -43,9 +43,8 @@ commander
   .option("--url <string>", "url to podcast rss feed")
   .option("--out-dir <path>", "specify output directory", "./{{podcast_title}}")
   .option(
-    "--archive <path>",
-    "download or write only items not listed in archive file",
-    "./{{podcast_title}}/archive.json"
+    "--archive [path]",
+    "download or write only items not listed in archive file"
   )
   .option(
     "--episode-template <string>",
@@ -191,6 +190,10 @@ const main = async () => {
   }
 
   if (archive) {
+    archive =
+      typeof archive === "boolean"
+        ? "./{{podcast_title}}/archive.json"
+        : archive;
     archive = getFolderName({ feed, template: archive });
   }
 
