@@ -312,18 +312,14 @@ const main = async () => {
         },
         onAfterDownload: () => {
           if (addMp3MetadataFlag || bitrate || mono) {
-            try {
-              runFfmpeg({
-                feed,
-                item,
-                bitrate,
-                mono,
-                itemIndex: item._originalIndex,
-                outputPath: outputPodcastPath,
-              });
-            } catch (error) {
-              logError("Error running ffmpeg", error);
-            }
+            runFfmpeg({
+              feed,
+              item,
+              bitrate,
+              mono,
+              itemIndex: item._originalIndex,
+              outputPath: outputPodcastPath,
+            });
           }
 
           if (exec) {

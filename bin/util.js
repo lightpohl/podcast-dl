@@ -560,7 +560,19 @@ const runFfmpeg = ({
   command += ` "${tmpMp3Path}"`;
 
   logMessage("Running ffmpeg...");
-  execSync(command);
+
+  try {
+    execSync(command);
+  } catch (error) {
+    logError("Error running ffmpeg", error);
+
+    if (fs.existsSync(tmpMp3Path)) {
+      logMessage("Cleaning up temporary file...");
+      fs.unlinkSync(tmpMp3Path);
+    }
+
+    return;
+  }
 
   fs.unlinkSync(outputPath);
   fs.renameSync(tmpMp3Path, outputPath);
