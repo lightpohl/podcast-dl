@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [6.1.0](https://github.com/lightpohl/podcast-dl/compare/v6.0.0...v6.1.0) (2021-08-15)
+
+
+### Features
+
+* add 'static' log level support ([66b5934](https://github.com/lightpohl/podcast-dl/commit/66b593430ccbfea110cc0c6a809646b0390d02ba)), closes [#32](https://github.com/lightpohl/podcast-dl/issues/32)
+
+
+### Bug Fixes
+
+* cleanup any temp files if ffmpeg fails ([c4a5408](https://github.com/lightpohl/podcast-dl/commit/c4a5408c05445f43cbb3d651dbab4d7cb2e81d72))
+
 ## [6.0.0](https://github.com/lightpohl/podcast-dl/compare/v5.4.0...v6.0.0) (2021-08-13)
 
 
