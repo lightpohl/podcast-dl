@@ -428,6 +428,23 @@ const download = async ({
     }
   };
 
+  const expectedSize =
+    headResponse &&
+    headResponse.headers &&
+    headResponse.headers["content-length"]
+      ? parseInt(headResponse.headers["content-length"])
+      : 0;
+
+  if (!getShouldOutputProgressIndicator()) {
+    logMessage(
+      `Starting download${
+        expectedSize
+          ? ` of ${(expectedSize / BYTES_IN_MB).toFixed(2)} MB`
+          : "..."
+      }`
+    );
+  }
+
   try {
     await pipeline(
       got.stream(url).on("downloadProgress", (progress) => {
@@ -446,12 +463,6 @@ const download = async ({
   }
 
   const fileSize = fs.statSync(outputPath).size;
-  const expectedSize =
-    headResponse &&
-    headResponse.headers &&
-    headResponse.headers["content-length"]
-      ? parseInt(headResponse.headers["content-length"])
-      : 0;
 
   if (fileSize === 0) {
     removeFile();

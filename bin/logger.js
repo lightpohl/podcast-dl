@@ -7,6 +7,7 @@ const LOG_LEVEL_TYPES = {
   debug: "debug",
   quiet: "quiet",
   silent: "silent",
+  static: "static",
 };
 
 const LOG_LEVELS = {
@@ -18,13 +19,18 @@ const LOG_LEVELS = {
 const getShouldOutputProgressIndicator = () => {
   return (
     process.stdout.isTTY &&
+    process.env.LOG_LEVEL !== LOG_LEVEL_TYPES.static &&
     process.env.LOG_LEVEL !== LOG_LEVEL_TYPES.quiet &&
     process.env.LOG_LEVEL !== LOG_LEVEL_TYPES.silent
   );
 };
 
 const logMessage = (message, logLevel = 1) => {
-  if (!process.env.LOG_LEVEL) {
+  if (
+    !process.env.LOG_LEVEL ||
+    process.env.LOG_LEVEL === LOG_LEVEL_TYPES.debug ||
+    process.env.LOG_LEVEL === LOG_LEVEL_TYPES.static
+  ) {
     console.log(message);
     return;
   }
@@ -38,8 +44,7 @@ const logMessage = (message, logLevel = 1) => {
     logLevel > LOG_LEVELS.info
   ) {
     console.log(message);
-  } else if (process.env.LOG_LEVEL === LOG_LEVEL_TYPES.debug) {
-    console.log(message);
+    return;
   }
 };
 

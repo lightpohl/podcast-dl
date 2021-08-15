@@ -87,5 +87,6 @@ Option to execute command after downloading episode with `{}` being a placeholde
 
 By default, all logs and errors are outputted to the console. The amount of logs can be controlled using the environment variable `LOG_LEVEL` with the following options:
 
+- `static`: All logs and errors are outputted to the console, but disables any animations.
 - `quiet`: Only important info and non-critical errors will be logged (e.g. episode download started).
 - `silent`: Only critical error messages will be be logged.
