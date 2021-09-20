@@ -1,25 +1,49 @@
-const _url = require("url");
-const rssParser = require("rss-parser");
-const { promisify } = require("util");
-const stream = require("stream");
-const path = require("path");
-const fs = require("fs");
-const got = require("got");
-const dayjs = require("dayjs");
-const { execSync } = require("child_process");
+import _url from "url";
+import rssParser from "rss-parser";
+import path from "path";
+import fs from "fs";
+import dayjs from "dayjs";
+import util from "util";
+import { exec } from "child_process";
 
-const {
-  getShouldOutputProgressIndicator,
-  logMessage,
-  logError,
-  logErrorAndExit,
-  LOG_LEVELS,
-} = require("./logger");
+import { logErrorAndExit, logMessage } from "./logger.js";
+import { getArchiveFilename, getFilename } from "./naming.js";
 
-const pipeline = promisify(stream.pipeline);
+const execWithPromise = util.promisify(exec);
+
 const parser = new rssParser({
   defaultRSS: 2.0,
 });
+
+const getArchiveKey = ({ prefix, name }) => {
+  return `${prefix}-${name}`;
+};
+
+const getArchive = (archive) => {
+  const archivePath = path.resolve(process.cwd(), archive);
+
+  if (!fs.existsSync(archivePath)) {
+    return [];
+  }
+
+  return JSON.parse(fs.readFileSync(archivePath));
+};
+
+const writeToArchive = ({ key, archive }) => {
+  const archivePath = path.resolve(process.cwd(), archive);
+  const archiveResult = getArchive(archive);
+
+  if (!archiveResult.includes(key)) {
+    archiveResult.push(key);
+  }
+
+  fs.writeFileSync(archivePath, JSON.stringify(archiveResult, null, 4));
+};
+
+const getIsInArchive = ({ key, archive }) => {
+  const archiveResult = getArchive(archive);
+  return archiveResult.includes(key);
+};
 
 const getLoopControls = ({ limit, offset, length, reverse }) => {
   if (reverse) {
@@ -48,6 +72,9 @@ const getLoopControls = ({ limit, offset, length, reverse }) => {
 };
 
 const getItemsToDownload = ({
+  archive,
+  archiveUrl,
+  basePath,
   feed,
   limit,
   offset,
@@ -55,6 +82,8 @@ const getItemsToDownload = ({
   before,
   after,
   episodeRegex,
+  episodeTemplate,
+  includeEpisodeImages,
 }) => {
   const { startIndex, limitCheck, next } = getLoopControls({
     limit,
@@ -65,6 +94,8 @@ const getItemsToDownload = ({
 
   let i = startIndex;
   const items = [];
+
+  const savedArchive = archive ? getArchive(archive) : [];
 
   while (limitCheck(i)) {
     const { title, pubDate } = feed.items[i];
@@ -98,9 +129,59 @@ const getItemsToDownload = ({
       }
     }
 
+    const { url: episodeAudioUrl, ext: audioFileExt } =
+      getEpisodeAudioUrlAndExt(feed.items[i]);
+    const key = getArchiveKey({
+      prefix: archiveUrl,
+      name: getArchiveFilename({
+        pubDate,
+        name: title,
+        ext: audioFileExt,
+      }),
+    });
+
+    if (key && savedArchive.includes(key)) {
+      isValid = false;
+    }
+
     if (isValid) {
       const item = feed.items[i];
       item._originalIndex = i;
+      item._extra_downloads = [];
+
+      if (includeEpisodeImages) {
+        const episodeImageUrl = getImageUrl(item);
+
+        if (episodeImageUrl) {
+          const episodeImageFileExt = getUrlExt(episodeImageUrl);
+          const episodeImageArchiveKey = getArchiveKey({
+            prefix: archiveUrl,
+            name: getArchiveFilename({
+              pubDate,
+              name: title,
+              ext: episodeImageFileExt,
+            }),
+          });
+
+          if (!savedArchive.includes(episodeImageArchiveKey)) {
+            const episodeImageName = getFilename({
+              item,
+              feed,
+              url: episodeAudioUrl,
+              ext: episodeImageFileExt,
+              template: episodeTemplate,
+            });
+
+            const outputImagePath = path.resolve(basePath, episodeImageName);
+            item._extra_downloads.push({
+              url: episodeImageUrl,
+              outputPath: outputImagePath,
+              key: episodeImageArchiveKey,
+            });
+          }
+        }
+      }
+
       items.push(item);
     }
 
@@ -111,9 +192,9 @@ const getItemsToDownload = ({
 };
 
 const logFeedInfo = (feed) => {
-  console.log(`Title: ${feed.title}`);
-  console.log(`Description: ${feed.description}`);
-  console.log(`Total Episodes: ${feed.items ? feed.items.length : 0}`);
+  logMessage(feed.title);
+  logMessage(feed.description);
+  logMessage();
 };
 
 const ITEM_LIST_FORMATS = {
@@ -148,6 +229,7 @@ const logItemsList = ({
       pubDate: item.pubDate,
     };
   });
+
   if (!tableData.length) {
     logErrorAndExit("No episodes found with provided criteria to list");
   }
@@ -159,46 +241,9 @@ const logItemsList = ({
   }
 };
 
-const logItemInfo = (item, logLevel) => {
-  const { title, pubDate } = item;
-
-  logMessage(`Title: ${title}`, logLevel);
-  logMessage(`Publish Date: ${pubDate}`, logLevel);
-};
-
-const getArchiveKey = ({ prefix, name }) => {
-  return `${prefix}-${name}`;
-};
-
-const writeToArchive = ({ key, archive }) => {
-  let archiveResult = [];
-  const archivePath = path.resolve(process.cwd(), archive);
-
-  if (fs.existsSync(archivePath)) {
-    archiveResult = JSON.parse(fs.readFileSync(archivePath));
-  }
-
-  if (!archiveResult.includes(key)) {
-    archiveResult.push(key);
-  }
-
-  fs.writeFileSync(archivePath, JSON.stringify(archiveResult, null, 4));
-};
-
-const getIsInArchive = ({ key, archive }) => {
-  const archivePath = path.resolve(process.cwd(), archive);
-
-  if (!fs.existsSync(archivePath)) {
-    return false;
-  }
-
-  const archiveResult = JSON.parse(fs.readFileSync(archivePath));
-  return archiveResult.includes(key);
-};
-
 const writeFeedMeta = ({ outputPath, feed, key, archive, override }) => {
   if (key && archive && getIsInArchive({ key, archive })) {
-    logMessage("Feed metadata exists in archive. Skipping write");
+    logMessage("Feed metadata exists in archive. Skipping write...");
     return;
   }
 
@@ -225,24 +270,35 @@ const writeFeedMeta = ({ outputPath, feed, key, archive, override }) => {
         )
       );
     } else {
-      logMessage("Feed metadata exists locally. Skipping write");
+      logMessage("Feed metadata exists locally. Skipping write...");
     }
 
     if (key && archive && !getIsInArchive({ key, archive })) {
       try {
         writeToArchive({ key, archive });
       } catch (error) {
-        logError("Error writing to archive", error);
+        throw new Error(`Error writing to archive: ${error.toString()}`);
       }
     }
   } catch (error) {
-    logError("Unable to save metadata file for episode", error);
+    throw new Error(
+      `Unable to save metadata file for feed: ${error.toString()}`
+    );
   }
 };
 
-const writeItemMeta = ({ outputPath, item, key, archive, override }) => {
+const writeItemMeta = ({
+  marker,
+  outputPath,
+  item,
+  key,
+  archive,
+  override,
+}) => {
   if (key && archive && getIsInArchive({ key, archive })) {
-    logMessage("Episode metadata exists in archive. Skipping write");
+    logMessage(
+      `${marker} | Episode metadata exists in archive. Skipping write...`
+    );
     return;
   }
 
@@ -267,18 +323,20 @@ const writeItemMeta = ({ outputPath, item, key, archive, override }) => {
         )
       );
     } else {
-      logMessage("Episode metadata exists locally. Skipping write");
+      logMessage(
+        `${marker} | Episode metadata exists locally. Skipping write...`
+      );
     }
 
     if (key && archive && !getIsInArchive({ key, archive })) {
       try {
         writeToArchive({ key, archive });
       } catch (error) {
-        logError("Error writing to archive", error);
+        throw new Error("Error writing to archive", error);
       }
     }
   } catch (error) {
-    logError("Unable to save meta file for episode", error);
+    throw new Error("Unable to save meta file for episode", error);
   }
 };
 
@@ -349,147 +407,6 @@ const getImageUrl = ({ image, itunes }) => {
   return null;
 };
 
-const BYTES_IN_MB = 1000000;
-const printProgress = ({ percent, total, transferred }) => {
-  if (!getShouldOutputProgressIndicator()) {
-    /*
-      Non-TTY environments do not have access to `stdout.clearLine` and
-      `stdout.cursorTo`. Skip download progress logging in these environments.
-    */
-    return;
-  }
-
-  let line = "downloading...";
-  const percentRounded = (percent * 100).toFixed(2);
-
-  if (transferred > 0) {
-    /*
-     * Got has a bug where it'll set percent to 1 when the download first starts.
-     * Ignore percent until transfer has started.
-     */
-    line += ` ${percentRounded}%`;
-
-    if (total) {
-      const totalMBs = total / BYTES_IN_MB;
-      const roundedTotalMbs = totalMBs.toFixed(2);
-      line += ` of ${roundedTotalMbs} MB`;
-    }
-  }
-
-  process.stdout.clearLine();
-  process.stdout.cursorTo(0);
-  process.stdout.write(line);
-};
-
-const download = async ({
-  url,
-  outputPath,
-  key,
-  archive,
-  override,
-  onSkip,
-  onBeforeDownload,
-  onAfterDownload,
-}) => {
-  if (key && archive && getIsInArchive({ key, archive })) {
-    if (onSkip) {
-      onSkip();
-    }
-
-    logMessage("Download exists in archive. Skipping");
-    return;
-  }
-
-  if (!override && fs.existsSync(outputPath)) {
-    if (onSkip) {
-      onSkip();
-    }
-
-    logMessage("Download exists locally. Skipping");
-    return;
-  }
-
-  if (onBeforeDownload) {
-    onBeforeDownload();
-  }
-
-  const headResponse = await got(url, {
-    timeout: 5000,
-    method: "HEAD",
-    responseType: "json",
-    headers: {
-      accept: "*/*",
-    },
-  });
-
-  const removeFile = () => {
-    if (fs.existsSync(outputPath)) {
-      fs.unlinkSync(outputPath);
-    }
-  };
-
-  const expectedSize =
-    headResponse &&
-    headResponse.headers &&
-    headResponse.headers["content-length"]
-      ? parseInt(headResponse.headers["content-length"])
-      : 0;
-
-  if (!getShouldOutputProgressIndicator()) {
-    logMessage(
-      `Starting download${
-        expectedSize
-          ? ` of ${(expectedSize / BYTES_IN_MB).toFixed(2)} MB`
-          : "..."
-      }`
-    );
-  }
-
-  try {
-    await pipeline(
-      got.stream(url).on("downloadProgress", (progress) => {
-        printProgress(progress);
-      }),
-      fs.createWriteStream(outputPath)
-    );
-  } catch (error) {
-    removeFile();
-
-    throw error;
-  } finally {
-    if (getShouldOutputProgressIndicator()) {
-      console.log();
-    }
-  }
-
-  const fileSize = fs.statSync(outputPath).size;
-
-  if (fileSize === 0) {
-    removeFile();
-    throw new Error("Unable to write to file. Suggestion: verify permissions");
-  }
-
-  if (expectedSize && !isNaN(expectedSize) && expectedSize !== fileSize) {
-    logMessage(
-      "File size differs from expected content length. Suggestion: verify file works as expected",
-      LOG_LEVELS.important
-    );
-    logMessage(outputPath, LOG_LEVELS.important);
-  }
-
-  if (onAfterDownload) {
-    onAfterDownload();
-  }
-
-  if (key && archive && !getIsInArchive({ key, archive })) {
-    try {
-      writeToArchive({ key, archive });
-    } catch (error) {
-      logError("Error writing to archive", error);
-    }
-  }
-};
-
 const getFeed = async (url) => {
   const { href } = _url.parse(url);
 
@@ -503,7 +420,7 @@ const getFeed = async (url) => {
   return feed;
 };
 
-const runFfmpeg = ({
+const runFfmpeg = async ({
   feed,
   item,
   itemIndex,
@@ -517,8 +434,7 @@ const runFfmpeg = ({
   }
 
   if (!outputPath.endsWith(".mp3")) {
-    logError("Not an .mp3 file. Unable to run ffmpeg.");
-    return;
+    throw new Error("Not an .mp3 file. Unable to run ffmpeg.");
   }
 
   let command = `ffmpeg -loglevel quiet -i "${outputPath}"`;
@@ -570,26 +486,21 @@ const runFfmpeg = ({
   const tmpMp3Path = `${outputPath}.tmp.mp3`;
   command += ` "${tmpMp3Path}"`;
 
-  logMessage("Running ffmpeg...");
-
   try {
-    execSync(command);
+    await execWithPromise(command, { stdio: "ignore" });
   } catch (error) {
-    logError("Error running ffmpeg", error);
-
     if (fs.existsSync(tmpMp3Path)) {
-      logMessage("Cleaning up temporary file...");
       fs.unlinkSync(tmpMp3Path);
     }
 
-    return;
+    throw error;
   }
 
   fs.unlinkSync(outputPath);
   fs.renameSync(tmpMp3Path, outputPath);
 };
 
-const runExec = ({ exec, outputPodcastPath, episodeFilename }) => {
+const runExec = async ({ exec, outputPodcastPath, episodeFilename }) => {
   const filenameBase = episodeFilename.substring(
     0,
     episodeFilename.lastIndexOf(".")
@@ -597,23 +508,21 @@ const runExec = ({ exec, outputPodcastPath, episodeFilename }) => {
   const execCmd = exec
     .replace(/{}/g, `"${outputPodcastPath}"`)
     .replace(/{filenameBase}/g, `"${filenameBase}"`);
-  try {
-    execSync(execCmd, { stdio: "ignore" });
-  } catch (error) {
-    logError(`--exec process error: exit code ${error.status}`, error);
-  }
+
+  await execWithPromise(execCmd, { stdio: "ignore" });
 };
 
-module.exports = {
-  download,
+export {
+  getArchive,
+  getIsInArchive,
   getArchiveKey,
+  writeToArchive,
   getEpisodeAudioUrlAndExt,
   getFeed,
   getImageUrl,
   getItemsToDownload,
   getUrlExt,
   logFeedInfo,
-  logItemInfo,
   ITEM_LIST_FORMATS,
   logItemsList,
   writeFeedMeta,

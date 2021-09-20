@@ -1,5 +1,5 @@
-const filenamify = require("filenamify");
-const dayjs = require("dayjs");
+import filenamify from "filenamify";
+import dayjs from "dayjs";
 
 const INVALID_CHAR_REPLACE = "_";
 const MAX_LENGTH_FILENAME = 255;
@@ -67,9 +67,4 @@ const getArchiveFilename = ({ pubDate, name, ext }) => {
   return getSafeName(`${baseName}${ext}`);
 };
 
-module.exports = {
-  getArchiveFilename,
-  getFilename,
-  getFolderName,
-  getSafeName,
-};
+export { getArchiveFilename, getFilename, getFolderName, getSafeName };

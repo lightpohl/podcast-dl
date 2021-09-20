@@ -2,6 +2,7 @@
   "name": "podcast-dl",
   "version": "6.1.0",
   "description": "A CLI for downloading podcasts.",
+  "type": "module",
   "bin": "./bin/bin.js",
   "scripts": {
     "build": "rimraf ./binaries && npm run pkg",
@@ -52,6 +53,9 @@
     "dayjs": "^1.8.25",
     "filenamify": "^4.1.0",
     "got": "^11.0.2",
-    "rss-parser": "^3.7.6"
+    "p-limit": "^4.0.0",
+    "pluralize": "^8.0.0",
+    "rss-parser": "^3.7.6",
+    "throttle-debounce": "^3.0.1"
   }
 }

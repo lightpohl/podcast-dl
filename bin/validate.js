@@ -1,4 +1,4 @@
-const { logErrorAndExit } = require("./logger");
+import { logErrorAndExit } from "./logger.js";
 
 const createParseNumber = ({ min, name, required = true }) => {
   return (value) => {
@@ -24,6 +24,4 @@ const createParseNumber = ({ min, name, required = true }) => {
   };
 };
 
-module.exports = {
-  createParseNumber,
-};
+export { createParseNumber };

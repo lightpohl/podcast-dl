@@ -1,6 +1,7 @@
 const ERROR_STATUSES = {
   general: 1,
   nothingDownloaded: 2,
+  completedWithErrors: 3,
 };
 
 const LOG_LEVEL_TYPES = {
@@ -25,7 +26,7 @@ const getShouldOutputProgressIndicator = () => {
   );
 };
 
-const logMessage = (message, logLevel = 1) => {
+const logMessage = (message = "", logLevel = 1) => {
   if (
     !process.env.LOG_LEVEL ||
     process.env.LOG_LEVEL === LOG_LEVEL_TYPES.debug ||
@@ -46,6 +47,16 @@ const logMessage = (message, logLevel = 1) => {
     console.log(message);
     return;
   }
+};
+
+const getLogMessageWithMarker = (marker) => {
+  return (message, logLevel) => {
+    if (marker) {
+      logMessage(`${marker} | ${message}`, logLevel);
+    } else {
+      logMessage(message, logLevel);
+    }
+  };
 };
 
 const logError = (msg, error) => {
@@ -70,9 +81,10 @@ const logErrorAndExit = (msg, error) => {
   process.exit(ERROR_STATUSES.general);
 };
 
-module.exports = {
+export {
   ERROR_STATUSES,
   getShouldOutputProgressIndicator,
+  getLogMessageWithMarker,
   LOG_LEVELS,
   logMessage,
   logError,

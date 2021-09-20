@@ -1,42 +1,37 @@
 #!/usr/bin/env node
 
-const fs = require("fs");
-const _path = require("path");
-const _url = require("url");
-const commander = require("commander");
+import fs from "fs";
+import _path from "path";
+import _url from "url";
+import commander from "commander";
+import { createRequire } from "module";
+import pluralize from "pluralize";
 
-const { version } = require("../package.json");
-const {
-  download,
+import { download } from "./async.js";
+import {
   getArchiveKey,
-  getEpisodeAudioUrlAndExt,
   getFeed,
   getImageUrl,
   getItemsToDownload,
   getUrlExt,
   logFeedInfo,
-  logItemInfo,
   logItemsList,
   writeFeedMeta,
-  writeItemMeta,
-  runExec,
   ITEM_LIST_FORMATS,
-  runFfmpeg,
-} = require("./util");
-const { createParseNumber } = require("./validate");
-const {
+} from "./util.js";
+import { createParseNumber } from "./validate.js";
+import {
   ERROR_STATUSES,
   LOG_LEVELS,
   logMessage,
   logError,
   logErrorAndExit,
-} = require("./logger");
-const {
-  getFilename,
-  getFolderName,
-  getArchiveFilename,
-  getSafeName,
-} = require("./naming");
+} from "./logger.js";
+import { getFolderName, getSafeName } from "./naming.js";
+import { downloadItemsAsync } from "./async.js";
+
+const require = createRequire(import.meta.url);
+const { version } = require("../package.json");
 
 commander
   .version(version)
@@ -56,10 +51,7 @@ commander
     "--include-episode-meta",
     "write out individual episode metadata to json"
   )
-  .option(
-    "--ignore-episode-images",
-    "ignore downloading found images from --include-episode-meta"
-  )
+  .option("--include-episode-images", "include found episode images")
   .option(
     "--offset <number>",
     "offset episode to start downloading from (most recent = 0)",
@@ -115,6 +107,12 @@ commander
     "--exec <string>",
     "Execute a command after each episode is downloaded"
   )
+  .option(
+    "--threads <number>",
+    "the number of downloads that can happen concurrently",
+    createParseNumber({ min: 1, name: "threads" }),
+    1
+  )
   .parse(process.argv);
 
 const {
@@ -123,7 +121,7 @@ const {
   episodeTemplate,
   includeMeta,
   includeEpisodeMeta,
-  ignoreEpisodeImages,
+  includeEpisodeImages,
   offset,
   limit,
   episodeRegex,
@@ -135,6 +133,7 @@ const {
   list,
   exec,
   mono,
+  threads,
   addMp3Metadata: addMp3MetadataFlag,
   adjustBitrate: bitrate,
 } = commander;
@@ -154,9 +153,7 @@ const main = async () => {
     getFolderName({ feed, template: outDir })
   );
 
-  if (info) {
-    logFeedInfo(feed);
-  }
+  logFeedInfo(feed);
 
   if (list) {
     if (feed.items && feed.items.length) {
@@ -207,32 +204,35 @@ const main = async () => {
       );
 
       try {
-        logMessage("Saving podcast image");
+        logMessage("\nDownloading podcast image...");
         await download({
           archive,
           override,
+          marker: podcastImageUrl,
           key: getArchiveKey({ prefix: archiveUrl, name: podcastImageName }),
           outputPath: outputImagePath,
           url: podcastImageUrl,
         });
       } catch (error) {
-        logError("Unable to download episode image", error);
+        logError("Unable to download podcast image", error);
       }
-    } else {
-      logMessage("Unable to find podcast image");
     }
 
     const outputMetaName = `${feed.title ? `${feed.title}.meta` : "meta"}.json`;
     const outputMetaPath = _path.resolve(basePath, getSafeName(outputMetaName));
 
-    logMessage("Saving podcast metadata");
-    writeFeedMeta({
-      archive,
-      override,
-      feed,
-      key: getArchiveKey({ prefix: archiveUrl, name: outputMetaName }),
-      outputPath: outputMetaPath,
-    });
+    try {
+      logMessage("\nSaving podcast metadata...");
+      writeFeedMeta({
+        archive,
+        override,
+        feed,
+        key: getArchiveKey({ prefix: archiveUrl, name: outputMetaName }),
+        outputPath: outputMetaPath,
+      });
+    } catch (error) {
+      logError("Unable to save podcast metadata", error);
+    }
   }
 
   if (!feed.items || feed.items.length === 0) {
@@ -244,6 +244,9 @@ const main = async () => {
   }
 
   const targetItems = getItemsToDownload({
+    archive,
+    archiveUrl,
+    basePath,
     feed,
     limit,
     offset,
@@ -251,159 +254,40 @@ const main = async () => {
     after,
     before,
     episodeRegex,
+    episodeTemplate,
+    includeEpisodeImages,
   });
 
   if (!targetItems.length) {
     logErrorAndExit("No episodes found with provided criteria to download");
   }
 
-  const nextItem = () => {
-    counter += 1;
-    logMessage("");
-  };
+  logMessage(
+    `\nStarting download of ${pluralize("episode", targetItems.length, true)}\n`
+  );
 
-  const episodeText = targetItems.length === 1 ? "episode" : "episodes";
-  logMessage(`Starting download of ${targetItems.length} ${episodeText}\n`);
+  const { numEpisodesDownloaded, hasErrors } = await downloadItemsAsync({
+    addMp3MetadataFlag,
+    archive,
+    archiveUrl,
+    basePath,
+    bitrate,
+    episodeTemplate,
+    exec,
+    feed,
+    includeEpisodeMeta,
+    mono,
+    override,
+    targetItems,
+    threads,
+  });
 
-  let counter = 1;
-  let episodesDownloadedCounter = 0;
-
-  for (const item of targetItems) {
-    logMessage(`${counter} of ${targetItems.length}`);
-
-    const { url: episodeAudioUrl, ext: audioFileExt } =
-      getEpisodeAudioUrlAndExt(item);
-
-    if (!episodeAudioUrl) {
-      logItemInfo(item, LOG_LEVELS.critical);
-      logError("Unable to find episode download URL. Skipping");
-      nextItem();
-      continue;
-    }
-
-    const episodeFilename = getFilename({
-      item,
-      feed,
-      url: episodeAudioUrl,
-      ext: audioFileExt,
-      template: episodeTemplate,
-    });
-    const outputPodcastPath = _path.resolve(basePath, episodeFilename);
-
-    try {
-      await download({
-        archive,
-        override,
-        key: getArchiveKey({
-          prefix: archiveUrl,
-          name: getArchiveFilename({
-            name: item.title,
-            pubDate: item.pubDate,
-            ext: audioFileExt,
-          }),
-        }),
-        outputPath: outputPodcastPath,
-        url: episodeAudioUrl,
-        onSkip: () => {
-          logItemInfo(item);
-        },
-        onBeforeDownload: () => {
-          logItemInfo(item, LOG_LEVELS.important);
-        },
-        onAfterDownload: () => {
-          if (addMp3MetadataFlag || bitrate || mono) {
-            runFfmpeg({
-              feed,
-              item,
-              bitrate,
-              mono,
-              itemIndex: item._originalIndex,
-              outputPath: outputPodcastPath,
-            });
-          }
-
-          if (exec) {
-            runExec({ exec, outputPodcastPath, episodeFilename });
-          }
-
-          episodesDownloadedCounter += 1;
-        },
-      });
-    } catch (error) {
-      logError("Unable to download episode", error);
-    }
-
-    if (includeEpisodeMeta) {
-      if (!ignoreEpisodeImages) {
-        const episodeImageUrl = getImageUrl(item);
-
-        if (episodeImageUrl) {
-          const episodeImageFileExt = getUrlExt(episodeImageUrl);
-          const episodeImageName = getFilename({
-            item,
-            feed,
-            url: episodeAudioUrl,
-            ext: episodeImageFileExt,
-            template: episodeTemplate,
-          });
-          const outputImagePath = _path.resolve(basePath, episodeImageName);
-
-          logMessage("Saving episode image");
-          try {
-            await download({
-              archive,
-              override,
-              key: getArchiveKey({
-                prefix: archiveUrl,
-                name: getArchiveFilename({
-                  pubDate: item.pubDate,
-                  name: item.title,
-                  ext: episodeImageFileExt,
-                }),
-              }),
-              outputPath: outputImagePath,
-              url: episodeImageUrl,
-            });
-          } catch (error) {
-            logError("Unable to download episode image", error);
-          }
-        } else {
-          logMessage("Unable to find episode image URL");
-        }
-      }
-
-      const episodeMetaExt = ".meta.json";
-      const episodeMetaName = getFilename({
-        item,
-        feed,
-        url: episodeAudioUrl,
-        ext: episodeMetaExt,
-        template: episodeTemplate,
-      });
-      const outputEpisodeMetaPath = _path.resolve(basePath, episodeMetaName);
-
-      logMessage("Saving episode metadata");
-      writeItemMeta({
-        archive,
-        override,
-        item,
-        key: getArchiveKey({
-          prefix: archiveUrl,
-          name: getArchiveFilename({
-            pubDate: item.pubDate,
-            name: item.title,
-            ext: episodeMetaExt,
-          }),
-        }),
-        outputPath: outputEpisodeMetaPath,
-      });
-    }
-
-    nextItem();
+  if (numEpisodesDownloaded === 0) {
+    process.exit(ERROR_STATUSES.nothingDownloaded);
   }
 
-  if (episodesDownloadedCounter === 0) {
-    process.exit(ERROR_STATUSES.nothingDownloaded);
+  if (hasErrors) {
+    process.exit(ERROR_STATUSES.completedWithErrors);
   }
 };
 
