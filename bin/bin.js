@@ -51,7 +51,7 @@ commander
     "--include-episode-meta",
     "write out individual episode metadata to json"
   )
-  .option("--include-episode-images", "include found episode images")
+  .option("--include-episode-images", "download found episode images")
   .option(
     "--offset <number>",
     "offset episode to start downloading from (most recent = 0)",
