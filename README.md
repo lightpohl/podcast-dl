@@ -6,14 +6,6 @@
 
 ## How to Use
 
-### Binaries
-
-[Visit the releases page](https://github.com/lightpohl/podcast-dl/releases) and download the latest binary for your system.
-
-`podcast-dl --url <PODCAST_RSS_URL>`
-
-`podcast-dl --url "http://friendsatthetable.libsyn.com/rss"`
-
 ### npx
 
 **[Node Required](https://nodejs.org/en/)**
