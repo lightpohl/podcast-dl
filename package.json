@@ -28,7 +28,7 @@
     "cli"
   ],
   "engines": {
-    "node": ">=12.16.2"
+    "node": ">=14.17.6"
   },
   "repository": {
     "type": "git",
