@@ -1,3 +1,5 @@
+import { sync as commandExistsSync } from "command-exists";
+
 import { logErrorAndExit } from "./logger.js";
 
 const createParseNumber = ({ min, name, required = true }) => {
@@ -24,4 +26,10 @@ const createParseNumber = ({ min, name, required = true }) => {
   };
 };
 
-export { createParseNumber };
+const hasFfmpeg = () => {
+  if (!commandExistsSync("ffmpeg")) {
+    logErrorAndExit('option specified requires "ffmpeg" be available');
+  }
+};
+
+export { createParseNumber, hasFfmpeg };

@@ -19,7 +19,7 @@ import {
   writeFeedMeta,
   ITEM_LIST_FORMATS,
 } from "./util.js";
-import { createParseNumber } from "./validate.js";
+import { createParseNumber, hasFfmpeg } from "./validate.js";
 import {
   ERROR_STATUSES,
   LOG_LEVELS,
@@ -77,13 +77,19 @@ commander
   )
   .option(
     "--add-mp3-metadata",
-    "attempts to add a base level of metadata to .mp3 files using ffmpeg"
+    "attempts to add a base level of metadata to .mp3 files using ffmpeg",
+    hasFfmpeg
   )
   .option(
     "--adjust-bitrate <string>",
-    "attempts to adjust bitrate of .mp3 files using ffmpeg"
+    "attempts to adjust bitrate of .mp3 files using ffmpeg",
+    hasFfmpeg
   )
-  .option("--mono", "attempts to force .mp3 files into mono using ffmpeg")
+  .option(
+    "--mono",
+    "attempts to force .mp3 files into mono using ffmpeg",
+    hasFfmpeg
+  )
   .option("--override", "override local files on collision")
   .option("--reverse", "download episodes in reverse order")
   .option("--info", "print retrieved podcast info instead of downloading")
