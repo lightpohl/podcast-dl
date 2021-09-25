@@ -116,7 +116,7 @@ commander
   .option(
     "--threads <number>",
     "the number of downloads that can happen concurrently",
-    createParseNumber({ min: 1, name: "threads" }),
+    createParseNumber({ min: 1, max: 32, name: "threads" }),
     1
   )
   .parse(process.argv);
