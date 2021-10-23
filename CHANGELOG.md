@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [7.0.0](https://github.com/lightpohl/podcast-dl/compare/v6.1.0...v7.0.0) (2021-10-23)
+
+
+### ⚠ BREAKING CHANGES
+
+* support multiple downloads with '--threads' (#34)
+
+### Features
+
+* support multiple downloads with '--threads' ([#34](https://github.com/lightpohl/podcast-dl/issues/34)) ([c4ee9c6](https://github.com/lightpohl/podcast-dl/commit/c4ee9c60d4014196ef3b45bca65bc697faab7c19))
+
 ## [6.1.0](https://github.com/lightpohl/podcast-dl/compare/v6.0.0...v6.1.0) (2021-08-15)
 
 
