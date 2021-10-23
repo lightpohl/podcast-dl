@@ -9,9 +9,17 @@ All notable changes to this project will be documented in this file. See [standa
 
 * support multiple downloads with '--threads' (#34)
 
+* add '--include-episode-images', remove '--ignore-episode-images'
+
+* check for ffmpeg during validation if option requires it
+
+* specify Node 14 LTS
+
 ### Features
 
 * support multiple downloads with '--threads' ([#34](https://github.com/lightpohl/podcast-dl/issues/34)) ([c4ee9c6](https://github.com/lightpohl/podcast-dl/commit/c4ee9c60d4014196ef3b45bca65bc697faab7c19))
+
+* add '--include-episode-images'
 
 ## [6.1.0](https://github.com/lightpohl/podcast-dl/compare/v6.0.0...v6.1.0) (2021-08-15)
 
