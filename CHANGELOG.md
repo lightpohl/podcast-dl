@@ -2,29 +2,6 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-## [7.0.0-async.1](https://github.com/lightpohl/podcast-dl/compare/v7.0.0-async.0...v7.0.0-async.1) (2021-09-26)
-
-
-### Features
-
-* check for ffmpeg during validation if option requires it ([d8638d2](https://github.com/lightpohl/podcast-dl/commit/d8638d26b7deafc4b025a827214fbbc276a536ea))
-
-
-### Bug Fixes
-
-* set max on number of threads to 32 ([22b8b99](https://github.com/lightpohl/podcast-dl/commit/22b8b997c1272d8bd5448f7c169c88e24fa450e3))
-
-## [7.0.0-async.0](https://github.com/lightpohl/podcast-dl/compare/v6.1.0...v7.0.0-async.0) (2021-09-22)
-
-
-### ⚠ BREAKING CHANGES
-
-* support multiple downloads via --threads
-
-### Features
-
-* support multiple downloads via --threads ([c4d3ef1](https://github.com/lightpohl/podcast-dl/commit/c4d3ef10b0d393cebdce78037bf121a6018b3bc1))
-
 ## [6.1.0](https://github.com/lightpohl/podcast-dl/compare/v6.0.0...v6.1.0) (2021-08-15)
 
 
