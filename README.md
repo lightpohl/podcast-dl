@@ -2,8 +2,6 @@
 
 ## A CLI for downloading podcasts with a focus on archiving.
 
-![podcast-dl example gif](./docs/podcast-dl-example.gif)
-
 ## How to Use
 
 ### npx
