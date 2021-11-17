@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [7.1.0](https://github.com/lightpohl/podcast-dl/compare/v7.0.0...v7.1.0) (2021-11-17)
+
+
+### Features
+
+* add '--filter-url-tracking' option ([9e7365f](https://github.com/lightpohl/podcast-dl/commit/9e7365f0f5798b504854792d018980c8e4d280ef))
+
 ## [7.0.0](https://github.com/lightpohl/podcast-dl/compare/v6.1.0...v7.0.0) (2021-10-23)
 
 
