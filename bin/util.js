@@ -1,8 +1,8 @@
-import _url from "url";
 import rssParser from "rss-parser";
 import path from "path";
 import fs from "fs";
 import dayjs from "dayjs";
+import got from "got";
 import util from "util";
 import { exec } from "child_process";
 
@@ -43,6 +43,54 @@ const writeToArchive = ({ key, archive }) => {
 const getIsInArchive = ({ key, archive }) => {
   const archiveResult = getArchive(archive);
   return archiveResult.includes(key);
+};
+
+const getPossibleUrlEmbeds = (url, maxAmount = 5) => {
+  const fullUrl = new URL(url);
+  const possibleStartIndexes = [];
+
+  for (let i = 0; i < fullUrl.pathname.length; i++) {
+    if (fullUrl.pathname[i] === "/") {
+      possibleStartIndexes.push(i);
+    }
+  }
+
+  const possibleEmbedChoices = possibleStartIndexes.map((startIndex) => {
+    let possibleEmbed = fullUrl.pathname.slice(startIndex + 1);
+
+    if (!possibleEmbed.startsWith("http")) {
+      possibleEmbed = `https://${possibleEmbed}`;
+    }
+
+    return decodeURIComponent(possibleEmbed);
+  });
+
+  return possibleEmbedChoices
+    .slice(Math.max(possibleEmbedChoices.length - maxAmount, 0))
+    .reverse();
+};
+
+const getUrlEmbed = async (url) => {
+  const possibleUrlEmbeds = getPossibleUrlEmbeds(url);
+  for (const possibleUrl of possibleUrlEmbeds) {
+    try {
+      const embeddedUrl = new URL(possibleUrl);
+      await got(embeddedUrl.href, {
+        timeout: 3000,
+        method: "HEAD",
+        responseType: "json",
+        headers: {
+          accept: "*/*",
+        },
+      });
+
+      return embeddedUrl;
+    } catch (error) {
+      // do nothing
+    }
+  }
+
+  return null;
 };
 
 const getLoopControls = ({ limit, offset, length, reverse }) => {
@@ -341,7 +389,7 @@ const writeItemMeta = ({
 };
 
 const getUrlExt = (url) => {
-  const { pathname } = _url.parse(url);
+  const { pathname } = new URL(url);
 
   if (!pathname) {
     return "";
@@ -408,7 +456,7 @@ const getImageUrl = ({ image, itunes }) => {
 };
 
 const getFeed = async (url) => {
-  const { href } = _url.parse(url);
+  const { href } = new URL(url);
 
   let feed;
   try {
@@ -522,6 +570,7 @@ export {
   getImageUrl,
   getItemsToDownload,
   getUrlExt,
+  getUrlEmbed,
   logFeedInfo,
   ITEM_LIST_FORMATS,
   logItemsList,

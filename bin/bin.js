@@ -2,7 +2,6 @@
 
 import fs from "fs";
 import _path from "path";
-import _url from "url";
 import commander from "commander";
 import { createRequire } from "module";
 import pluralize from "pluralize";
@@ -119,6 +118,10 @@ commander
     createParseNumber({ min: 1, max: 32, name: "threads" }),
     1
   )
+  .option(
+    "--filter-url-tracking",
+    "attempts to extract the direct download link of an episode if detected (experimental)"
+  )
   .parse(process.argv);
 
 const {
@@ -140,6 +143,7 @@ const {
   exec,
   mono,
   threads,
+  filterUrlTracking,
   addMp3Metadata: addMp3MetadataFlag,
   adjustBitrate: bitrate,
 } = commander;
@@ -151,7 +155,7 @@ const main = async () => {
     logErrorAndExit("No URL provided");
   }
 
-  const { hostname, pathname } = _url.parse(url);
+  const { hostname, pathname } = new URL(url);
   const archiveUrl = `${hostname}${pathname}`;
   const feed = await getFeed(url);
   const basePath = _path.resolve(
@@ -286,6 +290,7 @@ const main = async () => {
     override,
     targetItems,
     threads,
+    filterUrlTracking,
   });
 
   if (numEpisodesDownloaded === 0) {
