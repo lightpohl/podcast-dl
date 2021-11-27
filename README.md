@@ -10,6 +10,8 @@
 
 `npx podcast-dl --url <PODCAST_RSS_URL>`
 
+### [More Examples](./docs/examples.md)
+
 ## Options
 
 Type values surrounded in square brackets (`[]`) can be used as used as boolean options (no argument required).
@@ -18,6 +20,7 @@ Type values surrounded in square brackets (`[]`) can be used as used as boolean 
 | ------------------------ | ------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | --url                    | String              | true     | URL to podcast RSS feed.                                                                                                                                                                                              |
 | --out-dir                | String              | false    | Specify output directory for episodes and metadata. Defaults to "./{{podcast_title}}". See "Templating" for more details.                                                                                             |
+| --threads                | Number              | false    | Determines the number of downloads that will happen concurrently. Default is 1.                                                                                                                                       |
 | --archive                | [String]            | false    | Download or write out items not listed in archive file. Generates archive file at path if not found. Defaults to "./{{podcast_title}}/archive.json" when used as a boolean option. See "Templating" for more details. |
 | --episode-template       | String              | false    | Template for generating episode related filenames. See "Templating" for details.                                                                                                                                      |
 | --include-meta           |                     | false    | Write out podcast metadata to JSON.                                                                                                                                                                                   |
@@ -36,7 +39,6 @@ Type values surrounded in square brackets (`[]`) can be used as used as boolean 
 | --info                   |                     | false    | Print retrieved podcast info instead of downloading.                                                                                                                                                                  |
 | --list                   | [String]            | false    | Print episode list instead of downloading. Defaults to "table" when used as a boolean option. "json" is also supported.                                                                                               |
 | --exec                   | String              | false    | Execute a command after each episode is downloaded.                                                                                                                                                                   |
-| --threads                | Number              | false    | Determines the number of downloads that will happen concurrently. Default is 1.                                                                                                                                       |
 | --filter-url-tacking     |                     | false    | Attempts to extract the direct download link of an episode if detected (**experimental**).                                                                                                                            |
 | --version                |                     | false    | Output the version number.                                                                                                                                                                                            |
 | --help                   |                     | false    | Output usage information.                                                                                                                                                                                             |
