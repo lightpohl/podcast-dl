@@ -16,6 +16,7 @@ import { getArchiveFilename, getFilename } from "./naming.js";
 import {
   getEpisodeAudioUrlAndExt,
   getArchiveKey,
+  getTempPath,
   runFfmpeg,
   runExec,
   writeItemMeta,
@@ -63,9 +64,10 @@ const download = async ({
     },
   });
 
+  const tempOutputPath = getTempPath(outputPath);
   const removeFile = () => {
-    if (fs.existsSync(outputPath)) {
-      fs.unlinkSync(outputPath);
+    if (fs.existsSync(tempOutputPath)) {
+      fs.unlinkSync(tempOutputPath);
     }
   };
 
@@ -101,14 +103,14 @@ const download = async ({
 
     await pipeline(
       got.stream(finalUrl).on("downloadProgress", onDownloadProgress),
-      fs.createWriteStream(outputPath)
+      fs.createWriteStream(tempOutputPath)
     );
   } catch (error) {
     removeFile();
     throw error;
   }
 
-  const fileSize = fs.statSync(outputPath).size;
+  const fileSize = fs.statSync(tempOutputPath).size;
 
   if (fileSize === 0) {
     removeFile();
@@ -120,6 +122,8 @@ const download = async ({
 
     return;
   }
+
+  fs.renameSync(tempOutputPath, outputPath);
 
   if (expectedSize && !isNaN(expectedSize) && expectedSize !== fileSize) {
     logMessage(

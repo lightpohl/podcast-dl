@@ -15,6 +15,10 @@ const parser = new rssParser({
   defaultRSS: 2.0,
 });
 
+const getTempPath = (path) => {
+  return `${path}.tmp`;
+};
+
 const getArchiveKey = ({ prefix, name }) => {
   return `${prefix}-${name}`;
 };
@@ -569,6 +573,7 @@ export {
   getFeed,
   getImageUrl,
   getItemsToDownload,
+  getTempPath,
   getUrlExt,
   getUrlEmbed,
   logFeedInfo,
