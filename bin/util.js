@@ -293,7 +293,14 @@ const logItemsList = ({
   }
 };
 
-const writeFeedMeta = ({ outputPath, feed, key, archive, override }) => {
+const writeFeedMeta = ({
+  outputPath,
+  feed,
+  key,
+  archive,
+  override,
+  extraFields,
+}) => {
   if (key && archive && getIsInArchive({ key, archive })) {
     logMessage("Feed metadata exists in archive. Skipping write...");
     return;
@@ -304,6 +311,8 @@ const writeFeedMeta = ({ outputPath, feed, key, archive, override }) => {
   const link = feed.link || null;
   const feedUrl = feed.feedUrl || null;
   const managingEditor = feed.managingEditor || null;
+  const extraData = getExtraFields(feed, extraFields);
+  delete extraData["items"];
 
   try {
     if (override || !fs.existsSync(outputPath)) {
@@ -311,6 +320,7 @@ const writeFeedMeta = ({ outputPath, feed, key, archive, override }) => {
         outputPath,
         JSON.stringify(
           {
+            ...extraData,
             title,
             description,
             link,
@@ -346,6 +356,7 @@ const writeItemMeta = ({
   key,
   archive,
   override,
+  extraFields,
 }) => {
   if (key && archive && getIsInArchive({ key, archive })) {
     logMessage(
@@ -358,6 +369,7 @@ const writeItemMeta = ({
   const descriptionText = item.contentSnippet || null;
   const pubDate = item.pubDate || null;
   const creator = item.creator || null;
+  const extraData = getExtraFields(item, extraFields);
 
   try {
     if (override || !fs.existsSync(outputPath)) {
@@ -365,6 +377,7 @@ const writeItemMeta = ({
         outputPath,
         JSON.stringify(
           {
+            ...extraData,
             title,
             pubDate,
             creator,
@@ -470,6 +483,35 @@ const getFeed = async (url) => {
   }
 
   return feed;
+};
+
+const globToRegExp = (glob) => {
+  const pattern = glob.replace(/[.+?^${}()|[\]\\]/g, "\\$&").replace("*", ".+");
+  return RegExp(`^${pattern}$`);
+};
+
+const getExtraFields = (object, patterns) => {
+  const rules = patterns.map((pattern) => {
+    let include = true;
+    if (pattern.startsWith("!")) {
+      include = false;
+      pattern = pattern.substring(1);
+    } else if (pattern.startsWith("\\!")) {
+      pattern = pattern.substring(1);
+    }
+
+    return {
+      include,
+      pattern: globToRegExp(pattern),
+    };
+  });
+  rules.reverse();
+
+  const entries = Object.entries(object).filter(([key]) => {
+    const matchingRule = rules.find((rule) => rule.pattern.test(key));
+    return matchingRule && matchingRule.include;
+  });
+  return Object.fromEntries(entries);
 };
 
 const runFfmpeg = async ({

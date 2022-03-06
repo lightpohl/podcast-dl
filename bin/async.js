@@ -159,6 +159,7 @@ let downloadItemsAsync = async ({
   feed,
   filterUrlTracking,
   includeEpisodeMeta,
+  includeEpisodeMetaFields,
   mono,
   override,
   targetItems,
@@ -278,6 +279,7 @@ let downloadItemsAsync = async ({
             }),
           }),
           outputPath: outputEpisodeMetaPath,
+          extraFields: includeEpisodeMetaFields,
         });
       } catch (error) {
         hasErrors = true;

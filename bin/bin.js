@@ -32,6 +32,8 @@ import { downloadItemsAsync } from "./async.js";
 const require = createRequire(import.meta.url);
 const { version } = require("../package.json");
 
+const collect = (value, previous) => previous.concat([value]);
+
 commander
   .version(version)
   .option("--url <string>", "url to podcast rss feed")
@@ -47,8 +49,20 @@ commander
   )
   .option("--include-meta", "write out podcast metadata to json")
   .option(
+    "--include-meta-fields <field-glob>",
+    "include extra fields in the saved podcast metadata",
+    collect,
+    []
+  )
+  .option(
     "--include-episode-meta",
     "write out individual episode metadata to json"
+  )
+  .option(
+    "--include-episode-meta-fields <field-glob>",
+    "include extra fields in the saved episode metadata",
+    collect,
+    []
   )
   .option("--include-episode-images", "download found episode images")
   .option(
@@ -129,7 +143,9 @@ const {
   outDir,
   episodeTemplate,
   includeMeta,
+  includeMetaFields,
   includeEpisodeMeta,
+  includeEpisodeMetaFields,
   includeEpisodeImages,
   offset,
   limit,
@@ -153,6 +169,17 @@ let { archive } = commander;
 const main = async () => {
   if (!url) {
     logErrorAndExit("No URL provided");
+  }
+
+  if (!includeMeta && includeMetaFields.length) {
+    logErrorAndExit(
+      "--include-meta-fields cannot be used without --include-meta"
+    );
+  }
+  if (!includeEpisodeMeta && includeEpisodeMetaFields.length) {
+    logErrorAndExit(
+      "--include-episode-meta-fields cannot be used without --include-episode-meta"
+    );
   }
 
   const { hostname, pathname } = new URL(url);
@@ -239,6 +266,7 @@ const main = async () => {
         feed,
         key: getArchiveKey({ prefix: archiveUrl, name: outputMetaName }),
         outputPath: outputMetaPath,
+        extraFields: includeMetaFields,
       });
     } catch (error) {
       logError("Unable to save podcast metadata", error);
@@ -286,6 +314,7 @@ const main = async () => {
     exec,
     feed,
     includeEpisodeMeta,
+    includeEpisodeMetaFields,
     mono,
     override,
     targetItems,
