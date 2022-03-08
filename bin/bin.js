@@ -32,7 +32,12 @@ import { downloadItemsAsync } from "./async.js";
 const require = createRequire(import.meta.url);
 const { version } = require("../package.json");
 
-const collect = (value, previous) => previous.concat([value]);
+const collect = (value, previous) => {
+  if (!previous) {
+    previous = [];
+  }
+  return previous.concat([value]);
+};
 
 commander
   .version(version)
@@ -47,22 +52,15 @@ commander
     "template for generating episode related filenames",
     "{{release_date}}-{{title}}"
   )
-  .option("--include-meta", "write out podcast metadata to json")
   .option(
-    "--include-meta-fields <field-glob>",
-    "include extra fields in the saved podcast metadata",
-    collect,
-    []
+    "--include-meta [rule]",
+    "write out podcast metadata to json",
+    collect
   )
   .option(
-    "--include-episode-meta",
-    "write out individual episode metadata to json"
-  )
-  .option(
-    "--include-episode-meta-fields <field-glob>",
-    "include extra fields in the saved episode metadata",
-    collect,
-    []
+    "--include-episode-meta [rule]",
+    "write out individual episode metadata to json",
+    collect
   )
   .option("--include-episode-images", "download found episode images")
   .option(
@@ -143,9 +141,7 @@ const {
   outDir,
   episodeTemplate,
   includeMeta,
-  includeMetaFields,
   includeEpisodeMeta,
-  includeEpisodeMetaFields,
   includeEpisodeImages,
   offset,
   limit,
@@ -166,20 +162,22 @@ const {
 
 let { archive } = commander;
 
+const getFieldOptionValue = (value, defaultValue) => {
+  // If the option hasn't be used the value is falsy (undefined).
+  if (!value) {
+    return value;
+  }
+  // If the option has been used with an argument the value is an array.
+  if (Array.isArray(value)) {
+    return value;
+  }
+  // If the option has been used without an argument the value is truthy (true).
+  return defaultValue;
+};
+
 const main = async () => {
   if (!url) {
     logErrorAndExit("No URL provided");
-  }
-
-  if (!includeMeta && includeMetaFields.length) {
-    logErrorAndExit(
-      "--include-meta-fields cannot be used without --include-meta"
-    );
-  }
-  if (!includeEpisodeMeta && includeEpisodeMetaFields.length) {
-    logErrorAndExit(
-      "--include-episode-meta-fields cannot be used without --include-episode-meta"
-    );
   }
 
   const { hostname, pathname } = new URL(url);
@@ -264,9 +262,15 @@ const main = async () => {
         archive,
         override,
         feed,
+        fields: getFieldOptionValue(includeMeta, [
+          "title",
+          "description",
+          "link",
+          "feedUrl",
+          "managingEditor",
+        ]),
         key: getArchiveKey({ prefix: archiveUrl, name: outputMetaName }),
         outputPath: outputMetaPath,
-        extraFields: includeMetaFields,
       });
     } catch (error) {
       logError("Unable to save podcast metadata", error);
@@ -313,8 +317,12 @@ const main = async () => {
     episodeTemplate,
     exec,
     feed,
-    includeEpisodeMeta,
-    includeEpisodeMetaFields,
+    fields: getFieldOptionValue(includeEpisodeMeta, [
+      "title",
+      "contentSnippet",
+      "pubDate",
+      "creator",
+    ]),
     mono,
     override,
     targetItems,

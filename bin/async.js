@@ -158,8 +158,7 @@ let downloadItemsAsync = async ({
   exec,
   feed,
   filterUrlTracking,
-  includeEpisodeMeta,
-  includeEpisodeMetaFields,
+  fields,
   mono,
   override,
   targetItems,
@@ -252,7 +251,7 @@ let downloadItemsAsync = async ({
       }
     }
 
-    if (includeEpisodeMeta) {
+    if (fields && fields.length) {
       const episodeMetaExt = ".meta.json";
       const episodeMetaName = getFilename({
         item,
@@ -279,7 +278,7 @@ let downloadItemsAsync = async ({
             }),
           }),
           outputPath: outputEpisodeMetaPath,
-          extraFields: includeEpisodeMetaFields,
+          fields,
         });
       } catch (error) {
         hasErrors = true;

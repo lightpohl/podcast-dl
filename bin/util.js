@@ -299,38 +299,19 @@ const writeFeedMeta = ({
   key,
   archive,
   override,
-  extraFields,
+  fields,
 }) => {
   if (key && archive && getIsInArchive({ key, archive })) {
     logMessage("Feed metadata exists in archive. Skipping write...");
     return;
   }
 
-  const title = feed.title || null;
-  const description = feed.description || null;
-  const link = feed.link || null;
-  const feedUrl = feed.feedUrl || null;
-  const managingEditor = feed.managingEditor || null;
-  const extraData = getExtraFields(feed, extraFields);
-  delete extraData["items"];
+  const metadata = getFields(feed, fields);
+  delete metadata["items"];
 
   try {
     if (override || !fs.existsSync(outputPath)) {
-      fs.writeFileSync(
-        outputPath,
-        JSON.stringify(
-          {
-            ...extraData,
-            title,
-            description,
-            link,
-            feedUrl,
-            managingEditor,
-          },
-          null,
-          4
-        )
-      );
+      fs.writeFileSync(outputPath, JSON.stringify(metadata, null, 4));
     } else {
       logMessage("Feed metadata exists locally. Skipping write...");
     }
@@ -356,7 +337,7 @@ const writeItemMeta = ({
   key,
   archive,
   override,
-  extraFields,
+  fields,
 }) => {
   if (key && archive && getIsInArchive({ key, archive })) {
     logMessage(
@@ -365,28 +346,11 @@ const writeItemMeta = ({
     return;
   }
 
-  const title = item.title || null;
-  const descriptionText = item.contentSnippet || null;
-  const pubDate = item.pubDate || null;
-  const creator = item.creator || null;
-  const extraData = getExtraFields(item, extraFields);
+  const metadata = getFields(item, fields);
 
   try {
     if (override || !fs.existsSync(outputPath)) {
-      fs.writeFileSync(
-        outputPath,
-        JSON.stringify(
-          {
-            ...extraData,
-            title,
-            pubDate,
-            creator,
-            descriptionText,
-          },
-          null,
-          4
-        )
-      );
+      fs.writeFileSync(outputPath, JSON.stringify(metadata, null, 4));
     } else {
       logMessage(
         `${marker} | Episode metadata exists locally. Skipping write...`
@@ -486,12 +450,15 @@ const getFeed = async (url) => {
 };
 
 const globToRegExp = (glob) => {
-  const pattern = glob.replace(/[.+?^${}()|[\]\\]/g, "\\$&").replace("*", ".+");
+  const pattern = glob
+    .replace(/[.+?^${}()|[\]\\]/g, "\\$&")
+    .replace("**", ".+")
+    .replace("*", "[^.]+");
   return RegExp(`^${pattern}$`);
 };
 
-const getExtraFields = (object, patterns) => {
-  const rules = patterns.map((pattern) => {
+const processFieldRules = (patterns) =>
+  patterns.map((pattern) => {
     let include = true;
     if (pattern.startsWith("!")) {
       include = false;
@@ -505,13 +472,31 @@ const getExtraFields = (object, patterns) => {
       pattern: globToRegExp(pattern),
     };
   });
-  rules.reverse();
 
-  const entries = Object.entries(object).filter(([key]) => {
-    const matchingRule = rules.find((rule) => rule.pattern.test(key));
-    return matchingRule && matchingRule.include;
+const applyFieldRules = (object, rules, prefix) => {
+  const result = {};
+  Object.entries(object).forEach(([key, value]) => {
+    const fullKey = `${prefix}${key}`;
+    if (typeof value === "object" && !Array.isArray(value)) {
+      const nested = applyFieldRules(value, rules, `${fullKey}.`);
+      if (Object.keys(nested).length) {
+        result[key] = nested;
+      }
+    } else {
+      const matchingRule = rules.find((rule) => rule.pattern.test(fullKey));
+      if (matchingRule && matchingRule.include) {
+        result[key] = value;
+      }
+    }
   });
-  return Object.fromEntries(entries);
+  return result;
+};
+
+const getFields = (object, patterns) => {
+  const rules = processFieldRules(patterns);
+  // We're really only interested in the last rule that matches, so the list is more useful to us in reverse.
+  rules.reverse();
+  return applyFieldRules(object, rules, "");
 };
 
 const runFfmpeg = async ({
