@@ -41,3 +41,33 @@ npx podcast-dl --after "01/01/2021" --before "12/31/2021" --url "http://eightfou
 ```bash
 npx podcast-dl --episode-regex "Zelda" --url "http://eightfour.libsyn.com/rss"
 ```
+
+### Download all episodes + standard set of metadata for the podcast
+
+```bash
+npx podcast-dl --include-meta  --url "http://eightfour.libsyn.com/rss"
+```
+
+### Download all episodes + standard set of metadata for the episodes
+
+```bash
+npx podcast-dl --include-episode-meta  --url "http://eightfour.libsyn.com/rss"
+```
+
+### Download all episodes + all top-level metadata for the episodes (excluding nested fields like `itunes:subtitle`)
+
+```bash
+npx podcast-dl --include-episode-meta '*' --url "http://eightfour.libsyn.com/rss"
+```
+
+### Download all episodes + all metadata for the episodes (including nested fields like `itunes:subtitle`)
+
+```bash
+npx podcast-dl --include-episode-meta '**' --url "http://eightfour.libsyn.com/rss"
+```
+
+### Download all episodes + all metadata for the episodes, except for itunes metadata
+
+```bash
+npx podcast-dl --include-episode-meta '**' --include-episode-meta '!itunes.**' --url "http://eightfour.libsyn.com/rss"
+```
