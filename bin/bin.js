@@ -163,15 +163,15 @@ const {
 let { archive } = commander;
 
 const getFieldOptionValue = (value, defaultValue) => {
-  // If the option hasn't be used the value is falsy (undefined).
+  // If the option hasn't been provided the value is falsy (undefined).
   if (!value) {
     return value;
   }
-  // If the option has been used with an argument the value is an array.
+  // If the option has been provided with an argument the value is an array.
   if (Array.isArray(value)) {
     return value;
   }
-  // If the option has been used without an argument the value is truthy (true).
+  // If the option has been provided without an argument the value is truthy (true).
   return defaultValue;
 };
 
