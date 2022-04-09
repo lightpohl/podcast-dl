@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [7.3.0](https://github.com/lightpohl/podcast-dl/compare/v7.2.0...v7.3.0) (2022-04-09)
+
+
+### Features
+
+* add success/failure message at end of downloads ([a785c73](https://github.com/lightpohl/podcast-dl/commit/a785c73f05f4d5e348bd54888b93500336662539))
+* do not include null values in JSON output ([70f1dac](https://github.com/lightpohl/podcast-dl/commit/70f1dac10dd94fa57e49ee721766dfe463e93dd5))
+
+
+### Bug Fixes
+
+* remove unnecessary file size warning ([96a48b2](https://github.com/lightpohl/podcast-dl/commit/96a48b2c2490ad329ef8212ed17f11f2ff7c0780))
+
 ## [7.2.0](https://github.com/lightpohl/podcast-dl/compare/v7.1.0...v7.2.0) (2022-03-05)
 
 
