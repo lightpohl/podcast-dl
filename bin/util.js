@@ -299,28 +299,18 @@ const writeFeedMeta = ({ outputPath, feed, key, archive, override }) => {
     return;
   }
 
-  const title = feed.title || null;
-  const description = feed.description || null;
-  const link = feed.link || null;
-  const feedUrl = feed.feedUrl || null;
-  const managingEditor = feed.managingEditor || null;
+  const output = {};
+  ["title", "description", "link", "feedUrl", "managingEditor"].forEach(
+    (key) => {
+      if (feed[key]) {
+        output[key] = feed[key];
+      }
+    }
+  );
 
   try {
     if (override || !fs.existsSync(outputPath)) {
-      fs.writeFileSync(
-        outputPath,
-        JSON.stringify(
-          {
-            title,
-            description,
-            link,
-            feedUrl,
-            managingEditor,
-          },
-          null,
-          4
-        )
-      );
+      fs.writeFileSync(outputPath, JSON.stringify(output, null, 4));
     } else {
       logMessage("Feed metadata exists locally. Skipping write...");
     }
@@ -354,26 +344,16 @@ const writeItemMeta = ({
     return;
   }
 
-  const title = item.title || null;
-  const descriptionText = item.contentSnippet || null;
-  const pubDate = item.pubDate || null;
-  const creator = item.creator || null;
+  const output = {};
+  ["title", "contentSnippet", "pubDate", "creator"].forEach((key) => {
+    if (item[key]) {
+      output[key] = item[key];
+    }
+  });
 
   try {
     if (override || !fs.existsSync(outputPath)) {
-      fs.writeFileSync(
-        outputPath,
-        JSON.stringify(
-          {
-            title,
-            pubDate,
-            creator,
-            descriptionText,
-          },
-          null,
-          4
-        )
-      );
+      fs.writeFileSync(outputPath, JSON.stringify(output, null, 4));
     } else {
       logMessage(
         `${marker} | Episode metadata exists locally. Skipping write...`
