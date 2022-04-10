@@ -301,7 +301,7 @@ const main = async () => {
         true
       )} downloaded\n`
     );
-  } else {
+  } else if (numEpisodesDownloaded > 0) {
     logMessage(
       `\nSuccessfully downloaded ${pluralize(
         "episode",
