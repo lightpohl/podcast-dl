@@ -22,6 +22,7 @@ import {
   writeItemMeta,
   writeToArchive,
   getUrlEmbed,
+  getIsInArchive,
 } from "./util.js";
 
 const pipeline = promisify(stream.pipeline);
@@ -41,6 +42,11 @@ const download = async ({
   const logMessage = getLogMessageWithMarker(marker);
   if (!override && fs.existsSync(outputPath)) {
     logMessage("Download exists locally. Skipping...");
+    return;
+  }
+
+  if (key && archive && getIsInArchive({ key, archive })) {
+    logMessage("Download exists in archive. Skipping...");
     return;
   }
 

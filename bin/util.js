@@ -215,22 +215,20 @@ const getItemsToDownload = ({
             }),
           });
 
-          if (!savedArchive.includes(episodeImageArchiveKey)) {
-            const episodeImageName = getFilename({
-              item,
-              feed,
-              url: episodeAudioUrl,
-              ext: episodeImageFileExt,
-              template: episodeTemplate,
-            });
+          const episodeImageName = getFilename({
+            item,
+            feed,
+            url: episodeAudioUrl,
+            ext: episodeImageFileExt,
+            template: episodeTemplate,
+          });
 
-            const outputImagePath = path.resolve(basePath, episodeImageName);
-            item._extra_downloads.push({
-              url: episodeImageUrl,
-              outputPath: outputImagePath,
-              key: episodeImageArchiveKey,
-            });
-          }
+          const outputImagePath = path.resolve(basePath, episodeImageName);
+          item._extra_downloads.push({
+            url: episodeImageUrl,
+            outputPath: outputImagePath,
+            key: episodeImageArchiveKey,
+          });
         }
       }
 
@@ -295,7 +293,7 @@ const logItemsList = ({
 
 const writeFeedMeta = ({ outputPath, feed, key, archive, override }) => {
   if (key && archive && getIsInArchive({ key, archive })) {
-    logMessage("Feed metadata exists in archive. Skipping write...");
+    logMessage("Feed metadata exists in archive. Skipping...");
     return;
   }
 
@@ -312,7 +310,7 @@ const writeFeedMeta = ({ outputPath, feed, key, archive, override }) => {
     if (override || !fs.existsSync(outputPath)) {
       fs.writeFileSync(outputPath, JSON.stringify(output, null, 4));
     } else {
-      logMessage("Feed metadata exists locally. Skipping write...");
+      logMessage("Feed metadata exists locally. Skipping...");
     }
 
     if (key && archive && !getIsInArchive({ key, archive })) {
@@ -338,9 +336,7 @@ const writeItemMeta = ({
   override,
 }) => {
   if (key && archive && getIsInArchive({ key, archive })) {
-    logMessage(
-      `${marker} | Episode metadata exists in archive. Skipping write...`
-    );
+    logMessage(`${marker} | Episode metadata exists in archive. Skipping...`);
     return;
   }
 
@@ -355,9 +351,7 @@ const writeItemMeta = ({
     if (override || !fs.existsSync(outputPath)) {
       fs.writeFileSync(outputPath, JSON.stringify(output, null, 4));
     } else {
-      logMessage(
-        `${marker} | Episode metadata exists locally. Skipping write...`
-      );
+      logMessage(`${marker} | Episode metadata exists locally. Skipping...`);
     }
 
     if (key && archive && !getIsInArchive({ key, archive })) {
