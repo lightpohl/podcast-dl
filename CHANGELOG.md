@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [7.3.1](https://github.com/lightpohl/podcast-dl/compare/v7.3.0...v7.3.1) (2022-04-11)
+
+
+### Bug Fixes
+
+* limit success message to > 0 episodes downloaded ([e7c189b](https://github.com/lightpohl/podcast-dl/commit/e7c189be3088111478d0ee131754635f4812aa4b))
+* prevent podcast images from downloading if already archived ([c1a7440](https://github.com/lightpohl/podcast-dl/commit/c1a7440c28519ef3c5c85eaa7f696795b234b564)), closes [#39](https://github.com/lightpohl/podcast-dl/issues/39)
+
 ## [7.3.0](https://github.com/lightpohl/podcast-dl/compare/v7.2.0...v7.3.0) (2022-04-09)
 
 
