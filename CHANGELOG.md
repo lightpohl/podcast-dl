@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [7.3.2](https://github.com/lightpohl/podcast-dl/compare/v7.3.1...v7.3.2) (2022-04-13)
+
+
+### Bug Fixes
+
+* limit filtering should be applied last ([e2db23a](https://github.com/lightpohl/podcast-dl/commit/e2db23ae511d534ce5de16b9783da1e182959672))
+
 ### [7.3.1](https://github.com/lightpohl/podcast-dl/compare/v7.3.0...v7.3.1) (2022-04-11)
 
 
