@@ -11,7 +11,35 @@ import { getArchiveFilename, getFilename } from "./naming.js";
 
 const execWithPromise = util.promisify(exec);
 
-const parser = new rssParser({
+class RSSParser extends rssParser {
+  buildAtomFeed(xmlObj) {
+    const feed = super.buildAtomFeed(xmlObj);
+    feed.raw = { ...xmlObj };
+    delete feed.raw.feed;
+    return feed;
+  }
+
+  parseItemAtom(entry) {
+    const item = super.parseItemAtom(entry);
+    item.raw = entry;
+    return item;
+  }
+
+  buildRSS(channel, items) {
+    const feed = super.buildRSS(channel, items);
+    feed.raw = { ...channel };
+    delete feed.raw.item;
+    return feed;
+  }
+
+  parseItemRss(xmlItem, itemFields) {
+    const item = super.parseItemRss(xmlItem, itemFields);
+    item.raw = xmlItem;
+    return item;
+  }
+}
+
+const parser = new RSSParser({
   defaultRSS: 2.0,
 });
 
@@ -307,7 +335,6 @@ const writeFeedMeta = ({
   }
 
   const metadata = getFields(feed, fields);
-  delete metadata["items"];
 
   try {
     if (override || !fs.existsSync(outputPath)) {
@@ -475,20 +502,37 @@ const processFieldRules = (patterns) =>
 
 const applyFieldRules = (object, rules, prefix) => {
   const result = {};
-  Object.entries(object).forEach(([key, value]) => {
-    const fullKey = `${prefix}${key}`;
-    if (typeof value === "object" && !Array.isArray(value)) {
+
+  const getToInclude = (value, fullKey) => {
+    if (Array.isArray(value)) {
+      const nested = value
+        .map((item) => getToInclude(item, fullKey))
+        .filter((item) => item !== undefined);
+      if (nested.length) {
+        return nested;
+      }
+    } else if (typeof value === "object") {
       const nested = applyFieldRules(value, rules, `${fullKey}.`);
       if (Object.keys(nested).length) {
-        result[key] = nested;
+        return nested;
       }
     } else {
       const matchingRule = rules.find((rule) => rule.pattern.test(fullKey));
       if (matchingRule && matchingRule.include) {
-        result[key] = value;
+        return value;
       }
     }
+    return undefined;
+  };
+
+  Object.entries(object).forEach(([key, value]) => {
+    const fullKey = `${prefix}${key}`;
+    const toInclude = getToInclude(value, fullKey);
+    if (toInclude !== undefined) {
+      result[key] = toInclude;
+    }
   });
+
   return result;
 };
 
