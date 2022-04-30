@@ -5,6 +5,7 @@ import dayjs from "dayjs";
 import got from "got";
 import util from "util";
 import { exec } from "child_process";
+import xml2js from "xml2js";
 
 import { logErrorAndExit, logMessage } from "./logger.js";
 import { getArchiveFilename, getFilename } from "./naming.js";
@@ -42,6 +43,8 @@ class RSSParser extends rssParser {
 const parser = new RSSParser({
   defaultRSS: 2.0,
 });
+
+const builder = new xml2js.Builder();
 
 const getTempPath = (path) => {
   return `${path}.tmp`;
@@ -321,6 +324,22 @@ const logItemsList = ({
   }
 };
 
+const METADATA_FORMATS = {
+  json: "json",
+  xml: "xml",
+};
+
+const writeMeta = (path, data) => {
+  const format = path.split(".").pop();
+  if (format == METADATA_FORMATS.json) {
+    fs.writeFileSync(path, JSON.stringify(data, null, 4));
+  } else if (format == METADATA_FORMATS.xml) {
+    fs.writeFileSync(path, builder.buildObject(data));
+  } else {
+    throw new Error(`Invalid metadata path ${path}`);
+  }
+};
+
 const writeFeedMeta = ({
   outputPath,
   feed,
@@ -335,10 +354,11 @@ const writeFeedMeta = ({
   }
 
   const metadata = getFields(feed, fields);
+  delete metadata.items;
 
   try {
     if (override || !fs.existsSync(outputPath)) {
-      fs.writeFileSync(outputPath, JSON.stringify(metadata, null, 4));
+      writeMeta(outputPath, metadata);
     } else {
       logMessage("Feed metadata exists locally. Skipping write...");
     }
@@ -377,7 +397,7 @@ const writeItemMeta = ({
 
   try {
     if (override || !fs.existsSync(outputPath)) {
-      fs.writeFileSync(outputPath, JSON.stringify(metadata, null, 4));
+      writeMeta(outputPath, metadata);
     } else {
       logMessage(
         `${marker} | Episode metadata exists locally. Skipping write...`
@@ -511,7 +531,7 @@ const applyFieldRules = (object, rules, prefix) => {
       if (nested.length) {
         return nested;
       }
-    } else if (typeof value === "object") {
+    } else if (value !== null && typeof value === "object") {
       const nested = applyFieldRules(value, rules, `${fullKey}.`);
       if (Object.keys(nested).length) {
         return nested;
@@ -526,6 +546,13 @@ const applyFieldRules = (object, rules, prefix) => {
   };
 
   Object.entries(object).forEach(([key, value]) => {
+    // Always include special properties $ (which contains attributes of the XML tag) and _ (which contains any text
+    // directly inside the tag), because filtering these is non-intuitive (expecially for the XML export).
+    if (key === "$" || key === "_") {
+      result[key] = value;
+      return;
+    }
+
     const fullKey = `${prefix}${key}`;
     const toInclude = getToInclude(value, fullKey);
     if (toInclude !== undefined) {
@@ -650,6 +677,7 @@ export {
   logFeedInfo,
   ITEM_LIST_FORMATS,
   logItemsList,
+  METADATA_FORMATS,
   writeFeedMeta,
   writeItemMeta,
   runFfmpeg,

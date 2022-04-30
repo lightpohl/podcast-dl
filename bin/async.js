@@ -159,6 +159,7 @@ let downloadItemsAsync = async ({
   feed,
   filterUrlTracking,
   fields,
+  metadataFormat,
   mono,
   override,
   targetItems,
@@ -252,7 +253,7 @@ let downloadItemsAsync = async ({
     }
 
     if (fields && fields.length) {
-      const episodeMetaExt = ".meta.json";
+      const episodeMetaExt = `.meta.${metadataFormat}`;
       const episodeMetaName = getFilename({
         item,
         feed,

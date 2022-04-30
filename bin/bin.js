@@ -17,6 +17,7 @@ import {
   logItemsList,
   writeFeedMeta,
   ITEM_LIST_FORMATS,
+  METADATA_FORMATS,
 } from "./util.js";
 import { createParseNumber, hasFfmpeg } from "./validate.js";
 import {
@@ -52,15 +53,25 @@ commander
     "template for generating episode related filenames",
     "{{release_date}}-{{title}}"
   )
+  .option("--include-meta [rule]", "write out podcast metadata", collect)
   .option(
-    "--include-meta [rule]",
-    "write out podcast metadata to json",
+    "--include-episode-meta [rule]",
+    "write out individual episode metadata",
     collect
   )
   .option(
-    "--include-episode-meta [rule]",
-    "write out individual episode metadata to json",
-    collect
+    "--metadata-format [json|xml]",
+    "the format to use for the podcast/episode metadata",
+    (value) => {
+      if (value !== METADATA_FORMATS.json && value !== METADATA_FORMATS.xml) {
+        logErrorAndExit(
+          `${value} is an invalid format for --metadata-format\nUse "json" or "xml"`
+        );
+      }
+
+      return value;
+    },
+    METADATA_FORMATS.json
   )
   .option("--include-episode-images", "download found episode images")
   .option(
@@ -143,6 +154,7 @@ const {
   includeMeta,
   includeEpisodeMeta,
   includeEpisodeImages,
+  metadataFormat,
   offset,
   limit,
   episodeRegex,
@@ -253,7 +265,9 @@ const main = async () => {
       }
     }
 
-    const outputMetaName = `${feed.title ? `${feed.title}.meta` : "meta"}.json`;
+    const outputMetaName = `${
+      feed.title ? `${feed.title}.meta` : "meta"
+    }.${metadataFormat}`;
     const outputMetaPath = _path.resolve(basePath, getSafeName(outputMetaName));
 
     try {
@@ -323,6 +337,7 @@ const main = async () => {
       "pubDate",
       "creator",
     ]),
+    metadataFormat,
     mono,
     override,
     targetItems,
