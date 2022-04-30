@@ -22,6 +22,7 @@ import {
   writeItemMeta,
   writeToArchive,
   getUrlEmbed,
+  getIsInArchive,
 } from "./util.js";
 
 const pipeline = promisify(stream.pipeline);
@@ -41,6 +42,11 @@ const download = async ({
   const logMessage = getLogMessageWithMarker(marker);
   if (!override && fs.existsSync(outputPath)) {
     logMessage("Download exists locally. Skipping...");
+    return;
+  }
+
+  if (key && archive && getIsInArchive({ key, archive })) {
+    logMessage("Download exists in archive. Skipping...");
     return;
   }
 
@@ -124,14 +130,6 @@ const download = async ({
   }
 
   fs.renameSync(tempOutputPath, outputPath);
-
-  if (expectedSize && !isNaN(expectedSize) && expectedSize !== fileSize) {
-    logMessage(
-      "File size differs from expected content length. Suggestion: verify file works as expected",
-      LOG_LEVELS.important
-    );
-    logMessage(`${outputPath}`, LOG_LEVELS.important);
-  }
 
   logMessage("Download complete!");
 

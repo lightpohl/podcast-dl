@@ -345,6 +345,24 @@ const main = async () => {
     filterUrlTracking,
   });
 
+  if (hasErrors && numEpisodesDownloaded !== targetItems.length) {
+    logMessage(
+      `\n${numEpisodesDownloaded} of ${pluralize(
+        "episode",
+        targetItems.length,
+        true
+      )} downloaded\n`
+    );
+  } else if (numEpisodesDownloaded > 0) {
+    logMessage(
+      `\nSuccessfully downloaded ${pluralize(
+        "episode",
+        numEpisodesDownloaded,
+        true
+      )}\n`
+    );
+  }
+
   if (numEpisodesDownloaded === 0) {
     process.exit(ERROR_STATUSES.nothingDownloaded);
   }

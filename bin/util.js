@@ -128,28 +128,28 @@ const getUrlEmbed = async (url) => {
   return null;
 };
 
-const getLoopControls = ({ limit, offset, length, reverse }) => {
+const getLoopControls = ({ offset, length, reverse }) => {
   if (reverse) {
     const startIndex = length - 1 - offset;
-    const min = limit ? Math.max(startIndex - limit, -1) : -1;
-    const limitCheck = (i) => i > min;
+    const min = -1;
+    const shouldGo = (i) => i > min;
     const decrement = (i) => i - 1;
 
     return {
       startIndex,
-      limitCheck,
+      shouldGo,
       next: decrement,
     };
   }
 
   const startIndex = 0 + offset;
-  const max = limit ? Math.min(startIndex + limit, length) : length;
-  const limitCheck = (i) => i < max;
+  const max = length;
+  const shouldGo = (i) => i < max;
   const increment = (i) => i + 1;
 
   return {
     startIndex,
-    limitCheck,
+    shouldGo,
     next: increment,
   };
 };
@@ -168,8 +168,7 @@ const getItemsToDownload = ({
   episodeTemplate,
   includeEpisodeImages,
 }) => {
-  const { startIndex, limitCheck, next } = getLoopControls({
-    limit,
+  const { startIndex, shouldGo, next } = getLoopControls({
     offset,
     reverse,
     length: feed.items.length,
@@ -180,7 +179,7 @@ const getItemsToDownload = ({
 
   const savedArchive = archive ? getArchive(archive) : [];
 
-  while (limitCheck(i)) {
+  while (shouldGo(i)) {
     const { title, pubDate } = feed.items[i];
     const pubDateDay = dayjs(new Date(pubDate));
     let isValid = true;
@@ -246,22 +245,20 @@ const getItemsToDownload = ({
             }),
           });
 
-          if (!savedArchive.includes(episodeImageArchiveKey)) {
-            const episodeImageName = getFilename({
-              item,
-              feed,
-              url: episodeAudioUrl,
-              ext: episodeImageFileExt,
-              template: episodeTemplate,
-            });
+          const episodeImageName = getFilename({
+            item,
+            feed,
+            url: episodeAudioUrl,
+            ext: episodeImageFileExt,
+            template: episodeTemplate,
+          });
 
-            const outputImagePath = path.resolve(basePath, episodeImageName);
-            item._extra_downloads.push({
-              url: episodeImageUrl,
-              outputPath: outputImagePath,
-              key: episodeImageArchiveKey,
-            });
-          }
+          const outputImagePath = path.resolve(basePath, episodeImageName);
+          item._extra_downloads.push({
+            url: episodeImageUrl,
+            outputPath: outputImagePath,
+            key: episodeImageArchiveKey,
+          });
         }
       }
 
@@ -271,7 +268,7 @@ const getItemsToDownload = ({
     i = next(i);
   }
 
-  return items;
+  return limit ? items.slice(0, limit) : items;
 };
 
 const logFeedInfo = (feed) => {
@@ -349,7 +346,7 @@ const writeFeedMeta = ({
   fields,
 }) => {
   if (key && archive && getIsInArchive({ key, archive })) {
-    logMessage("Feed metadata exists in archive. Skipping write...");
+    logMessage("Feed metadata exists in archive. Skipping...");
     return;
   }
 
@@ -360,7 +357,7 @@ const writeFeedMeta = ({
     if (override || !fs.existsSync(outputPath)) {
       writeMeta(outputPath, metadata);
     } else {
-      logMessage("Feed metadata exists locally. Skipping write...");
+      logMessage("Feed metadata exists locally. Skipping...");
     }
 
     if (key && archive && !getIsInArchive({ key, archive })) {
@@ -387,9 +384,7 @@ const writeItemMeta = ({
   fields,
 }) => {
   if (key && archive && getIsInArchive({ key, archive })) {
-    logMessage(
-      `${marker} | Episode metadata exists in archive. Skipping write...`
-    );
+    logMessage(`${marker} | Episode metadata exists in archive. Skipping...`);
     return;
   }
 
@@ -399,9 +394,7 @@ const writeItemMeta = ({
     if (override || !fs.existsSync(outputPath)) {
       writeMeta(outputPath, metadata);
     } else {
-      logMessage(
-        `${marker} | Episode metadata exists locally. Skipping write...`
-      );
+      logMessage(`${marker} | Episode metadata exists locally. Skipping...`);
     }
 
     if (key && archive && !getIsInArchive({ key, archive })) {

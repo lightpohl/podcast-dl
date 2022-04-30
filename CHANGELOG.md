@@ -2,6 +2,34 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [7.3.2](https://github.com/lightpohl/podcast-dl/compare/v7.3.1...v7.3.2) (2022-04-13)
+
+
+### Bug Fixes
+
+* limit filtering should be applied last ([e2db23a](https://github.com/lightpohl/podcast-dl/commit/e2db23ae511d534ce5de16b9783da1e182959672))
+
+### [7.3.1](https://github.com/lightpohl/podcast-dl/compare/v7.3.0...v7.3.1) (2022-04-11)
+
+
+### Bug Fixes
+
+* limit success message to > 0 episodes downloaded ([e7c189b](https://github.com/lightpohl/podcast-dl/commit/e7c189be3088111478d0ee131754635f4812aa4b))
+* prevent podcast images from downloading if already archived ([c1a7440](https://github.com/lightpohl/podcast-dl/commit/c1a7440c28519ef3c5c85eaa7f696795b234b564)), closes [#39](https://github.com/lightpohl/podcast-dl/issues/39)
+
+## [7.3.0](https://github.com/lightpohl/podcast-dl/compare/v7.2.0...v7.3.0) (2022-04-09)
+
+
+### Features
+
+* add success/failure message at end of downloads ([a785c73](https://github.com/lightpohl/podcast-dl/commit/a785c73f05f4d5e348bd54888b93500336662539))
+* do not include null values in JSON output ([70f1dac](https://github.com/lightpohl/podcast-dl/commit/70f1dac10dd94fa57e49ee721766dfe463e93dd5))
+
+
+### Bug Fixes
+
+* remove unnecessary file size warning ([96a48b2](https://github.com/lightpohl/podcast-dl/commit/96a48b2c2490ad329ef8212ed17f11f2ff7c0780))
+
 ## [7.2.0](https://github.com/lightpohl/podcast-dl/compare/v7.1.0...v7.2.0) (2022-03-05)
 
 
