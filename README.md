@@ -10,6 +10,12 @@ A CLI for downloading podcasts with a focus on archiving.
 
 `npx podcast-dl --url <PODCAST_RSS_URL>`
 
+### Binaries
+
+[Visit the releases page](https://github.com/lightpohl/podcast-dl/releases) and download the latest binary for your system.
+
+`podcast-dl --url <PODCAST_RSS_URL>`
+
 ### [More Examples](./docs/examples.md)
 
 ## Options
