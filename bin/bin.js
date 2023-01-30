@@ -3,7 +3,6 @@
 import fs from "fs";
 import _path from "path";
 import commander from "commander";
-import { createRequire } from "module";
 import pluralize from "pluralize";
 
 import { download } from "./async.js";
@@ -29,11 +28,8 @@ import {
 import { getFolderName, getSafeName } from "./naming.js";
 import { downloadItemsAsync } from "./async.js";
 
-const require = createRequire(import.meta.url);
-const { version } = require("../package.json");
-
 commander
-  .version(version)
+  .version("7.3.2")
   .option("--url <string>", "url to podcast rss feed")
   .option("--out-dir <path>", "specify output directory", "./{{podcast_title}}")
   .option(
