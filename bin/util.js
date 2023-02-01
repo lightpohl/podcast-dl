@@ -295,15 +295,12 @@ const writeFeedMeta = ({ outputPath, feed, key, archive, override }) => {
     logMessage("Feed metadata exists in archive. Skipping...");
     return;
   }
-
   const output = {};
-  ["title", "description", "link", "feedUrl", "managingEditor"].forEach(
-    (key) => {
-      if (feed[key]) {
-        output[key] = feed[key];
-      }
+  Object.keys(feed).forEach((key) => {
+    if (!key.startsWith("_") && feed[key]) {
+      output[key] = feed[key];
     }
-  );
+  });
 
   try {
     if (override || !fs.existsSync(outputPath)) {
@@ -340,8 +337,8 @@ const writeItemMeta = ({
   }
 
   const output = {};
-  ["title", "contentSnippet", "pubDate", "creator"].forEach((key) => {
-    if (item[key]) {
+  Object.keys(item).forEach((key) => {
+    if (!key.startsWith("_") && item[key]) {
       output[key] = item[key];
     }
   });
