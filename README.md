@@ -44,7 +44,7 @@ Type values surrounded in square brackets (`[]`) can be used as used as boolean 
 | --reverse                |                     | false    | Reverse download direction and start at last RSS item.                                                                                                                                                                |
 | --info                   |                     | false    | Print retrieved podcast info instead of downloading.                                                                                                                                                                  |
 | --list                   | [String]            | false    | Print episode list instead of downloading. Defaults to "table" when used as a boolean option. "json" is also supported.                                                                                               |
-| --exec                   | String              | false    | Execute a command after each episode is downloaded.                                                                                                                                                                   |
+| --exec                   | String              | false    | Execute a command after each episode is downloaded. See "Templating" for more details.                                                                                                                                |
 | --version                |                     | false    | Output the version number.                                                                                                                                                                                            |
 | --help                   |                     | false    | Output usage information.                                                                                                                                                                                             |
 
@@ -55,7 +55,7 @@ Type values surrounded in square brackets (`[]`) can be used as used as boolean 
 
 ## Templating
 
-Options that support templating allow users to specify a template for the generated filename(s). The provided template will replace all matched keywords with the related data described below. Each keyword must be wrapped in two braces like so:
+Options that support templating allow users to specify a template for the generated filename(s) or option. The provided template will replace all matched keywords with the related data described below. Each keyword must be wrapped in two braces like so:
 
 `--out-dir "./{{podcast_title}}"`
 
@@ -75,12 +75,12 @@ Options that support templating allow users to specify a template for the genera
 - `podcast_title`: Title of the podcast feed.
 - `podcast_link`: `link` value provided for the podcast feed. Typically the homepage URL.
 
-## Executing Process After Downloading Episode
+### `--exec`
 
-Option to execute command after downloading episode with `{}` being a placeholder for the downloaded episode and `{filenameBase}` for the filename without extension.
-
-- Example to convert all episodes to mp3 with 192k: `ffmpeg -i {} -b:a 192k -f mp3 {filenameBase}.mp3`
-- Example to move all episodes to folder: `mv {} /mnt/media_server/`
+- `episode_path`: The path to the downloaded episode.
+- `episode_path_base`: The path to the folder of the downloaded episode.
+- `episode_filname`: The filename of the episode.
+- `episode_filename_base`: The filename of the episode without its extension.
 
 ## Log Levels
 

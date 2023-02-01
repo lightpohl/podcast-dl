@@ -204,7 +204,12 @@ let downloadItemsAsync = async ({
 
           if (exec) {
             logMessage("Running exec...");
-            await runExec({ exec, outputPodcastPath, episodeFilename });
+            await runExec({
+              exec,
+              basePath,
+              outputPodcastPath,
+              episodeFilename,
+            });
           }
 
           numEpisodesDownloaded += 1;

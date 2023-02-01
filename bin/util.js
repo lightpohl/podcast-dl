@@ -473,14 +473,22 @@ const runFfmpeg = async ({
   fs.renameSync(tmpMp3Path, outputPath);
 };
 
-const runExec = async ({ exec, outputPodcastPath, episodeFilename }) => {
-  const filenameBase = episodeFilename.substring(
+const runExec = async ({
+  exec,
+  basePath,
+  outputPodcastPath,
+  episodeFilename,
+}) => {
+  const episodeFilenameBase = episodeFilename.substring(
     0,
     episodeFilename.lastIndexOf(".")
   );
+
   const execCmd = exec
-    .replace(/{}/g, `"${outputPodcastPath}"`)
-    .replace(/{filenameBase}/g, `"${filenameBase}"`);
+    .replace(/{{episode_path}}/g, `"${outputPodcastPath}"`)
+    .replace(/{{episode_path_base}}/g, `"${basePath}"`)
+    .replace(/{{episode_filename}}/g, `"${episodeFilename}"`)
+    .replace(/{{episode_filename_base}}/g, `"${episodeFilenameBase}"`);
 
   await execWithPromise(execCmd, { stdio: "ignore" });
 };
