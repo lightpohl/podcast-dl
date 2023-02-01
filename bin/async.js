@@ -21,7 +21,6 @@ import {
   runExec,
   writeItemMeta,
   writeToArchive,
-  getUrlEmbed,
   getIsInArchive,
 } from "./util.js";
 
@@ -37,7 +36,6 @@ const download = async ({
   archive,
   override,
   onAfterDownload,
-  filterUrlTracking,
 }) => {
   const logMessage = getLogMessageWithMarker(marker);
   if (!override && fs.existsSync(outputPath)) {
@@ -50,18 +48,7 @@ const download = async ({
     return;
   }
 
-  let embeddedUrl = null;
-  if (filterUrlTracking) {
-    logMessage("Attempting to find embedded URL...");
-    embeddedUrl = await getUrlEmbed(url);
-
-    if (!embeddedUrl) {
-      logMessage("Unable to find embedded URL. Defaulting to full address");
-    }
-  }
-
-  const finalUrl = embeddedUrl || url;
-  const headResponse = await got(finalUrl, {
+  const headResponse = await got(url, {
     timeout: 5000,
     method: "HEAD",
     responseType: "json",
@@ -108,7 +95,7 @@ const download = async ({
     });
 
     await pipeline(
-      got.stream(finalUrl).on("downloadProgress", onDownloadProgress),
+      got.stream(url).on("downloadProgress", onDownloadProgress),
       fs.createWriteStream(tempOutputPath)
     );
   } catch (error) {
@@ -155,7 +142,6 @@ let downloadItemsAsync = async ({
   episodeTemplate,
   exec,
   feed,
-  filterUrlTracking,
   includeEpisodeMeta,
   mono,
   override,
@@ -193,7 +179,6 @@ let downloadItemsAsync = async ({
         archive,
         override,
         marker,
-        filterUrlTracking,
         key: getArchiveKey({
           prefix: archiveUrl,
           name: getArchiveFilename({

@@ -114,10 +114,6 @@ commander
     createParseNumber({ min: 1, max: 32, name: "threads" }),
     1
   )
-  .option(
-    "--filter-url-tracking",
-    "attempts to extract the direct download link of an episode if detected (experimental)"
-  )
   .parse(process.argv);
 
 const {
@@ -139,7 +135,6 @@ const {
   exec,
   mono,
   threads,
-  filterUrlTracking,
   addMp3Metadata: addMp3MetadataFlag,
   adjustBitrate: bitrate,
 } = commander;
@@ -286,7 +281,6 @@ const main = async () => {
     override,
     targetItems,
     threads,
-    filterUrlTracking,
   });
 
   if (hasErrors && numEpisodesDownloaded !== targetItems.length) {
