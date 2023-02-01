@@ -159,8 +159,6 @@ const main = async () => {
     getFolderName({ feed, template: outDir })
   );
 
-  logFeedInfo(feed);
-
   if (list) {
     if (feed.items && feed.items.length) {
       const listFormat = typeof list === "boolean" ? "table" : list;
@@ -182,6 +180,8 @@ const main = async () => {
   if (info || list) {
     process.exit(0);
   }
+
+  logFeedInfo(feed);
 
   if (!fs.existsSync(basePath)) {
     logMessage(`${basePath} does not exist. Creating...`, LOG_LEVELS.important);
