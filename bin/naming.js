@@ -41,8 +41,8 @@ const getFilename = ({ item, ext, url, feed, template }) => {
 
 const getFolderName = ({ feed, template }) => {
   const templateReplacementsTuples = [
-    ["podcast_title", feed.title ? getSafeName(feed.title) : ""],
-    ["podcast_link", feed.link ? getSafeName(feed.link) : ""],
+    ["podcast_title", feed.title || ""],
+    ["podcast_link", feed.link || ""],
   ];
 
   let name = template;
@@ -55,7 +55,7 @@ const getFolderName = ({ feed, template }) => {
       : name.replace(replaceRegex, "");
   });
 
-  return name;
+  return getSafeName(name);
 };
 
 const getArchiveFilename = ({ pubDate, name, ext }) => {

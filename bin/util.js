@@ -22,6 +22,17 @@ const getArchiveKey = ({ prefix, name }) => {
   return `${prefix}-${name}`;
 };
 
+const getPublicObject = (object) => {
+  const output = {};
+  Object.keys(object).forEach((key) => {
+    if (!key.startsWith("_") && object[key]) {
+      output[key] = object[key];
+    }
+  });
+
+  return output;
+};
+
 const getArchive = (archive) => {
   const archivePath = path.resolve(process.cwd(), archive);
 
@@ -197,10 +208,7 @@ const logFeedInfo = (feed) => {
   logMessage();
 };
 
-const ITEM_LIST_FORMATS = {
-  table: "table",
-  json: "json",
-};
+const ITEM_LIST_FORMATS = ["table", "json"];
 
 const logItemsList = ({
   type,
@@ -222,23 +230,28 @@ const logItemsList = ({
     episodeRegex,
   });
 
-  const tableData = items.map((item) => {
-    return {
+  if (!items.length) {
+    logErrorAndExit("No episodes found with provided criteria to list");
+  }
+
+  const isJson = type === "json";
+
+  const output = items.map((item) => {
+    const data = {
       episodeNum: feed.items.length - item._originalIndex,
       title: item.title,
       pubDate: item.pubDate,
     };
+
+    return data;
   });
 
-  if (!tableData.length) {
-    logErrorAndExit("No episodes found with provided criteria to list");
+  if (isJson) {
+    console.log(JSON.stringify(output));
+    return;
   }
 
-  if (type === ITEM_LIST_FORMATS.json) {
-    console.log(JSON.stringify(tableData));
-  } else {
-    console.table(tableData);
-  }
+  console.table(output);
 };
 
 const writeFeedMeta = ({ outputPath, feed, key, archive, override }) => {
@@ -246,12 +259,7 @@ const writeFeedMeta = ({ outputPath, feed, key, archive, override }) => {
     logMessage("Feed metadata exists in archive. Skipping...");
     return;
   }
-  const output = {};
-  Object.keys(feed).forEach((key) => {
-    if (!key.startsWith("_") && feed[key]) {
-      output[key] = feed[key];
-    }
-  });
+  const output = getPublicObject(feed);
 
   try {
     if (override || !fs.existsSync(outputPath)) {
@@ -287,12 +295,7 @@ const writeItemMeta = ({
     return;
   }
 
-  const output = {};
-  Object.keys(item).forEach((key) => {
-    if (!key.startsWith("_") && item[key]) {
-      output[key] = item[key];
-    }
-  });
+  const output = getPublicObject(item);
 
   try {
     if (override || !fs.existsSync(outputPath)) {
