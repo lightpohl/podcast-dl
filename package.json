@@ -7,8 +7,7 @@
   "scripts": {
     "build": "rimraf ./binaries && npx webpack && npm run pkg",
     "lint": "eslint ./bin",
-    "pkg": "npx pkg ./dist/podcast-dl.js --targets node14-linux-x64,node14-win-x64,node14-macos-x64 --out-path ./binaries",
-    "release": "standard-version"
+    "pkg": "npx pkg ./dist/podcast-dl.js --targets node14-linux-x64,node14-win-x64,node14-macos-x64 --out-path ./binaries"
   },
   "lint-staged": {
     "*.{js,json,md}": [
@@ -46,7 +45,6 @@
     "lint-staged": "^10.1.7",
     "prettier": "2.3.2",
     "rimraf": "^3.0.2",
-    "standard-version": "^9.0.0",
     "webpack-cli": "^5.0.1"
   },
   "dependencies": {
