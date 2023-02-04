@@ -92,5 +92,9 @@ export const setupCommander = (commander, argv) => {
       createParseNumber({ min: 1, max: 32, name: "threads" }),
       1
     )
+    .option(
+      "--parser-config <string>",
+      "path to JSON config to override RSS parser"
+    )
     .parse(argv);
 };

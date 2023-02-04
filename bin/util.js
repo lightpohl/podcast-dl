@@ -10,10 +10,6 @@ import { getArchiveFilename, getFilename } from "./naming.js";
 
 const execWithPromise = util.promisify(exec);
 
-const parser = new rssParser({
-  defaultRSS: 2.0,
-});
-
 const getTempPath = (path) => {
   return `${path}.tmp`;
 };
@@ -33,14 +29,19 @@ const getPublicObject = (object) => {
   return output;
 };
 
-const getArchive = (archive) => {
-  const archivePath = path.resolve(process.cwd(), archive);
+const getJsonFile = (filePath) => {
+  const fullPath = path.resolve(process.cwd(), filePath);
 
-  if (!fs.existsSync(archivePath)) {
-    return [];
+  if (!fs.existsSync(fullPath)) {
+    return null;
   }
 
-  return JSON.parse(fs.readFileSync(archivePath));
+  return JSON.parse(fs.readFileSync(fullPath));
+};
+
+const getArchive = (archive) => {
+  const archiveContent = getJsonFile(archive);
+  return archiveContent === null ? [] : archiveContent;
 };
 
 const writeToArchive = ({ key, archive }) => {
@@ -383,7 +384,19 @@ const getImageUrl = ({ image, itunes }) => {
   return null;
 };
 
-const getFeed = async (url) => {
+const getFeed = async (url, parserConfig) => {
+  const defaultConfig = {
+    defaultRSS: 2.0,
+  };
+
+  const config = parserConfig ? getJsonFile(parserConfig) : defaultConfig;
+
+  if (parserConfig && !config) {
+    logErrorAndExit(`Unable to load parser config: ${parserConfig}`);
+  }
+
+  const parser = new rssParser(config);
+
   const { href } = new URL(url);
 
   let feed;

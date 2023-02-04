@@ -48,6 +48,7 @@ const {
   exec,
   mono,
   threads,
+  parserConfig,
   addMp3Metadata: addMp3MetadataFlag,
   adjustBitrate: bitrate,
 } = commander;
@@ -61,11 +62,15 @@ const main = async () => {
 
   const { hostname, pathname } = new URL(url);
   const archiveUrl = `${hostname}${pathname}`;
-  const feed = await getFeed(url);
+  const feed = await getFeed(url, parserConfig);
   const basePath = _path.resolve(
     process.cwd(),
     getFolderName({ feed, template: outDir })
   );
+
+  if (info) {
+    logFeedInfo(feed);
+  }
 
   if (list) {
     if (feed.items && feed.items.length) {
