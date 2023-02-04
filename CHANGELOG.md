@@ -1,9 +1,14 @@
 # Changelog
 
-All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+All notable changes to this project will be documented in this file.
 
 ## [8.0.0](https://github.com/lightpohl/podcast-dl/compare/v7.3.2...v8.0.0) (2023-02-04)
 
+### ⚠ BREAKING CHANGES
+
+* remove '--filter-url-tracking' experimental flag
+* include all properties in metadata from rss-parser
+* make '--exec' templating options more consistent
 
 ### Features
 
