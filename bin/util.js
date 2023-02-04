@@ -18,10 +18,10 @@ const getArchiveKey = ({ prefix, name }) => {
   return `${prefix}-${name}`;
 };
 
-const getPublicObject = (object) => {
+const getPublicObject = (object, exclude = []) => {
   const output = {};
   Object.keys(object).forEach((key) => {
-    if (!key.startsWith("_") && object[key]) {
+    if (!key.startsWith("_") && !exclude.includes(key) && object[key]) {
       output[key] = object[key];
     }
   });
@@ -260,7 +260,7 @@ const writeFeedMeta = ({ outputPath, feed, key, archive, override }) => {
     logMessage("Feed metadata exists in archive. Skipping...");
     return;
   }
-  const output = getPublicObject(feed);
+  const output = getPublicObject(feed, ["items"]);
 
   try {
     if (override || !fs.existsSync(outputPath)) {
