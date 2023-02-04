@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+### [8.0.1](https://github.com/lightpohl/podcast-dl/compare/v8.0.0...v8.0.1) (2023-02-04)
+
+### Bug Fixes
+
+* feed meta should not include items meta
+
 ## [8.0.0](https://github.com/lightpohl/podcast-dl/compare/v7.3.2...v8.0.0) (2023-02-04)
 
 ### ⚠ BREAKING CHANGES
