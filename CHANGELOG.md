@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [8.0.0](https://github.com/lightpohl/podcast-dl/compare/v7.3.2...v8.0.0) (2023-02-04)
+
+
+### Features
+
+* add '--parser-config' option ([e70eaac](https://github.com/lightpohl/podcast-dl/commit/e70eaac237af6cc569494bee0576dc04494cb632))
+
+
+### Bug Fixes
+
+* do not log feed info when using '--list' ([1bb340b](https://github.com/lightpohl/podcast-dl/commit/1bb340bd9337fcab1054dd2f4e556699b9c55e58))
+
 ### [7.3.2](https://github.com/lightpohl/podcast-dl/compare/v7.3.1...v7.3.2) (2022-04-13)
 
 
