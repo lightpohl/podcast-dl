@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+### [8.0.2](https://github.com/lightpohl/podcast-dl/compare/v8.0.0...v8.0.2) (2023-02-04)
+
+### Features
+
+* make 'episode_num' available for '--episode-template' templating
+
+### Bug Fixes
+
+* increase timeout check for slower servers
+
 ### [8.0.1](https://github.com/lightpohl/podcast-dl/compare/v8.0.0...v8.0.1) (2023-02-04)
 
 ### Bug Fixes
