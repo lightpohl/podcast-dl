@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-### [8.0.2](https://github.com/lightpohl/podcast-dl/compare/v8.0.0...v8.0.2) (2023-02-04)
+### [8.0.2](https://github.com/lightpohl/podcast-dl/compare/v8.0.1...v8.0.2) (2023-02-04)
 
 ### Features
 
