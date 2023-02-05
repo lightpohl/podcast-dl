@@ -12,6 +12,7 @@ const getSafeName = (name) => {
 };
 
 const getFilename = ({ item, ext, url, feed, template }) => {
+  const episodeNum = feed.items.length - item._originalIndex;
   const formattedPubDate = item.pubDate
     ? dayjs(new Date(item.pubDate)).format("YYYYMMDD")
     : null;
@@ -19,6 +20,7 @@ const getFilename = ({ item, ext, url, feed, template }) => {
   const templateReplacementsTuples = [
     ["title", item.title || ""],
     ["release_date", formattedPubDate || ""],
+    ["episode_num", episodeNum],
     ["url", url],
     ["podcast_title", feed.title || ""],
     ["podcast_link", feed.link || ""],

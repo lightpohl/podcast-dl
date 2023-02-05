@@ -71,6 +71,7 @@ Options that support templating allow users to specify a template for the genera
 
 - `title`: The title of the episode.
 - `release_date`: The release date of the episode in `YYYYMMDD` format.
+- `episode_num`: The location number of where the episodes appears in the feed.
 - `url`: URL of episode audio file.
 - `duration`: Provided `mm:ss` duration (if found).
 - `podcast_title`: Title of the podcast feed.
