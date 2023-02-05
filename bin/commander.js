@@ -96,5 +96,6 @@ export const setupCommander = (commander, argv) => {
       "--parser-config <string>",
       "path to JSON config to override RSS parser"
     )
+    .option("--proxy", "enable proxy support via global-agent")
     .parse(argv);
 };

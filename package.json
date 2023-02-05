@@ -52,6 +52,7 @@
     "commander": "^5.1.0",
     "dayjs": "^1.8.25",
     "filenamify": "^4.1.0",
+    "global-agent": "^3.0.0",
     "got": "^11.0.2",
     "p-limit": "^4.0.0",
     "pluralize": "^8.0.0",
