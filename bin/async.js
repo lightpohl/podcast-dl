@@ -49,7 +49,7 @@ const download = async ({
   }
 
   const headResponse = await got(url, {
-    timeout: 5000,
+    timeout: 30000,
     method: "HEAD",
     responseType: "json",
     headers: {
