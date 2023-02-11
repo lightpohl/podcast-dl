@@ -4,6 +4,7 @@ import fs from "fs";
 import _path from "path";
 import commander from "commander";
 import pluralize from "pluralize";
+import { bootstrap as bootstrapProxy } from "global-agent";
 
 import { setupCommander } from "./commander.js";
 import { download } from "./async.js";
@@ -49,6 +50,7 @@ const {
   mono,
   threads,
   parserConfig,
+  proxy,
   addMp3Metadata: addMp3MetadataFlag,
   adjustBitrate: bitrate,
 } = commander;
@@ -58,6 +60,10 @@ let { archive } = commander;
 const main = async () => {
   if (!url) {
     logErrorAndExit("No URL provided");
+  }
+
+  if (proxy) {
+    bootstrapProxy();
   }
 
   const { hostname, pathname } = new URL(url);
