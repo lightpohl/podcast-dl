@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+### [8.0.3](https://github.com/lightpohl/podcast-dl/compare/v8.0.2...v8.0.3) (2023-02-11)
+
+### Features
+
+* add `--proxy` flag to enable proxy support via ENV variables
+
 ### [8.0.2](https://github.com/lightpohl/podcast-dl/compare/v8.0.1...v8.0.2) (2023-02-04)
 
 ### Features
