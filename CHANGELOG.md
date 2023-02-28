@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+### [8.0.4](https://github.com/lightpohl/podcast-dl/compare/v8.0.2...v8.0.4) (2023-02-27)
+
+### Bug Fixes
+
+'--out-dir' and '--archive' incorrectly generating nested folders
+
 ### [8.0.3](https://github.com/lightpohl/podcast-dl/compare/v8.0.2...v8.0.3) (2023-02-11)
 
 ### Features
