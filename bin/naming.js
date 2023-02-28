@@ -53,11 +53,11 @@ const getFolderName = ({ feed, template }) => {
     const replaceRegex = new RegExp(`{{${matcher}}}`, "g");
 
     name = replacement
-      ? name.replace(replaceRegex, replacement)
+      ? name.replace(replaceRegex, getSafeName(replacement))
       : name.replace(replaceRegex, "");
   });
 
-  return getSafeName(name);
+  return name;
 };
 
 const getArchiveFilename = ({ pubDate, name, ext }) => {
