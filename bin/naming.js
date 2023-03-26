@@ -11,7 +11,7 @@ const getSafeName = (name) => {
   });
 };
 
-const getFilename = ({ item, ext, url, feed, template }) => {
+const getFilename = ({ item, ext, url, feed, template, width }) => {
   const episodeNum = feed.items.length - item._originalIndex;
   const formattedPubDate = item.pubDate
     ? dayjs(new Date(item.pubDate)).format("YYYYMMDD")
@@ -20,7 +20,7 @@ const getFilename = ({ item, ext, url, feed, template }) => {
   const templateReplacementsTuples = [
     ["title", item.title || ""],
     ["release_date", formattedPubDate || ""],
-    ["episode_num", episodeNum],
+    ["episode_num", `${episodeNum}`.padStart(width, "0")],
     ["url", url],
     ["podcast_title", feed.title || ""],
     ["podcast_link", feed.link || ""],
