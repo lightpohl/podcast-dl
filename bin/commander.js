@@ -20,6 +20,12 @@ export const setupCommander = (commander, argv) => {
       "template for generating episode related filenames",
       "{{release_date}}-{{title}}"
     )
+    .option(
+      "--episode-digits <number>",
+      "number of digits to use for episode numbering (leading zeros)",
+      createParseNumber({ min: 0, name: "--episode-digits" }),
+      1
+    )
     .option("--include-meta", "write out podcast metadata to json")
     .option(
       "--include-episode-meta",

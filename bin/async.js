@@ -140,6 +140,7 @@ let downloadItemsAsync = async ({
   basePath,
   bitrate,
   episodeTemplate,
+  episodeDigits,
   exec,
   feed,
   includeEpisodeMeta,
@@ -171,6 +172,7 @@ let downloadItemsAsync = async ({
       url: episodeAudioUrl,
       ext: audioFileExt,
       template: episodeTemplate,
+      width: episodeDigits,
     });
     const outputPodcastPath = _path.resolve(basePath, episodeFilename);
 
