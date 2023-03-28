@@ -1,8 +1,12 @@
 # Changelog
 
-All notable changes to this project will be documented in this file.
+### [8.0.5](https://github.com/lightpohl/podcast-dl/compare/v8.0.4...v8.0.5) (2023-03-27)
 
-### [8.0.4](https://github.com/lightpohl/podcast-dl/compare/v8.0.2...v8.0.4) (2023-02-27)
+### Features
+
+* add `--episode-digits` to allow episode number to be padded with leading zeroes
+
+### [8.0.4](https://github.com/lightpohl/podcast-dl/compare/v8.0.3...v8.0.4) (2023-02-27)
 
 ### Bug Fixes
 
