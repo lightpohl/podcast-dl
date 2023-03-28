@@ -22,7 +22,7 @@ export const setupCommander = (commander, argv) => {
     )
     .option(
       "--episode-digits <number>",
-      "number of digits to use for episode numbering (leading zeros)",
+      "minimum number of digits to use for episode numbering (leading zeros)",
       createParseNumber({ min: 0, name: "--episode-digits" }),
       1
     )
