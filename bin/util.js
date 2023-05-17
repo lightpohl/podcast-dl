@@ -318,6 +318,10 @@ const writeItemMeta = ({
 };
 
 const getUrlExt = (url) => {
+  if (!url) {
+    return "";
+  }
+
   const { pathname } = new URL(url);
 
   if (!pathname) {
