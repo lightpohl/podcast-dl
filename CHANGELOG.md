@@ -1,5 +1,11 @@
 # Changelog
 
+### [8.0.6](https://github.com/lightpohl/podcast-dl/compare/v8.0.4...v8.0.5) (2023-03-27)
+
+### Bug Fixes
+
+* handle feeds where audio files are missing exts
+
 ### [8.0.5](https://github.com/lightpohl/podcast-dl/compare/v8.0.4...v8.0.5) (2023-03-27)
 
 ### Features
@@ -10,7 +16,7 @@
 
 ### Bug Fixes
 
-'--out-dir' and '--archive' incorrectly generating nested folders
+* '--out-dir' and '--archive' incorrectly generating nested folders
 
 ### [8.0.3](https://github.com/lightpohl/podcast-dl/compare/v8.0.2...v8.0.3) (2023-02-11)
 
