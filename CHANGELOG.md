@@ -1,6 +1,12 @@
 # Changelog
 
-### [8.0.6](https://github.com/lightpohl/podcast-dl/compare/v8.0.4...v8.0.5) (2023-03-27)
+### [8.0.7](https://github.com/lightpohl/podcast-dl/compare/v8.0.6...v8.0.7) (2023-07-09)
+
+### Bug Fixes
+
+* meta and episode image filenames should respect --episode-digits
+
+### [8.0.6](https://github.com/lightpohl/podcast-dl/compare/v8.0.5...v8.0.6) (2023-05-17)
 
 ### Bug Fixes
 
