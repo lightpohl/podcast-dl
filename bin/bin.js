@@ -179,6 +179,7 @@ const main = async () => {
     reverse,
     after,
     before,
+    episodeDigits,
     episodeRegex,
     episodeTemplate,
     includeEpisodeImages,

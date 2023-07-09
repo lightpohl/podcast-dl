@@ -249,6 +249,7 @@ let downloadItemsAsync = async ({
         url: episodeAudioUrl,
         ext: episodeMetaExt,
         template: episodeTemplate,
+        width: episodeDigits,
       });
       const outputEpisodeMetaPath = _path.resolve(basePath, episodeMetaName);
 

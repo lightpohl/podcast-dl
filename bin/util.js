@@ -96,6 +96,7 @@ const getItemsToDownload = ({
   reverse,
   before,
   after,
+  episodeDigits,
   episodeRegex,
   episodeTemplate,
   includeEpisodeImages,
@@ -183,6 +184,7 @@ const getItemsToDownload = ({
             url: episodeAudioUrl,
             ext: episodeImageFileExt,
             template: episodeTemplate,
+            width: episodeDigits,
           });
 
           const outputImagePath = path.resolve(basePath, episodeImageName);
