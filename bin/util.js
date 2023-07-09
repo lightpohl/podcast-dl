@@ -36,7 +36,13 @@ const getJsonFile = (filePath) => {
     return null;
   }
 
-  return JSON.parse(fs.readFileSync(fullPath));
+  const data = fs.readFileSync(fullPath);
+
+  if (!data) {
+    return null;
+  }
+
+  return JSON.parse(data);
 };
 
 const getArchive = (archive) => {
