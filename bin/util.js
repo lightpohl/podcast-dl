@@ -355,7 +355,13 @@ const AUDIO_TYPES_TO_EXTS = {
 const VALID_AUDIO_EXTS = [...new Set(Object.values(AUDIO_TYPES_TO_EXTS))];
 
 const getIsAudioUrl = (url) => {
-  const ext = getUrlExt(url);
+  let ext;
+  try {
+    ext = getUrlExt(url);
+  } catch (err) {
+    // could log a warning here?
+    return false;
+  }
 
   if (!ext) {
     return false;
