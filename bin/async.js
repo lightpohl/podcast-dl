@@ -224,7 +224,6 @@ let downloadItemsAsync = async ({
 
     for (const extra of item._extra_downloads) {
       try {
-        logMessage("Downloading episode image...");
         await download({
           archive,
           override,

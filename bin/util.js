@@ -359,7 +359,6 @@ const getIsAudioUrl = (url) => {
   try {
     ext = getUrlExt(url);
   } catch (err) {
-    // could log a warning here?
     return false;
   }
 
