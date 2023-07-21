@@ -1,5 +1,13 @@
 # Changelog
 
+### [8.0.8](https://github.com/lightpohl/podcast-dl/compare/v8.0.7...v8.0.8) (2023-07-21)
+
+### Bug Fixes
+
+* handle invalid URLs when attempting to find audio file URL
+* more gracefully handle initially empty archive files
+* remove an inaccurate log message when download extra items for an episode
+
 ### [8.0.7](https://github.com/lightpohl/podcast-dl/compare/v8.0.6...v8.0.7) (2023-07-09)
 
 ### Bug Fixes
