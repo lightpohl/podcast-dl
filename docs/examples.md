@@ -42,7 +42,7 @@ npx podcast-dl --after "01/01/2021" --before "12/31/2021" --url "http://eightfou
 npx podcast-dl --episode-regex "Zelda" --url "http://eightfour.libsyn.com/rss"
 ```
 
-## Convert all episodes to MP3s at 192k bitrate: `ffmpeg -i {{episode_path}} -b:a 192k -f mp3 {{episode_filename_base}}.mp3`
+## Convert all episodes to MP3s at 192k bitrate with ffmpeg
 
 ```bash
 npx podcast-dl --url "http://eightfour.libsyn.com/rss" --exec "ffmpeg -i {{episode_path}} -b:a 192k -f mp3 {{episode_path_base}}/{{episode_filename_base}}-192k.mp3"
