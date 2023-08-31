@@ -66,7 +66,8 @@ const getArchiveFilename = ({ pubDate, name, ext }) => {
     : null;
 
   const baseName = formattedPubDate ? `${formattedPubDate}-${name}` : name;
-  return getSafeName(`${baseName}${ext}`);
+
+  return `${baseName}${ext}`;
 };
 
 export { getArchiveFilename, getFilename, getFolderName, getSafeName };
