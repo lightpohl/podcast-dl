@@ -2,7 +2,7 @@ import { sync as commandExistsSync } from "command-exists";
 
 import { logErrorAndExit } from "./logger.js";
 
-const createParseNumber = ({ min, name, required = true }) => {
+const createParseNumber = ({ min, max, name, required = true }) => {
   return (value) => {
     if (!value && !required) {
       return undefined;
@@ -15,8 +15,16 @@ const createParseNumber = ({ min, name, required = true }) => {
         logErrorAndExit(`${name} must be a number`);
       }
 
-      if (number < min) {
+      if (typeof min !== undefined && number < min) {
         logErrorAndExit(`${name} must be >= ${min}`);
+      }
+
+      if (typeof max !== undefined && number > max) {
+        logErrorAndExit(
+          `${name} must be <= ${
+            max === Number.MAX_SAFE_INTEGER ? "Number.MAX_SAFE_INTEGER" : max
+          }`
+        );
       }
 
       return number;

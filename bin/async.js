@@ -28,15 +28,19 @@ const pipeline = promisify(stream.pipeline);
 
 const BYTES_IN_MB = 1000000;
 
-const download = async ({
-  marker,
-  url,
-  outputPath,
-  key,
-  archive,
-  override,
-  onAfterDownload,
-}) => {
+const download = async (options) => {
+  const {
+    marker,
+    url,
+    outputPath,
+    key,
+    archive,
+    override,
+    onAfterDownload,
+    attempt = 1,
+    maxAttempts = 3,
+  } = options;
+
   const logMessage = getLogMessageWithMarker(marker);
   if (!override && fs.existsSync(outputPath)) {
     logMessage("Download exists locally. Skipping...");
@@ -100,7 +104,17 @@ const download = async ({
     );
   } catch (error) {
     removeFile();
-    throw error;
+
+    if (attempt <= maxAttempts) {
+      logMessage(`Download attempt #${attempt} failed. Retrying...`);
+
+      await download({
+        ...options,
+        attempt: attempt + 1,
+      });
+    } else {
+      throw error;
+    }
   }
 
   const fileSize = fs.statSync(tempOutputPath).size;
@@ -137,6 +151,7 @@ let downloadItemsAsync = async ({
   addMp3MetadataFlag,
   archive,
   archiveUrl,
+  attempts,
   basePath,
   bitrate,
   episodeTemplate,
@@ -189,6 +204,7 @@ let downloadItemsAsync = async ({
             ext: audioFileExt,
           }),
         }),
+        maxAttempts: attempts,
         outputPath: outputPodcastPath,
         url: episodeAudioUrl,
         onAfterDownload: async () => {
@@ -228,6 +244,7 @@ let downloadItemsAsync = async ({
           archive,
           override,
           marker: extra.url,
+          maxAttempts: attempts,
           key: extra.key,
           outputPath: extra.outputPath,
           url: extra.url,

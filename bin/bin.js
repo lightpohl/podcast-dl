@@ -51,6 +51,7 @@ const {
   exec,
   mono,
   threads,
+  attempts,
   parserConfig,
   proxy,
   addMp3Metadata: addMp3MetadataFlag,
@@ -139,6 +140,7 @@ const main = async () => {
           key: getArchiveKey({ prefix: archiveUrl, name: podcastImageName }),
           outputPath: outputImagePath,
           url: podcastImageUrl,
+          maxAttempts: attempts,
         });
       } catch (error) {
         logError("Unable to download podcast image", error);
@@ -199,6 +201,7 @@ const main = async () => {
     addMp3MetadataFlag,
     archive,
     archiveUrl,
+    attempts,
     basePath,
     bitrate,
     episodeTemplate,

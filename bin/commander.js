@@ -112,8 +112,22 @@ export const setupCommander = (commander, argv) => {
     .option(
       "--threads <number>",
       "the number of downloads that can happen concurrently",
-      createParseNumber({ min: 1, max: 32, name: "threads" }),
+      createParseNumber({
+        min: 1,
+        max: Number.MAX_SAFE_INTEGER,
+        name: "threads",
+      }),
       1
+    )
+    .option(
+      "--attempts <number>",
+      "the number of attempts for an individual download",
+      createParseNumber({
+        min: 1,
+        max: Number.MAX_SAFE_INTEGER,
+        name: "attempts",
+      }),
+      3
     )
     .option(
       "--parser-config <string>",
