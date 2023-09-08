@@ -1,5 +1,18 @@
 # Changelog
 
+## [9.0.0](https://github.com/lightpohl/podcast-dl/compare/v7.3.2...v8.0.0) (2023-02-04)
+
+### ⚠ BREAKING CHANGES
+
+* keys generated for the archive will use the full and unaltered titles
+* pull from item enclosure first when looking for episode downloads
+
+### Features
+
+* add `--attempts` and support automatic retries
+* add `--episode-source-order` for better support of problematic feeds
+
+
 ### [8.0.8](https://github.com/lightpohl/podcast-dl/compare/v8.0.7...v8.0.8) (2023-07-21)
 
 ### Bug Fixes
