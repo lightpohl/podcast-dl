@@ -1,4 +1,4 @@
-import { ITEM_LIST_FORMATS } from "./util.js";
+import { AUDIO_ORDER_TYPES, ITEM_LIST_FORMATS } from "./util.js";
 import { createParseNumber, hasFfmpeg } from "./validate.js";
 import { logErrorAndExit } from "./logger.js";
 
@@ -25,6 +25,23 @@ export const setupCommander = (commander, argv) => {
       "minimum number of digits to use for episode numbering (leading zeros)",
       createParseNumber({ min: 0, name: "--episode-digits" }),
       1
+    )
+    .option(
+      "--episode-source-order <string>",
+      "attempted order to extract episode audio URL from rss feed",
+      (value) => {
+        const parsed = value.split(",").map((type) => type.trim());
+        const isValid = parsed.every((type) => !!AUDIO_ORDER_TYPES[type]);
+
+        if (!isValid) {
+          logErrorAndExit(
+            `Invalid type found in --episode-source-order: ${value}\n`
+          );
+        }
+
+        return parsed;
+      },
+      "enclosure,link"
     )
     .option("--include-meta", "write out podcast metadata to json")
     .option(

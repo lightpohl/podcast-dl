@@ -104,6 +104,7 @@ const getItemsToDownload = ({
   after,
   episodeDigits,
   episodeRegex,
+  episodeSourceOrder,
   episodeTemplate,
   includeEpisodeImages,
 }) => {
@@ -151,7 +152,7 @@ const getItemsToDownload = ({
     }
 
     const { url: episodeAudioUrl, ext: audioFileExt } =
-      getEpisodeAudioUrlAndExt(feed.items[i]);
+      getEpisodeAudioUrlAndExt(feed.items[i], episodeSourceOrder);
     const key = getArchiveKey({
       prefix: archiveUrl,
       name: getArchiveFilename({
@@ -369,17 +370,29 @@ const getIsAudioUrl = (url) => {
   return VALID_AUDIO_EXTS.includes(ext);
 };
 
-const getEpisodeAudioUrlAndExt = ({ enclosure, link }) => {
-  if (link && getIsAudioUrl(link)) {
-    return { url: link, ext: getUrlExt(link) };
-  }
+const AUDIO_ORDER_TYPES = {
+  enclosure: "enclosure",
+  link: "link",
+};
 
-  if (enclosure && getIsAudioUrl(enclosure.url)) {
-    return { url: enclosure.url, ext: getUrlExt(enclosure.url) };
-  }
+const getEpisodeAudioUrlAndExt = (
+  { enclosure, link },
+  order = [AUDIO_ORDER_TYPES.link, AUDIO_ORDER_TYPES.enclosure]
+) => {
+  for (const source of order) {
+    if (source === AUDIO_ORDER_TYPES.link && link && getIsAudioUrl(link)) {
+      return { url: link, ext: getUrlExt(link) };
+    }
 
-  if (enclosure && enclosure.url && AUDIO_TYPES_TO_EXTS[enclosure.type]) {
-    return { url: enclosure.url, ext: AUDIO_TYPES_TO_EXTS[enclosure.type] };
+    if (source === AUDIO_ORDER_TYPES.enclosure && enclosure) {
+      if (getIsAudioUrl(enclosure.url)) {
+        return { url: enclosure.url, ext: getUrlExt(enclosure.url) };
+      }
+
+      if (enclosure.url && AUDIO_TYPES_TO_EXTS[enclosure.type]) {
+        return { url: enclosure.url, ext: AUDIO_TYPES_TO_EXTS[enclosure.type] };
+      }
+    }
   }
 
   return { url: null, ext: null };
@@ -527,6 +540,7 @@ const runExec = async ({
 };
 
 export {
+  AUDIO_ORDER_TYPES,
   getArchive,
   getIsInArchive,
   getArchiveKey,

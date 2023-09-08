@@ -35,6 +35,7 @@ const {
   outDir,
   episodeTemplate,
   episodeDigits,
+  episodeSourceOrder,
   includeMeta,
   includeEpisodeMeta,
   includeEpisodeImages,
@@ -181,6 +182,7 @@ const main = async () => {
     before,
     episodeDigits,
     episodeRegex,
+    episodeSourceOrder,
     episodeTemplate,
     includeEpisodeImages,
   });
