@@ -95,3 +95,7 @@ By default, all logs and errors are outputted to the console. The amount of logs
 - `static`: All logs and errors are outputted to the console, but disables any animations.
 - `quiet`: Only important info and non-critical errors will be logged (e.g. episode download started).
 - `silent`: Only critical error messages will be be logged.
+
+## OS Filename Limits
+
+By default, the max length of a generated filename is `255`. If your OS has different limitations, or if you're running into issues with non-standard feeds, you can adjust the limit via the environment variable `MAX_LENGTH_FILENAME`.
