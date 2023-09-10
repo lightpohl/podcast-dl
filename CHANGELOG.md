@@ -8,7 +8,7 @@
 
 ### Feature
 
-* allow override of `MAX_LENGTH_LIMIT` via env variable
+* allow override of `MAX_LENGTH_FILENAME` via env variable
 
 ### [9.0.1](https://github.com/lightpohl/podcast-dl/compare/v9.0.0...v9.0.1) (2023-09-09)
 
