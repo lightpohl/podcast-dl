@@ -12,7 +12,7 @@ import {
   getLogMessageWithMarker,
   getShouldOutputProgressIndicator,
 } from "./logger.js";
-import { getArchiveFilename, getFilename } from "./naming.js";
+import { getArchiveFilename, getItemFilename } from "./naming.js";
 import {
   getEpisodeAudioUrlAndExt,
   getArchiveKey,
@@ -68,12 +68,9 @@ const download = async (options) => {
     }
   };
 
-  const expectedSize =
-    headResponse &&
-    headResponse.headers &&
-    headResponse.headers["content-length"]
-      ? parseInt(headResponse.headers["content-length"])
-      : 0;
+  const expectedSize = headResponse?.headers?.["content-length"]
+    ? parseInt(headResponse.headers["content-length"])
+    : 0;
 
   logMessage(
     `Starting download${
@@ -182,7 +179,7 @@ let downloadItemsAsync = async ({
       return;
     }
 
-    const episodeFilename = getFilename({
+    const episodeFilename = getItemFilename({
       item,
       feed,
       url: episodeAudioUrl,
@@ -260,7 +257,7 @@ let downloadItemsAsync = async ({
 
     if (includeEpisodeMeta) {
       const episodeMetaExt = ".meta.json";
-      const episodeMetaName = getFilename({
+      const episodeMetaName = getItemFilename({
         item,
         feed,
         url: episodeAudioUrl,

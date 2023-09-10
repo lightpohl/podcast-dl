@@ -6,7 +6,7 @@ import util from "util";
 import { exec } from "child_process";
 
 import { logErrorAndExit, logMessage } from "./logger.js";
-import { getArchiveFilename, getFilename } from "./naming.js";
+import { getArchiveFilename, getItemFilename } from "./naming.js";
 
 const execWithPromise = util.promisify(exec);
 
@@ -185,7 +185,7 @@ const getItemsToDownload = ({
             }),
           });
 
-          const episodeImageName = getFilename({
+          const episodeImageName = getItemFilename({
             item,
             feed,
             url: episodeAudioUrl,
@@ -399,15 +399,15 @@ const getEpisodeAudioUrlAndExt = (
 };
 
 const getImageUrl = ({ image, itunes }) => {
-  if (image && image.url) {
+  if (image?.url) {
     return image.url;
   }
 
-  if (image && image.link) {
+  if (image?.link) {
     return image.link;
   }
 
-  if (itunes && itunes.image) {
+  if (itunes?.image) {
     return itunes.image;
   }
 
@@ -469,14 +469,12 @@ const runFfmpeg = async ({
   if (addMp3Metadata) {
     const album = feed.title || "";
     const title = item.title || "";
-    const artist =
-      item.itunes && item.itunes.author
-        ? item.itunes.author
-        : item.author || "";
-    const track =
-      item.itunes && item.itunes.episode
-        ? item.itunes.episode
-        : `${feed.items.length - itemIndex}`;
+    const artist = item?.itunes?.author
+      ? item.itunes.author
+      : item.author || "";
+    const track = item?.itunes?.episode
+      ? item.itunes.episode
+      : `${feed.items.length - itemIndex}`;
     const date = item.pubDate
       ? dayjs(new Date(item.pubDate)).format("YYYY-MM-DD")
       : "";

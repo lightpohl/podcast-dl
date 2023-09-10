@@ -25,7 +25,7 @@ import {
   logError,
   logErrorAndExit,
 } from "./logger.js";
-import { getFolderName, getSafeName } from "./naming.js";
+import { getFolderName, getSimpleFilename } from "./naming.js";
 import { downloadItemsAsync } from "./async.js";
 
 setupCommander(commander, process.argv);
@@ -82,7 +82,7 @@ const main = async () => {
   }
 
   if (list) {
-    if (feed.items && feed.items.length) {
+    if (feed?.items?.length) {
       const listFormat = typeof list === "boolean" ? "table" : list;
       logItemsList({
         type: listFormat,
@@ -123,12 +123,12 @@ const main = async () => {
 
     if (podcastImageUrl) {
       const podcastImageFileExt = getUrlExt(podcastImageUrl);
-      const podcastImageName = `${
-        feed.title ? `${feed.title}.image` : "image"
-      }${podcastImageFileExt}`;
       const outputImagePath = _path.resolve(
         basePath,
-        getSafeName(podcastImageName)
+        getSimpleFilename(
+          feed.title ? feed.title : "image",
+          feed.title ? `.image${podcastImageFileExt}` : podcastImageFileExt
+        )
       );
 
       try {
@@ -137,7 +137,12 @@ const main = async () => {
           archive,
           override,
           marker: podcastImageUrl,
-          key: getArchiveKey({ prefix: archiveUrl, name: podcastImageName }),
+          key: getArchiveKey({
+            prefix: archiveUrl,
+            name: `${
+              feed.title ? `${feed.title}.image` : "image"
+            }${podcastImageFileExt}`,
+          }),
           outputPath: outputImagePath,
           url: podcastImageUrl,
           maxAttempts: attempts,
@@ -147,8 +152,13 @@ const main = async () => {
       }
     }
 
-    const outputMetaName = `${feed.title ? `${feed.title}.meta` : "meta"}.json`;
-    const outputMetaPath = _path.resolve(basePath, getSafeName(outputMetaName));
+    const outputMetaPath = _path.resolve(
+      basePath,
+      getSimpleFilename(
+        feed.title ? feed.title : "meta",
+        feed.title ? ".meta.json" : ".json"
+      )
+    );
 
     try {
       logMessage("\nSaving podcast metadata...");
@@ -156,7 +166,10 @@ const main = async () => {
         archive,
         override,
         feed,
-        key: getArchiveKey({ prefix: archiveUrl, name: outputMetaName }),
+        key: getArchiveKey({
+          prefix: archiveUrl,
+          name: `${feed.title ? `${feed.title}.meta` : "meta"}.json`,
+        }),
         outputPath: outputMetaPath,
       });
     } catch (error) {

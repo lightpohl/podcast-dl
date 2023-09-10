@@ -2,16 +2,22 @@ import filenamify from "filenamify";
 import dayjs from "dayjs";
 
 const INVALID_CHAR_REPLACE = "_";
-const MAX_LENGTH_FILENAME = 251; // account for ".tmp" files
+const MAX_LENGTH_FILENAME = process.env.MAX_LENGTH_FILENAME
+  ? parseInt(process.env.MAX_LENGTH_FILENAME)
+  : 255;
 
-const getSafeName = (name) => {
+const getSafeName = (name, maxLength = MAX_LENGTH_FILENAME) => {
   return filenamify(name, {
     replacement: INVALID_CHAR_REPLACE,
-    maxLength: MAX_LENGTH_FILENAME,
+    maxLength,
   });
 };
 
-const getFilename = ({ item, ext, url, feed, template, width }) => {
+const getSimpleFilename = (name, ext = "") => {
+  return `${getSafeName(name, MAX_LENGTH_FILENAME - (ext?.length ?? 0))}${ext}`;
+};
+
+const getItemFilename = ({ item, ext, url, feed, template, width }) => {
   const episodeNum = feed.items.length - item._originalIndex;
   const formattedPubDate = item.pubDate
     ? dayjs(new Date(item.pubDate)).format("YYYYMMDD")
@@ -24,7 +30,7 @@ const getFilename = ({ item, ext, url, feed, template, width }) => {
     ["url", url],
     ["podcast_title", feed.title || ""],
     ["podcast_link", feed.link || ""],
-    ["duration", (item.itunes && item.itunes.duration) || ""],
+    ["duration", item.itunes?.duration || ""],
   ];
 
   let name = template;
@@ -37,8 +43,7 @@ const getFilename = ({ item, ext, url, feed, template, width }) => {
       : name.replace(replaceRegex, "");
   });
 
-  name = `${name}${ext}`;
-  return getSafeName(name);
+  return getSimpleFilename(name, ext);
 };
 
 const getFolderName = ({ feed, template }) => {
@@ -70,4 +75,10 @@ const getArchiveFilename = ({ pubDate, name, ext }) => {
   return `${baseName}${ext}`;
 };
 
-export { getArchiveFilename, getFilename, getFolderName, getSafeName };
+export {
+  getArchiveFilename,
+  getFolderName,
+  getItemFilename,
+  getSafeName,
+  getSimpleFilename,
+};

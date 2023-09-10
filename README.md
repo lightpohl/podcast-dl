@@ -85,7 +85,7 @@ Options that support templates allow users to specify a template for the generat
 
 - `episode_path`: The path to the downloaded episode.
 - `episode_path_base`: The path to the folder of the downloaded episode.
-- `episode_filname`: The filename of the episode.
+- `episode_filename`: The filename of the episode.
 - `episode_filename_base`: The filename of the episode without its extension.
 
 ## Log Levels
