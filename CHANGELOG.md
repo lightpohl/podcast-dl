@@ -1,6 +1,14 @@
 # Changelog
 
-## [9.0.0](https://github.com/lightpohl/podcast-dl/compare/v7.3.2...v8.0.0) (2023-02-04)
+### [9.0.1](https://github.com/lightpohl/podcast-dl/compare/v9.0.0...v9.0.1) (2023-09-09)
+
+### Bug Fixes
+
+* prevent ".tmp" files causing file name limit issues
+* `--episode-source-order` using incorrect default value
+
+
+## [9.0.0](https://github.com/lightpohl/podcast-dl/compare/v8.0.8...v9.0.0) (2023-09-08)
 
 ### ⚠ BREAKING CHANGES
 
