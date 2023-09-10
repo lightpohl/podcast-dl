@@ -2,7 +2,7 @@ import filenamify from "filenamify";
 import dayjs from "dayjs";
 
 const INVALID_CHAR_REPLACE = "_";
-const MAX_LENGTH_FILENAME = 255;
+const MAX_LENGTH_FILENAME = 251; // account for ".tmp" files
 
 const getSafeName = (name) => {
   return filenamify(name, {
