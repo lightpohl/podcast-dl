@@ -156,6 +156,7 @@ let downloadItemsAsync = async ({
   bitrate,
   episodeTemplate,
   episodeDigits,
+  episodeSourceOrder,
   exec,
   feed,
   includeEpisodeMeta,
@@ -173,7 +174,7 @@ let downloadItemsAsync = async ({
     const marker = threads > 1 ? `[${threadIndex}] ${item.title}` : item.title;
     const logMessage = getLogMessageWithMarker(marker);
     const { url: episodeAudioUrl, ext: audioFileExt } =
-      getEpisodeAudioUrlAndExt(item);
+      getEpisodeAudioUrlAndExt(item, episodeSourceOrder);
 
     if (!episodeAudioUrl) {
       hasErrors = true;

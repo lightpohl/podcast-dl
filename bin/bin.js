@@ -206,6 +206,7 @@ const main = async () => {
     bitrate,
     episodeTemplate,
     episodeDigits,
+    episodeSourceOrder,
     exec,
     feed,
     includeEpisodeMeta,

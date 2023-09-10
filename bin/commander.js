@@ -41,7 +41,7 @@ export const setupCommander = (commander, argv) => {
 
         return parsed;
       },
-      "enclosure,link"
+      [AUDIO_ORDER_TYPES.enclosure, AUDIO_ORDER_TYPES.link]
     )
     .option("--include-meta", "write out podcast metadata to json")
     .option(

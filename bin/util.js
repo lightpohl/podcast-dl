@@ -377,7 +377,7 @@ const AUDIO_ORDER_TYPES = {
 
 const getEpisodeAudioUrlAndExt = (
   { enclosure, link },
-  order = [AUDIO_ORDER_TYPES.link, AUDIO_ORDER_TYPES.enclosure]
+  order = [AUDIO_ORDER_TYPES.enclosure, AUDIO_ORDER_TYPES.link]
 ) => {
   for (const source of order) {
     if (source === AUDIO_ORDER_TYPES.link && link && getIsAudioUrl(link)) {
