@@ -80,6 +80,7 @@ Options that support templates allow users to specify a template for the generat
 - `duration`: Provided `mm:ss` duration (if found).
 - `podcast_title`: Title of the podcast feed.
 - `podcast_link`: `link` value provided for the podcast feed. Typically the homepage URL.
+- `guid`: The GUID of the episode.
 
 ### `--exec`
 

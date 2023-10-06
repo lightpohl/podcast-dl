@@ -215,6 +215,7 @@ let downloadItemsAsync = async ({
               mono,
               itemIndex: item._originalIndex,
               outputPath: outputPodcastPath,
+              addMp3Metadata: addMp3MetadataFlag,
             });
           }
 
