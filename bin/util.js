@@ -5,7 +5,7 @@ import dayjs from "dayjs";
 import util from "util";
 import { exec } from "child_process";
 
-import { logErrorAndExit, logMessage } from "./logger.js";
+import { logErrorAndExit, logMessage, LOG_LEVELS } from "./logger.js";
 import { getArchiveFilename, getItemFilename } from "./naming.js";
 
 const execWithPromise = util.promisify(exec);
@@ -468,13 +468,13 @@ const runFfmpeg = async ({
 
   if (addMp3Metadata) {
     const album = feed.title || "";
+    const artist = item.itunes?.author || item.author || "";
     const title = item.title || "";
-    const artist = item?.itunes?.author
-      ? item.itunes.author
-      : item.author || "";
-    const track = item?.itunes?.episode
-      ? item.itunes.episode
-      : `${feed.items.length - itemIndex}`;
+    const subtitle = item.itunes?.subtitle || "";
+    const comment = item.content || "";
+    const disc = item.itunes?.season || "";
+    const track = item.itunes?.episode || `${feed.items.length - itemIndex}`;
+    const episodeType = item.itunes?.episodeType || "";
     const date = item.pubDate
       ? dayjs(new Date(item.pubDate)).format("YYYY-MM-DD")
       : "";
@@ -482,10 +482,14 @@ const runFfmpeg = async ({
     const metaKeysToValues = {
       album,
       artist,
+      album_artist: artist,
       title,
+      subtitle,
+      comment,
+      disc,
       track,
+      "episode-type": episodeType,
       date,
-      album_artist: album,
     };
 
     const metadataString = Object.keys(metaKeysToValues)
@@ -502,6 +506,7 @@ const runFfmpeg = async ({
 
   const tmpMp3Path = `${outputPath}.tmp.mp3`;
   command += ` "${tmpMp3Path}"`;
+  logMessage("Running command: " + command, LOG_LEVELS.debug);
 
   try {
     await execWithPromise(command, { stdio: "ignore" });
