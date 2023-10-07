@@ -1,12 +1,22 @@
 # Changelog
 
+### [9.0.3](https://github.com/lightpohl/podcast-dl/compare/v9.0.2...v9.0.3) (2023-10-07)
+
+### Bug Fixes
+
+* fix and enhance the --add-mp3-metadata flag
+
+### Features
+
+* add guid to episode template
+
 ### [9.0.2](https://github.com/lightpohl/podcast-dl/compare/v9.0.1...v9.0.2) (2023-09-10)
 
 ### Bug Fixes
 
 * prevent all exts from causing file name limit issues
 
-### Feature
+### Features
 
 * allow override of `MAX_LENGTH_FILENAME` via env variable
 
