@@ -88,6 +88,10 @@ export const setupCommander = (commander, argv) => {
       hasFfmpeg
     )
     .option("--override", "override local files on collision")
+    .option(
+      "--always-postprocess",
+      "always run additional tasks on the file regardless if the file already exists"
+    )
     .option("--reverse", "download episodes in reverse order")
     .option("--info", "print retrieved podcast info instead of downloading")
     .option(
