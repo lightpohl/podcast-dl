@@ -36,6 +36,7 @@ const download = async (options) => {
     key,
     archive,
     override,
+    alwaysPostprocess,
     onAfterDownload,
     attempt = 1,
     maxAttempts = 3,
@@ -44,6 +45,11 @@ const download = async (options) => {
   const logMessage = getLogMessageWithMarker(marker);
   if (!override && fs.existsSync(outputPath)) {
     logMessage("Download exists locally. Skipping...");
+
+    if (onAfterDownload && alwaysPostprocess) {
+      await onAfterDownload();
+    }
+
     return;
   }
 
@@ -159,6 +165,7 @@ let downloadItemsAsync = async ({
   includeEpisodeMeta,
   mono,
   override,
+  alwaysPostprocess,
   targetItems,
   threads = 1,
 }) => {
@@ -193,6 +200,7 @@ let downloadItemsAsync = async ({
       await download({
         archive,
         override,
+        alwaysPostprocess,
         marker,
         key: getArchiveKey({
           prefix: archiveUrl,

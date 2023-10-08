@@ -45,6 +45,7 @@ const {
   after,
   before,
   override,
+  alwaysPostprocess,
   reverse,
   info,
   list,
@@ -225,6 +226,7 @@ const main = async () => {
     includeEpisodeMeta,
     mono,
     override,
+    alwaysPostprocess,
     targetItems,
     threads,
   });
