@@ -348,9 +348,13 @@ const AUDIO_TYPES_TO_EXTS = {
   "audio/ogg": ".ogg",
   "audio/vorbis": ".ogg",
   "audio/mp4": ".m4a",
+  "audio/x-m4a": ".m4a",
   "audio/wav": ".wav",
   "audio/x-wav": ".wav",
   "audio/aac": ".aac",
+  "video/mp4": ".mp4",
+  "video/quicktime": ".mov",
+  "video/x-m4v": ".m4v",
 };
 
 const VALID_AUDIO_EXTS = [...new Set(Object.values(AUDIO_TYPES_TO_EXTS))];
@@ -447,13 +451,10 @@ const runFfmpeg = async ({
   bitrate,
   mono,
   addMp3Metadata,
+  ext,
 }) => {
   if (!fs.existsSync(outputPath)) {
     return;
-  }
-
-  if (!outputPath.endsWith(".mp3")) {
-    throw new Error("Not an .mp3 file. Unable to run ffmpeg.");
   }
 
   let command = `ffmpeg -loglevel quiet -i "${outputPath}"`;
@@ -504,7 +505,7 @@ const runFfmpeg = async ({
     command += ` -map_metadata 0 ${metadataString} -codec copy`;
   }
 
-  const tmpMp3Path = `${outputPath}.tmp.mp3`;
+  const tmpMp3Path = `${outputPath}.tmp${ext}`;
   command += ` "${tmpMp3Path}"`;
   logMessage("Running command: " + command, LOG_LEVELS.debug);
 
