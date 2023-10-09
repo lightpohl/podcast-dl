@@ -1,5 +1,15 @@
 # Changelog
 
+## [9.1.0](https://github.com/lightpohl/podcast-dl/compare/v9.0.3...v9.1.0) (2023-10-09)
+
+### Features
+
+* add flag to postprocess existing files
+
+### Bug Fixes
+
+* allow ffmpeg options to be run on all filetypes
+
 ### [9.0.3](https://github.com/lightpohl/podcast-dl/compare/v9.0.2...v9.0.3) (2023-10-07)
 
 ### Bug Fixes
