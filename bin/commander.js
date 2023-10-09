@@ -74,17 +74,17 @@ export const setupCommander = (commander, argv) => {
     )
     .option(
       "--add-mp3-metadata",
-      "attempts to add a base level of metadata to .mp3 files using ffmpeg",
+      "attempts to add a base level of metadata to episode files using ffmpeg",
       hasFfmpeg
     )
     .option(
       "--adjust-bitrate <string>",
-      "attempts to adjust bitrate of .mp3 files using ffmpeg",
+      "attempts to adjust bitrate of episode files using ffmpeg",
       hasFfmpeg
     )
     .option(
       "--mono",
-      "attempts to force .mp3 files into mono using ffmpeg",
+      "attempts to force episode files into mono using ffmpeg",
       hasFfmpeg
     )
     .option("--override", "override local files on collision")
