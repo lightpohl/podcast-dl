@@ -1,3 +1,4 @@
+import path from "path";
 import filenamify from "filenamify";
 import dayjs from "dayjs";
 
@@ -34,17 +35,27 @@ const getItemFilename = ({ item, ext, url, feed, template, width }) => {
     ["guid", item.guid],
   ];
 
-  let name = template;
-  templateReplacementsTuples.forEach((replacementTuple) => {
-    const [matcher, replacement] = replacementTuple;
-    const replaceRegex = new RegExp(`{{${matcher}}}`, "g");
+  const templateSegments = template.trim().split(path.sep);
+  const nameSegments = templateSegments.map((segment) => {
+    let name = segment;
+    templateReplacementsTuples.forEach((replacementTuple) => {
+      const [matcher, replacement] = replacementTuple;
+      const replaceRegex = new RegExp(`{{${matcher}}}`, "g");
 
-    name = replacement
-      ? name.replace(replaceRegex, replacement)
-      : name.replace(replaceRegex, "");
+      name = replacement
+        ? name.replace(replaceRegex, replacement)
+        : name.replace(replaceRegex, "");
+    });
+
+    return getSimpleFilename(name);
   });
 
-  return getSimpleFilename(name, ext);
+  nameSegments[nameSegments.length - 1] = getSimpleFilename(
+    nameSegments[nameSegments.length - 1],
+    ext
+  );
+
+  return nameSegments.join(path.sep);
 };
 
 const getFolderName = ({ feed, template }) => {

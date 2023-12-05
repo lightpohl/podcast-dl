@@ -22,6 +22,7 @@ import {
   writeItemMeta,
   writeToArchive,
   getIsInArchive,
+  prepareOutputPath,
 } from "./util.js";
 
 const pipeline = promisify(stream.pipeline);
@@ -195,6 +196,8 @@ let downloadItemsAsync = async ({
       width: episodeDigits,
     });
     const outputPodcastPath = _path.resolve(basePath, episodeFilename);
+
+    prepareOutputPath(outputPodcastPath);
 
     try {
       await download({

@@ -14,6 +14,17 @@ const getTempPath = (path) => {
   return `${path}.tmp`;
 };
 
+const prepareOutputPath = (outputPath) => {
+  const outputPathSegments = outputPath.split(path.sep);
+  outputPathSegments.pop();
+
+  const directoryOutputPath = outputPathSegments.join(path.sep);
+
+  if (directoryOutputPath.length) {
+    fs.mkdirSync(directoryOutputPath, { recursive: true });
+  }
+};
+
 const getArchiveKey = ({ prefix, name }) => {
   return `${prefix}-${name}`;
 };
@@ -558,6 +569,7 @@ export {
   logFeedInfo,
   ITEM_LIST_FORMATS,
   logItemsList,
+  prepareOutputPath,
   writeFeedMeta,
   writeItemMeta,
   runFfmpeg,

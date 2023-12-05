@@ -18,6 +18,12 @@ npx podcast-dl --threads 4 --url "http://eightfour.libsyn.com/rss"
 npx podcast-dl --out-dir "./another/directory" --url "http://eightfour.libsyn.com/rss"
 ```
 
+## Download all episodes to their own directory
+
+```bash
+npx podcast-dl --episode-template "{{title}}/{{title}}" --url "http://eightfour.libsyn.com/rss"
+```
+
 ## Download the last 10 episodes
 
 ```bash
