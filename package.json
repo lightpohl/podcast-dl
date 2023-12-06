@@ -6,7 +6,8 @@
   "bin": "./bin/bin.js",
   "scripts": {
     "build": "rimraf ./binaries && rimraf ./dist && node build.cjs",
-    "lint": "eslint ./bin"
+    "lint": "eslint ./bin",
+    "version:generate": "npx genversion --es6 --semi ./bin/version.js"
   },
   "lint-staged": {
     "*.{js,json,md}": [
