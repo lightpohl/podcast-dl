@@ -1,5 +1,11 @@
 # Changelog
 
+## [9.2.0](https://github.com/lightpohl/podcast-dl/compare/v9.1.0...v9.2.0) (2023-12-05)
+
+### Features
+
+* support directory paths in '--episode-template' 
+
 ## [9.1.0](https://github.com/lightpohl/podcast-dl/compare/v9.0.3...v9.1.0) (2023-10-09)
 
 ### Features
