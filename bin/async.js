@@ -151,7 +151,7 @@ const download = async (options) => {
   }
 };
 
-let downloadItemsAsync = async ({
+const downloadItemsAsync = async ({
   addMp3MetadataFlag,
   archive,
   archiveUrl,
