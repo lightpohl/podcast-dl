@@ -9,18 +9,26 @@ import { logErrorAndExit, logMessage, LOG_LEVELS } from "./logger.js";
 import { getArchiveFilename, getItemFilename } from "./naming.js";
 
 const execWithPromise = util.promisify(exec);
+const isWin = process.platform === "win32";
 
 /*
   Escape arguments for a shell command used with exec.
   Borrowed from shell-escape: https://github.com/xxorax/node-shell-escape/
+  Additionally, @see https://www.robvanderwoude.com/escapechars.php for why
+    we avoid trying tp escape complex sequences in Windows.
 */
 const escapeArgForShell = (arg) => {
   let result = arg;
+
   if (/[^A-Za-z0-9_/:=-]/.test(result)) {
-    result = "'" + result.replace(/'/g, "'\\''") + "'";
-    result = result
-      .replace(/^(?:'')+/g, "") // unduplicate single-quote at the beginning
-      .replace(/\\'''/g, "\\'"); // remove non-escaped single-quote if there are enclosed between 2 escaped
+    if (isWin) {
+      return null;
+    } else {
+      result = "'" + result.replace(/'/g, "'\\''") + "'";
+      result = result
+        .replace(/^(?:'')+/g, "") // unduplicate single-quote at the beginning
+        .replace(/\\'''/g, "\\'"); // remove non-escaped single-quote if there are enclosed between 2 escaped
+    }
   }
 
   return result;
@@ -521,11 +529,15 @@ const runFfmpeg = async ({
     };
 
     const metadataString = Object.keys(metaKeysToValues)
-      .map((key) =>
-        metaKeysToValues[key]
-          ? `-metadata ${key}=${escapeArgForShell(metaKeysToValues[key])}`
-          : null
-      )
+      .map((key) => {
+        if (!metaKeysToValues[key]) {
+          return null;
+        }
+
+        const argValue = escapeArgForShell(metaKeysToValues[key]);
+
+        return argValue ? `-metadata ${key}=${argValue}` : null;
+      })
       .filter((segment) => !!segment)
       .join(" ");
 
