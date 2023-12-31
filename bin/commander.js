@@ -1,11 +1,9 @@
 import { AUDIO_ORDER_TYPES, ITEM_LIST_FORMATS } from "./util.js";
 import { createParseNumber, hasFfmpeg } from "./validate.js";
 import { logErrorAndExit } from "./logger.js";
-import { version } from "./version.js";
 
 export const setupCommander = (commander, argv) => {
   commander
-    .version(version)
     .option("--url <string>", "url to podcast rss feed")
     .option(
       "--out-dir <path>",

@@ -51,7 +51,6 @@ Type values surrounded in square brackets (`[]`) can be used as used as boolean 
 | --exec                   | String              | false    | Execute a command after each episode is downloaded. See "Template Options" for more details.                                                                                                                                |
 | --parser-config          | String              | false    | Path to JSON file that will be parsed and used to override the default config passed to [rss-parser](https://github.com/rbren/rss-parser#xml-options).                                                                      |
 | --proxy                  |                     | false    | Enable proxy support. Specify environment variables listed by [global-agent](https://github.com/gajus/global-agent#environment-variables).                                                                                  |
-| --version                |                     | false    | Output the version number.                                                                                                                                                                                                  |
 | --help                   |                     | false    | Output usage information.                                                                                                                                                                                                   |
 
 ## Archive
