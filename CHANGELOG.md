@@ -1,5 +1,12 @@
 # Changelog
 
+## [9.2.1](https://github.com/lightpohl/podcast-dl/compare/v9.2.0...v9.2.1) (2023-12-31)
+
+
+### Bug Fixes
+
+* add better escape logic for mp3 metadata with ffmpeg ([7a4289f](https://github.com/lightpohl/podcast-dl/commit/7a4289f00f92dbbc06e517a09df5251f932f8c70)), closes [#60](https://github.com/lightpohl/podcast-dl/issues/60)
+
 ## [9.2.0](https://github.com/lightpohl/podcast-dl/compare/v9.1.0...v9.2.0) (2023-12-05)
 
 ### Features
