@@ -1,5 +1,12 @@
 # Changelog
 
+## [9.2.2](https://github.com/lightpohl/podcast-dl/compare/v9.2.1...v9.2.2) (2023-12-31)
+
+
+### Bug Fixes
+
+* avoid escaping complex args in Windows ([11b9f6a](https://github.com/lightpohl/podcast-dl/commit/11b9f6a9070a208f3e612ee94a5eaea5f5adecd3))
+
 ## [9.2.1](https://github.com/lightpohl/podcast-dl/compare/v9.2.0...v9.2.1) (2023-12-31)
 
 
