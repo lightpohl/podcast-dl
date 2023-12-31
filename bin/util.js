@@ -10,6 +10,22 @@ import { getArchiveFilename, getItemFilename } from "./naming.js";
 
 const execWithPromise = util.promisify(exec);
 
+/*
+  Escape arguments for a shell command used with exec.
+  Borrowed from shell-escape: https://github.com/xxorax/node-shell-escape/
+*/
+const escapeArgForShell = (arg) => {
+  let result = arg;
+  if (/[^A-Za-z0-9_/:=-]/.test(result)) {
+    result = "'" + result.replace(/'/g, "'\\''") + "'";
+    result = result
+      .replace(/^(?:'')+/g, "") // unduplicate single-quote at the beginning
+      .replace(/\\'''/g, "\\'"); // remove non-escaped single-quote if there are enclosed between 2 escaped
+  }
+
+  return result;
+};
+
 const getTempPath = (path) => {
   return `${path}.tmp`;
 };
@@ -507,7 +523,7 @@ const runFfmpeg = async ({
     const metadataString = Object.keys(metaKeysToValues)
       .map((key) =>
         metaKeysToValues[key]
-          ? `-metadata ${key}="${metaKeysToValues[key].replace(/"/g, '\\"')}"`
+          ? `-metadata ${key}=${escapeArgForShell(metaKeysToValues[key])}`
           : null
       )
       .filter((segment) => !!segment)
