@@ -20,11 +20,14 @@ A CLI for downloading podcasts with a focus on archiving.
 
 ## Options
 
+Either `--url` or `--file` must be provided.
+
 Type values surrounded in square brackets (`[]`) can be used as used as boolean options (no argument required).
 
 | Option                   | Type                | Required | Description                                                                                                                                                                                                                 |
 | ------------------------ | ------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| --url                    | String              | true     | URL to podcast RSS feed.                                                                                                                                                                                                    |
+| --url                    | String              | true\*   | URL to podcast RSS feed.                                                                                                                                                                                                    |
+| --file                   | String              | true\*   | Path to local RSS file.                                                                                                                                                                                                     |
 | --out-dir                | String              | false    | Specify output directory for episodes and metadata. Defaults to "./{{podcast_title}}". See "Template Options" for more details.                                                                                             |
 | --threads                | Number              | false    | Determines the number of downloads that will happen concurrently. Default is 1.                                                                                                                                             |
 | --attempts               | Number              | false    | Sets the number of download attempts per individual file. Default is 3.                                                                                                                                                     |

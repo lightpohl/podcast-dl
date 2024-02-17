@@ -5,6 +5,7 @@ import { logErrorAndExit } from "./logger.js";
 export const setupCommander = (commander, argv) => {
   commander
     .option("--url <string>", "url to podcast rss feed")
+    .option("--file <path>", "local path to podcast rss feed")
     .option(
       "--out-dir <path>",
       "specify output directory",

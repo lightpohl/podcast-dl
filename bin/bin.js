@@ -10,10 +10,11 @@ import { setupCommander } from "./commander.js";
 import { download } from "./async.js";
 import {
   getArchiveKey,
-  getFeed,
+  getFileFeed,
   getImageUrl,
   getItemsToDownload,
   getUrlExt,
+  getUrlFeed,
   logFeedInfo,
   logItemsList,
   writeFeedMeta,
@@ -31,6 +32,7 @@ import { downloadItemsAsync } from "./async.js";
 setupCommander(commander, process.argv);
 
 const {
+  file,
   url,
   outDir,
   episodeTemplate,
@@ -62,17 +64,24 @@ const {
 let { archive } = commander;
 
 const main = async () => {
-  if (!url) {
-    logErrorAndExit("No URL provided");
+  if (!url && !file) {
+    logErrorAndExit("No URL or file location provided");
+  }
+
+  if (url && file) {
+    logErrorAndExit("Must not use URL and file location");
   }
 
   if (proxy) {
     bootstrapProxy();
   }
 
-  const { hostname, pathname } = new URL(url);
+  const feed = url
+    ? await getUrlFeed(url, parserConfig)
+    : await getFileFeed(file, parserConfig);
+
+  const { hostname, pathname } = new URL(feed.feedUrl);
   const archiveUrl = `${hostname}${pathname}`;
-  const feed = await getFeed(url, parserConfig);
   const basePath = _path.resolve(
     process.cwd(),
     getFolderName({ feed, template: outDir })

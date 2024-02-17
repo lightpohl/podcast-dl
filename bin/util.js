@@ -64,6 +64,22 @@ const getPublicObject = (object, exclude = []) => {
   return output;
 };
 
+const getFileString = (filePath) => {
+  const fullPath = path.resolve(process.cwd(), filePath);
+
+  if (!fs.existsSync(fullPath)) {
+    return null;
+  }
+
+  const data = fs.readFileSync(fullPath, "utf8");
+
+  if (!data) {
+    return null;
+  }
+
+  return data;
+};
+
 const getJsonFile = (filePath) => {
   const fullPath = path.resolve(process.cwd(), filePath);
 
@@ -453,7 +469,33 @@ const getImageUrl = ({ image, itunes }) => {
   return null;
 };
 
-const getFeed = async (url, parserConfig) => {
+const getFileFeed = async (filePath, parserConfig) => {
+  const defaultConfig = {
+    defaultRSS: 2.0,
+  };
+
+  const config = parserConfig ? getJsonFile(parserConfig) : defaultConfig;
+  const rssString = getFileString(filePath);
+
+  console.log(filePath, "rss string", rssString);
+
+  if (parserConfig && !config) {
+    logErrorAndExit(`Unable to load parser config: ${parserConfig}`);
+  }
+
+  const parser = new rssParser(config);
+
+  let feed;
+  try {
+    feed = await parser.parseString(rssString);
+  } catch (err) {
+    logErrorAndExit("Unable to parse RSS URL", err);
+  }
+
+  return feed;
+};
+
+const getUrlFeed = async (url, parserConfig) => {
   const defaultConfig = {
     defaultRSS: 2.0,
   };
@@ -589,11 +631,12 @@ export {
   getArchiveKey,
   writeToArchive,
   getEpisodeAudioUrlAndExt,
-  getFeed,
+  getFileFeed,
   getImageUrl,
   getItemsToDownload,
   getTempPath,
   getUrlExt,
+  getUrlFeed,
   logFeedInfo,
   ITEM_LIST_FORMATS,
   logItemsList,
