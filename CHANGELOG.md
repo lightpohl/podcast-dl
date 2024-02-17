@@ -1,5 +1,12 @@
 # Changelog
 
+## [9.3.0](https://github.com/lightpohl/podcast-dl/compare/v9.2.2...v9.3.0) (2024-02-17)
+
+
+### Features
+
+* add support for '--file' parsing ([70254f3](https://github.com/lightpohl/podcast-dl/commit/70254f3bd6ce5f8d1de7dd52342e3dfb9d913120)), closes [#64](https://github.com/lightpohl/podcast-dl/issues/64)
+
 ## [9.2.2](https://github.com/lightpohl/podcast-dl/compare/v9.2.1...v9.2.2) (2023-12-31)
 
 
