@@ -1,5 +1,12 @@
 # Changelog
 
+## [9.3.1](https://github.com/lightpohl/podcast-dl/compare/v9.3.0...v9.3.1) (2024-02-17)
+
+
+### Bug Fixes
+
+* remove leftover console.log ([3135661](https://github.com/lightpohl/podcast-dl/commit/3135661e21a5c32eca6a6f73f385bae8939a9f49))
+
 ## [9.3.0](https://github.com/lightpohl/podcast-dl/compare/v9.2.2...v9.3.0) (2024-02-17)
 
 
