@@ -489,7 +489,7 @@ const getFileFeed = async (filePath, parserConfig) => {
   try {
     feed = await parser.parseString(rssString);
   } catch (err) {
-    logErrorAndExit("Unable to parse RSS URL", err);
+    logErrorAndExit("Unable to local RSS file", err);
   }
 
   return feed;
