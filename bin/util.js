@@ -308,10 +308,12 @@ const logItemsList = ({
   });
 
   if (isJson) {
+    // eslint-disable-next-line no-console
     console.log(JSON.stringify(output));
     return;
   }
 
+  // eslint-disable-next-line no-console
   console.table(output);
 };
 
@@ -477,8 +479,6 @@ const getFileFeed = async (filePath, parserConfig) => {
   const config = parserConfig ? getJsonFile(parserConfig) : defaultConfig;
   const rssString = getFileString(filePath);
 
-  console.log(filePath, "rss string", rssString);
-
   if (parserConfig && !config) {
     logErrorAndExit(`Unable to load parser config: ${parserConfig}`);
   }
@@ -489,7 +489,7 @@ const getFileFeed = async (filePath, parserConfig) => {
   try {
     feed = await parser.parseString(rssString);
   } catch (err) {
-    logErrorAndExit("Unable to local RSS file", err);
+    logErrorAndExit("Unable to parse local RSS file", err);
   }
 
   return feed;

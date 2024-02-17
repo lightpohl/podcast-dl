@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+
 const ERROR_STATUSES = {
   general: 1,
   nothingDownloaded: 2,
