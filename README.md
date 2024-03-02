@@ -1,6 +1,6 @@
 # podcast-dl
 
-A CLI for downloading podcasts with a focus on archiving.
+A humble CLI for downloading and archiving podcasts.
 
 ## How to Use
 
