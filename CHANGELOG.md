@@ -1,5 +1,12 @@
 # Changelog
 
+## [9.3.2](https://github.com/lightpohl/podcast-dl/compare/v9.3.1...v9.3.2) (2024-04-13)
+
+
+### Bug Fixes
+
+* add opus to audio types ([4973683](https://github.com/lightpohl/podcast-dl/commit/49736831a876da5278557d0ab7cf8e433b288b5a))
+
 ## [9.3.1](https://github.com/lightpohl/podcast-dl/compare/v9.3.0...v9.3.1) (2024-02-17)
 
 
