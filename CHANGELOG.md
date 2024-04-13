@@ -1,5 +1,12 @@
 # Changelog
 
+## [9.3.3](https://github.com/lightpohl/podcast-dl/compare/v9.3.2...v9.3.3) (2024-04-13)
+
+
+### Bug Fixes
+
+* fallback to provided URL if 'feedUrl' cannot be parsed ([d944bdf](https://github.com/lightpohl/podcast-dl/commit/d944bdfbb1272c85a60a451ed286b5e0181d0fc8))
+
 ## [9.3.2](https://github.com/lightpohl/podcast-dl/compare/v9.3.1...v9.3.2) (2024-04-13)
 
 
