@@ -80,7 +80,7 @@ const main = async () => {
     ? await getUrlFeed(url, parserConfig)
     : await getFileFeed(file, parserConfig);
 
-  const { hostname, pathname } = new URL(feed.feedUrl);
+  const { hostname, pathname } = new URL(feed.feedUrl || url);
   const archiveUrl = `${hostname}${pathname}`;
   const basePath = _path.resolve(
     process.cwd(),
