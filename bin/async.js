@@ -59,14 +59,19 @@ const download = async (options) => {
     return;
   }
 
-  const headResponse = await got(url, {
-    timeout: 30000,
-    method: "HEAD",
-    responseType: "json",
-    headers: {
-      accept: "*/*",
-    },
-  });
+  let headResponse = null;
+  try {
+    headResponse = await got(url, {
+      timeout: 30000,
+      method: "HEAD",
+      responseType: "json",
+      headers: {
+        accept: "*/*",
+      },
+    });
+  } catch (error) {
+    // unable to retrive head response
+  }
 
   const tempOutputPath = getTempPath(outputPath);
   const removeFile = () => {
