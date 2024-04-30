@@ -1,5 +1,12 @@
 # Changelog
 
+## [9.3.4](https://github.com/lightpohl/podcast-dl/compare/v9.3.3...v9.3.4) (2024-04-30)
+
+
+### Bug Fixes
+
+* handle feeds that block 'HEAD' check ([23b6b5d](https://github.com/lightpohl/podcast-dl/commit/23b6b5d65b2b9cbad7e35808739cec4364b7318c))
+
 ## [9.3.3](https://github.com/lightpohl/podcast-dl/compare/v9.3.2...v9.3.3) (2024-04-13)
 
 
