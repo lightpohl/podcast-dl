@@ -10,7 +10,6 @@ const createParseNumber = ({ min, max, name, required = true }) => {
 
     try {
       let number = parseInt(value);
-
       if (isNaN(number)) {
         logErrorAndExit(`${name} must be a number`);
       }

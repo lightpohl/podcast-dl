@@ -15,7 +15,7 @@ const isWin = process.platform === "win32";
   Escape arguments for a shell command used with exec.
   Borrowed from shell-escape: https://github.com/xxorax/node-shell-escape/
   Additionally, @see https://www.robvanderwoude.com/escapechars.php for why
-    we avoid trying tp escape complex sequences in Windows.
+    we avoid trying to escape complex sequences in Windows.
 */
 const escapeArgForShell = (arg) => {
   let result = arg;
@@ -154,6 +154,7 @@ const getItemsToDownload = ({
   before,
   after,
   episodeDigits,
+  episodeNumOffset,
   episodeRegex,
   episodeSourceOrder,
   episodeTemplate,
@@ -243,6 +244,7 @@ const getItemsToDownload = ({
             ext: episodeImageFileExt,
             template: episodeTemplate,
             width: episodeDigits,
+            offset: episodeNumOffset,
           });
 
           const outputImagePath = path.resolve(basePath, episodeImageName);

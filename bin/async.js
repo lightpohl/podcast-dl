@@ -165,6 +165,7 @@ const downloadItemsAsync = async ({
   bitrate,
   episodeTemplate,
   episodeDigits,
+  episodeNumOffset,
   episodeSourceOrder,
   exec,
   feed,
@@ -199,6 +200,7 @@ const downloadItemsAsync = async ({
       ext: audioFileExt,
       template: episodeTemplate,
       width: episodeDigits,
+      offset: episodeNumOffset,
     });
     const outputPodcastPath = _path.resolve(basePath, episodeFilename);
 
@@ -282,6 +284,7 @@ const downloadItemsAsync = async ({
         ext: episodeMetaExt,
         template: episodeTemplate,
         width: episodeDigits,
+        offset: episodeNumOffset,
       });
       const outputEpisodeMetaPath = _path.resolve(basePath, episodeMetaName);
 

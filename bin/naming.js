@@ -18,8 +18,16 @@ const getSimpleFilename = (name, ext = "") => {
   return `${getSafeName(name, MAX_LENGTH_FILENAME - (ext?.length ?? 0))}${ext}`;
 };
 
-const getItemFilename = ({ item, ext, url, feed, template, width }) => {
-  const episodeNum = feed.items.length - item._originalIndex;
+const getItemFilename = ({
+  item,
+  ext,
+  url,
+  feed,
+  template,
+  width,
+  offset = 0,
+}) => {
+  const episodeNum = feed.items.length - item._originalIndex + offset;
   const formattedPubDate = item.pubDate
     ? dayjs(new Date(item.pubDate)).format("YYYYMMDD")
     : null;

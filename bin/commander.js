@@ -27,6 +27,16 @@ export const setupCommander = (commander, argv) => {
       1
     )
     .option(
+      "--episode-num-offset <number>",
+      "offset the acquired episode number",
+      createParseNumber({
+        min: Number.MIN_SAFE_INTEGER,
+        max: Number.MAX_SAFE_INTEGER,
+        name: "--episode-num-offset",
+      }),
+      0
+    )
+    .option(
       "--episode-source-order <string>",
       "attempted order to extract episode audio URL from rss feed",
       (value) => {
