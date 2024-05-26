@@ -1,5 +1,12 @@
 # Changelog
 
+## [9.4.0](https://github.com/lightpohl/podcast-dl/compare/v9.3.4...v9.4.0) (2024-05-26)
+
+
+### Features
+
+* add '--episode-num-offset' option ([7a742c5](https://github.com/lightpohl/podcast-dl/commit/7a742c5a11aadff0411359938ea0076a4b4d49a0))
+
 ## [9.3.4](https://github.com/lightpohl/podcast-dl/compare/v9.3.3...v9.3.4) (2024-04-30)
 
 
