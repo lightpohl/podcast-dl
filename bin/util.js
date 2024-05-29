@@ -11,6 +11,13 @@ import { getArchiveFilename, getItemFilename } from "./naming.js";
 const execWithPromise = util.promisify(exec);
 const isWin = process.platform === "win32";
 
+const defaultRssParserConfig = {
+  defaultRSS: 2.0,
+  customFields: {
+    item: [["podcast:transcript", "podcastTranscripts", { keepArray: true }]],
+  },
+};
+
 /*
   Escape arguments for a shell command used with exec.
   Borrowed from shell-escape: https://github.com/xxorax/node-shell-escape/
@@ -159,6 +166,8 @@ const getItemsToDownload = ({
   episodeSourceOrder,
   episodeTemplate,
   includeEpisodeImages,
+  includeEpisodeTranscripts,
+  episodeTranscriptTypes,
 }) => {
   const { startIndex, shouldGo, next } = getLoopControls({
     offset,
@@ -252,6 +261,46 @@ const getItemsToDownload = ({
             url: episodeImageUrl,
             outputPath: outputImagePath,
             key: episodeImageArchiveKey,
+          });
+        }
+      }
+
+      if (includeEpisodeTranscripts) {
+        const episodeTranscriptUrl = getTranscriptUrl(
+          item,
+          episodeTranscriptTypes
+        );
+
+        if (episodeTranscriptUrl) {
+          const episodeTranscriptFileExt = getUrlExt(episodeTranscriptUrl);
+          const episodeTranscriptArchiveKey = getArchiveKey({
+            prefix: archiveUrl,
+            name: getArchiveFilename({
+              pubDate,
+              name: title,
+              ext: episodeTranscriptFileExt,
+            }),
+          });
+
+          const episodeTranscriptName = getItemFilename({
+            item,
+            feed,
+            url: episodeAudioUrl,
+            ext: episodeTranscriptFileExt,
+            template: episodeTemplate,
+            width: episodeDigits,
+            offset: episodeNumOffset,
+          });
+
+          const outputTranscriptPath = path.resolve(
+            basePath,
+            episodeTranscriptName
+          );
+
+          item._extra_downloads.push({
+            url: episodeTranscriptUrl,
+            outputPath: outputTranscriptPath,
+            key: episodeTranscriptArchiveKey,
           });
         }
       }
@@ -474,12 +523,40 @@ const getImageUrl = ({ image, itunes }) => {
   return null;
 };
 
-const getFileFeed = async (filePath, parserConfig) => {
-  const defaultConfig = {
-    defaultRSS: 2.0,
-  };
+export const TRANSCRIPT_TYPES = {
+  "application/json": "application/json",
+  "application/srr": "application/srr",
+  "application/srt": "application/srt",
+  "application/x-subrip": "application/x-subrip",
+  "text/html": "text/html",
+  "text/plain": "text/plain",
+  "text/vtt": "text/vtt",
+};
 
-  const config = parserConfig ? getJsonFile(parserConfig) : defaultConfig;
+// @see https://github.com/Podcastindex-org/podcast-namespace/blob/main/docs/1.0.md#transcript
+const getTranscriptUrl = (item, transcriptTypes = []) => {
+  if (!item.podcastTranscripts?.length) {
+    return null;
+  }
+
+  for (const transcriptType of transcriptTypes) {
+    const matchingTranscriptType = item.podcastTranscripts.find(
+      (transcript) =>
+        !!transcript?.["$"]?.url && transcript?.["$"]?.type === transcriptType
+    );
+
+    if (matchingTranscriptType) {
+      return matchingTranscriptType?.["$"]?.url;
+    }
+  }
+
+  return null;
+};
+
+const getFileFeed = async (filePath, parserConfig) => {
+  const config = parserConfig
+    ? getJsonFile(parserConfig)
+    : defaultRssParserConfig;
   const rssString = getFileString(filePath);
 
   if (parserConfig && !config) {
@@ -499,11 +576,9 @@ const getFileFeed = async (filePath, parserConfig) => {
 };
 
 const getUrlFeed = async (url, parserConfig) => {
-  const defaultConfig = {
-    defaultRSS: 2.0,
-  };
-
-  const config = parserConfig ? getJsonFile(parserConfig) : defaultConfig;
+  const config = parserConfig
+    ? getJsonFile(parserConfig)
+    : defaultRssParserConfig;
 
   if (parserConfig && !config) {
     logErrorAndExit(`Unable to load parser config: ${parserConfig}`);

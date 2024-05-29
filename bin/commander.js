@@ -1,4 +1,8 @@
-import { AUDIO_ORDER_TYPES, ITEM_LIST_FORMATS } from "./util.js";
+import {
+  AUDIO_ORDER_TYPES,
+  ITEM_LIST_FORMATS,
+  TRANSCRIPT_TYPES,
+} from "./util.js";
 import { createParseNumber, hasFfmpeg } from "./validate.js";
 import { logErrorAndExit } from "./logger.js";
 
@@ -57,6 +61,35 @@ export const setupCommander = (commander, argv) => {
     .option(
       "--include-episode-meta",
       "write out individual episode metadata to json"
+    )
+    .option(
+      "--include-episode-transcripts",
+      "download found episode transcripts"
+    )
+    .option(
+      "--episode-transcript-types <string>",
+      "list of allowed transcript types in preferred order",
+      (value) => {
+        const parsed = value.split(",").map((type) => type.trim());
+        const isValid = parsed.every((type) => !!TRANSCRIPT_TYPES[type]);
+
+        if (!isValid) {
+          logErrorAndExit(
+            `Invalid type found in --transcript-types: ${value}\n`
+          );
+        }
+
+        return parsed;
+      },
+      [
+        TRANSCRIPT_TYPES["application/json"],
+        TRANSCRIPT_TYPES["application/x-subrip"],
+        TRANSCRIPT_TYPES["application/srr"],
+        TRANSCRIPT_TYPES["application/srt"],
+        TRANSCRIPT_TYPES["text/vtt"],
+        TRANSCRIPT_TYPES["text/html"],
+        TRANSCRIPT_TYPES["text/plain"],
+      ]
     )
     .option("--include-episode-images", "download found episode images")
     .option(

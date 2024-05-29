@@ -41,10 +41,12 @@ const {
   episodeRegex,
   episodeSourceOrder,
   episodeTemplate,
+  episodeTranscriptTypes,
   exec,
   file,
   includeEpisodeImages,
   includeEpisodeMeta,
+  includeEpisodeTranscripts,
   includeMeta,
   info,
   limit,
@@ -212,6 +214,8 @@ const main = async () => {
     episodeSourceOrder,
     episodeTemplate,
     includeEpisodeImages,
+    includeEpisodeTranscripts,
+    episodeTranscriptTypes,
   });
 
   if (!targetItems.length) {
