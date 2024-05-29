@@ -1,5 +1,12 @@
 # Changelog
 
+## [9.5.0](https://github.com/lightpohl/podcast-dl/compare/v9.4.0...v9.5.0) (2024-05-29)
+
+
+### Features
+
+* support fetching available episode transcripts ([43e6c6c](https://github.com/lightpohl/podcast-dl/commit/43e6c6c82a1279757fa59a9cb4ac36a216d8c431))
+
 ## [9.4.0](https://github.com/lightpohl/podcast-dl/compare/v9.3.4...v9.4.0) (2024-05-26)
 
 
