@@ -57,5 +57,5 @@ npx podcast-dl --url "http://eightfour.libsyn.com/rss" --exec "ffmpeg -i {{episo
 ## Extract "foo" and "bar" from the episode title and place it in the episode filename
 
 ```bash
-npx podcast-dl --url "http://eightfour.libsyn.com/rss" --episode-custom-template-options "foo" "bar" --episode-template "{{custom_0}}-{{episode_num}}""
+npx podcast-dl --url "http://eightfour.libsyn.com/rss" --episode-custom-template-options "foo" "bar" --episode-template "{{custom_0}}-{{custom_1}}-{{episode_num}}""
 ```
