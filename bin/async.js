@@ -164,6 +164,7 @@ const downloadItemsAsync = async ({
   basePath,
   bitrate,
   episodeTemplate,
+  episodeCustomTemplateOptions,
   episodeDigits,
   episodeNumOffset,
   episodeSourceOrder,
@@ -199,6 +200,7 @@ const downloadItemsAsync = async ({
       url: episodeAudioUrl,
       ext: audioFileExt,
       template: episodeTemplate,
+      customTemplateOptions: episodeCustomTemplateOptions,
       width: episodeDigits,
       offset: episodeNumOffset,
     });

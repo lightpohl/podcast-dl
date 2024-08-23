@@ -25,12 +25,24 @@ const getItemFilename = ({
   feed,
   template,
   width,
+  customTemplateOptions = [],
   offset = 0,
 }) => {
   const episodeNum = feed.items.length - item._originalIndex + offset;
   const formattedPubDate = item.pubDate
     ? dayjs(new Date(item.pubDate)).format("YYYYMMDD")
     : null;
+
+  const customReplacementTuples = customTemplateOptions
+    .map((option, i) => {
+      const matchRegex = new RegExp(option);
+      const result = item.title.match(matchRegex);
+
+      return result && result[0]
+        ? [`custom_${i}`, result[0]]
+        : [`custom_${i}`, ""];
+    })
+    .filter(Boolean);
 
   const templateReplacementsTuples = [
     ["title", item.title || ""],
@@ -41,6 +53,7 @@ const getItemFilename = ({
     ["podcast_link", feed.link || ""],
     ["duration", item.itunes?.duration || ""],
     ["guid", item.guid],
+    ...customReplacementTuples,
   ];
 
   const templateSegments = template.trim().split(path.sep);

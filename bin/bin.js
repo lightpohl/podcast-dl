@@ -2,7 +2,7 @@
 
 import fs from "fs";
 import _path from "path";
-import commander from "commander";
+import { program } from "commander";
 import pluralize from "pluralize";
 import { bootstrap as bootstrapProxy } from "global-agent";
 
@@ -29,7 +29,7 @@ import {
 import { getFolderName, getSimpleFilename } from "./naming.js";
 import { downloadItemsAsync } from "./async.js";
 
-setupCommander(commander, process.argv);
+const opts = setupCommander(program);
 
 const {
   after,
@@ -41,6 +41,7 @@ const {
   episodeRegex,
   episodeSourceOrder,
   episodeTemplate,
+  episodeCustomTemplateOptions,
   episodeTranscriptTypes,
   exec,
   file,
@@ -62,9 +63,9 @@ const {
   url,
   addMp3Metadata: addMp3MetadataFlag,
   adjustBitrate: bitrate,
-} = commander;
+} = opts;
 
-let { archive } = commander;
+let { archive } = opts;
 
 const main = async () => {
   if (!url && !file) {
@@ -213,6 +214,7 @@ const main = async () => {
     episodeRegex,
     episodeSourceOrder,
     episodeTemplate,
+    episodeCustomTemplateOptions,
     includeEpisodeImages,
     includeEpisodeTranscripts,
     episodeTranscriptTypes,
@@ -234,6 +236,7 @@ const main = async () => {
     basePath,
     bitrate,
     episodeTemplate,
+    episodeCustomTemplateOptions,
     episodeDigits,
     episodeNumOffset,
     episodeSourceOrder,

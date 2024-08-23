@@ -165,6 +165,7 @@ const getItemsToDownload = ({
   episodeRegex,
   episodeSourceOrder,
   episodeTemplate,
+  episodeCustomTemplateOptions,
   includeEpisodeImages,
   includeEpisodeTranscripts,
   episodeTranscriptTypes,
@@ -252,6 +253,7 @@ const getItemsToDownload = ({
             url: episodeAudioUrl,
             ext: episodeImageFileExt,
             template: episodeTemplate,
+            customTemplateOptions: episodeCustomTemplateOptions,
             width: episodeDigits,
             offset: episodeNumOffset,
           });
