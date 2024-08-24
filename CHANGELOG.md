@@ -1,5 +1,16 @@
 # Changelog
 
+## [10.0.0](https://github.com/lightpohl/podcast-dl/compare/v9.5.0...v10.0.0) (2024-08-24)
+
+
+### ⚠ BREAKING CHANGES
+
+* add 'episode-custom-template-options' ([#79](https://github.com/lightpohl/podcast-dl/issues/79))
+
+### Features
+
+* add 'episode-custom-template-options' ([#79](https://github.com/lightpohl/podcast-dl/issues/79)) ([d280eea](https://github.com/lightpohl/podcast-dl/commit/d280eeadb172da87626ad7b4da91f597c0e6e46a))
+
 ## [9.5.0](https://github.com/lightpohl/podcast-dl/compare/v9.4.0...v9.5.0) (2024-05-29)
 
 
