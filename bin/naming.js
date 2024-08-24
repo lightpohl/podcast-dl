@@ -29,19 +29,20 @@ const getItemFilename = ({
   offset = 0,
 }) => {
   const episodeNum = feed.items.length - item._originalIndex + offset;
+  const title = item.title || "";
   const formattedPubDate = item.pubDate
     ? dayjs(new Date(item.pubDate)).format("YYYYMMDD")
     : null;
 
   const customReplacementTuples = customTemplateOptions.map((option, i) => {
     const matchRegex = new RegExp(option);
-    const match = item.title.match(matchRegex);
+    const match = title.match(matchRegex);
 
     return match && match[0] ? [`custom_${i}`, match[0]] : [`custom_${i}`, ""];
   });
 
   const templateReplacementsTuples = [
-    ["title", item.title || ""],
+    ["title", title],
     ["release_date", formattedPubDate || ""],
     ["episode_num", `${episodeNum}`.padStart(width, "0")],
     ["url", url],
