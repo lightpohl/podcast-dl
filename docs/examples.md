@@ -53,3 +53,9 @@ npx podcast-dl --episode-regex "Zelda" --url "http://eightfour.libsyn.com/rss"
 ```bash
 npx podcast-dl --url "http://eightfour.libsyn.com/rss" --exec "ffmpeg -i {{episode_path}} -b:a 192k -f mp3 {{episode_path_base}}/{{episode_filename_base}}-192k.mp3"
 ```
+
+## Extract "foo" and "bar" from the episode title and place it in the episode filename
+
+```bash
+npx podcast-dl --url "http://eightfour.libsyn.com/rss" --episode-custom-template-options "foo" "bar" --episode-template "{{custom_0}}-{{custom_1}}-{{episode_num}}""
+```

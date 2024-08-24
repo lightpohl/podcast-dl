@@ -70,7 +70,7 @@ const download = async (options) => {
       },
     });
   } catch (error) {
-    // unable to retrive head response
+    // unable to retrieve head response
   }
 
   const tempOutputPath = getTempPath(outputPath);
@@ -164,6 +164,7 @@ const downloadItemsAsync = async ({
   basePath,
   bitrate,
   episodeTemplate,
+  episodeCustomTemplateOptions,
   episodeDigits,
   episodeNumOffset,
   episodeSourceOrder,
@@ -199,6 +200,7 @@ const downloadItemsAsync = async ({
       url: episodeAudioUrl,
       ext: audioFileExt,
       template: episodeTemplate,
+      customTemplateOptions: episodeCustomTemplateOptions,
       width: episodeDigits,
       offset: episodeNumOffset,
     });
@@ -283,6 +285,7 @@ const downloadItemsAsync = async ({
         url: episodeAudioUrl,
         ext: episodeMetaExt,
         template: episodeTemplate,
+        customTemplateOptions: episodeCustomTemplateOptions,
         width: episodeDigits,
         offset: episodeNumOffset,
       });

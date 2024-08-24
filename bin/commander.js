@@ -6,8 +6,8 @@ import {
 import { createParseNumber, hasFfmpeg } from "./validate.js";
 import { logErrorAndExit } from "./logger.js";
 
-export const setupCommander = (commander, argv) => {
-  commander
+export const setupCommander = (program) => {
+  program
     .option("--url <string>", "url to podcast rss feed")
     .option("--file <path>", "local path to podcast rss feed")
     .option(
@@ -23,6 +23,10 @@ export const setupCommander = (commander, argv) => {
       "--episode-template <string>",
       "template for generating episode related filenames",
       "{{release_date}}-{{title}}"
+    )
+    .option(
+      "--episode-custom-template-options <patterns...>",
+      "create custom options for the episode template"
     )
     .option(
       "--episode-digits <number>",
@@ -180,6 +184,9 @@ export const setupCommander = (commander, argv) => {
       "--parser-config <string>",
       "path to JSON config to override RSS parser"
     )
-    .option("--proxy", "enable proxy support via global-agent")
-    .parse(argv);
+    .option("--proxy", "enable proxy support via global-agent");
+
+  program.parse();
+
+  return program.opts();
 };
