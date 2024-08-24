@@ -33,16 +33,12 @@ const getItemFilename = ({
     ? dayjs(new Date(item.pubDate)).format("YYYYMMDD")
     : null;
 
-  const customReplacementTuples = customTemplateOptions
-    .map((option, i) => {
-      const matchRegex = new RegExp(option);
-      const result = item.title.match(matchRegex);
+  const customReplacementTuples = customTemplateOptions.map((option, i) => {
+    const matchRegex = new RegExp(option);
+    const match = item.title.match(matchRegex);
 
-      return result && result[0]
-        ? [`custom_${i}`, result[0]]
-        : [`custom_${i}`, ""];
-    })
-    .filter(Boolean);
+    return match && match[0] ? [`custom_${i}`, match[0]] : [`custom_${i}`, ""];
+  });
 
   const templateReplacementsTuples = [
     ["title", item.title || ""],
