@@ -1,5 +1,12 @@
 # Changelog
 
+## [10.1.0](https://github.com/lightpohl/podcast-dl/compare/v10.0.0...v10.1.0) (2024-08-25)
+
+
+### Features
+
+* add 'release_year' option for episode template ([223022e](https://github.com/lightpohl/podcast-dl/commit/223022e0b8c226ed7f0db4fc14d31316820c3675))
+
 ## [10.0.0](https://github.com/lightpohl/podcast-dl/compare/v9.5.0...v10.0.0) (2024-08-24)
 
 
