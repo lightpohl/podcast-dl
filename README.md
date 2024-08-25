@@ -82,6 +82,7 @@ Options that support templates allow users to specify a template for the generat
 
 - `title`: The title of the episode.
 - `release_date`: The release date of the episode in `YYYYMMDD` format.
+- `release_year`: The release year of the episode.
 - `episode_num`: The location number of where the episodes appears in the feed.
 - `url`: URL of episode audio file.
 - `duration`: Provided `mm:ss` duration (if found).

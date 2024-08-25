@@ -30,7 +30,11 @@ const getItemFilename = ({
 }) => {
   const episodeNum = feed.items.length - item._originalIndex + offset;
   const title = item.title || "";
-  const formattedPubDate = item.pubDate
+  const releaseYear = item.pubDate
+    ? dayjs(new Date(item.pubDate)).format("YYYY")
+    : null;
+
+  const releaseDate = item.pubDate
     ? dayjs(new Date(item.pubDate)).format("YYYYMMDD")
     : null;
 
@@ -43,7 +47,8 @@ const getItemFilename = ({
 
   const templateReplacementsTuples = [
     ["title", title],
-    ["release_date", formattedPubDate || ""],
+    ["release_date", releaseDate || ""],
+    ["release_year", releaseYear || ""],
     ["episode_num", `${episodeNum}`.padStart(width, "0")],
     ["url", url],
     ["podcast_title", feed.title || ""],
