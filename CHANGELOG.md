@@ -1,5 +1,12 @@
 # Changelog
 
+## [10.2.0](https://github.com/lightpohl/podcast-dl/compare/v10.1.0...v10.2.0) (2024-08-29)
+
+
+### Features
+
+* add 'release_month' and 'release_day' template options ([27c2e8b](https://github.com/lightpohl/podcast-dl/commit/27c2e8b1229079018eb14404915bddcca2543fce))
+
 ## [10.1.0](https://github.com/lightpohl/podcast-dl/compare/v10.0.0...v10.1.0) (2024-08-25)
 
 
