@@ -30,8 +30,17 @@ const getItemFilename = ({
 }) => {
   const episodeNum = feed.items.length - item._originalIndex + offset;
   const title = item.title || "";
+
   const releaseYear = item.pubDate
     ? dayjs(new Date(item.pubDate)).format("YYYY")
+    : null;
+
+  const releaseMonth = item.pubDate
+    ? dayjs(new Date(item.pubDate)).format("MM")
+    : null;
+
+  const releaseDay = item.pubDate
+    ? dayjs(new Date(item.pubDate)).format("DD")
     : null;
 
   const releaseDate = item.pubDate
@@ -49,6 +58,8 @@ const getItemFilename = ({
     ["title", title],
     ["release_date", releaseDate || ""],
     ["release_year", releaseYear || ""],
+    ["release_month", releaseMonth || ""],
+    ["release_day", releaseDay || ""],
     ["episode_num", `${episodeNum}`.padStart(width, "0")],
     ["url", url],
     ["podcast_title", feed.title || ""],
