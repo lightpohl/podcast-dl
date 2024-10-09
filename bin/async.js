@@ -247,6 +247,7 @@ const downloadItemsAsync = async ({
               basePath,
               outputPodcastPath,
               episodeFilename,
+              episodeAudioUrl,
             });
           }
 

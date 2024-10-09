@@ -104,6 +104,7 @@ If no match is found, the `custom_<n>` keyword will be replaced with an empty st
 - `episode_path_base`: The path to the folder of the downloaded episode.
 - `episode_filename`: The filename of the episode.
 - `episode_filename_base`: The filename of the episode without its extension.
+- `url`: URL of episode audio file.
 
 ## Log Levels
 

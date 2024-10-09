@@ -689,6 +689,7 @@ const runExec = async ({
   basePath,
   outputPodcastPath,
   episodeFilename,
+  episodeAudioUrl,
 }) => {
   const episodeFilenameBase = episodeFilename.substring(
     0,
@@ -699,7 +700,8 @@ const runExec = async ({
     .replace(/{{episode_path}}/g, `"${outputPodcastPath}"`)
     .replace(/{{episode_path_base}}/g, `"${basePath}"`)
     .replace(/{{episode_filename}}/g, `"${episodeFilename}"`)
-    .replace(/{{episode_filename_base}}/g, `"${episodeFilenameBase}"`);
+    .replace(/{{episode_filename_base}}/g, `"${episodeFilenameBase}"`)
+    .replace(/{{url}}/g, `"${episodeAudioUrl}"`);
 
   await execWithPromise(execCmd, { stdio: "ignore" });
 };
