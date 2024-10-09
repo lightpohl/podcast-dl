@@ -1,5 +1,12 @@
 # Changelog
 
+## [10.3.0](https://github.com/lightpohl/podcast-dl/compare/v10.2.0...v10.3.0) (2024-10-09)
+
+
+### Features
+
+* add 'url' template option to '--exec' ([6f305c1](https://github.com/lightpohl/podcast-dl/commit/6f305c149831b83491a940ba8b77d45cb0834adc))
+
 ## [10.2.0](https://github.com/lightpohl/podcast-dl/compare/v10.1.0...v10.2.0) (2024-08-29)
 
 
