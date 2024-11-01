@@ -159,7 +159,7 @@ const download = async (options) => {
 const downloadItemsAsync = async ({
   addMp3MetadataFlag,
   archive,
-  archiveUrl,
+  archivePrefix,
   attempts,
   basePath,
   bitrate,
@@ -215,7 +215,7 @@ const downloadItemsAsync = async ({
         alwaysPostprocess,
         marker,
         key: getArchiveKey({
-          prefix: archiveUrl,
+          prefix: archivePrefix,
           name: getArchiveFilename({
             name: item.title,
             pubDate: item.pubDate,
@@ -300,7 +300,7 @@ const downloadItemsAsync = async ({
           override,
           item,
           key: getArchiveKey({
-            prefix: archiveUrl,
+            prefix: archivePrefix,
             name: getArchiveFilename({
               pubDate: item.pubDate,
               name: item.title,

@@ -84,8 +84,15 @@ const main = async () => {
     ? await getUrlFeed(url, parserConfig)
     : await getFileFeed(file, parserConfig);
 
-  const { hostname, pathname } = new URL(feed.feedUrl || url);
-  const archiveUrl = `${hostname}${pathname}`;
+  const archivePrefix = (() => {
+    if (feed.feedUrl || url) {
+      const { hostname, pathname } = new URL(feed.feedUrl || url);
+      return `${hostname}${pathname}`;
+    }
+
+    return feed.title || file;
+  })();
+
   const basePath = _path.resolve(
     process.cwd(),
     getFolderName({ feed, template: outDir })
@@ -152,7 +159,7 @@ const main = async () => {
           override,
           marker: podcastImageUrl,
           key: getArchiveKey({
-            prefix: archiveUrl,
+            prefix: archivePrefix,
             name: `${
               feed.title ? `${feed.title}.image` : "image"
             }${podcastImageFileExt}`,
@@ -181,7 +188,7 @@ const main = async () => {
         override,
         feed,
         key: getArchiveKey({
-          prefix: archiveUrl,
+          prefix: archivePrefix,
           name: `${feed.title ? `${feed.title}.meta` : "meta"}.json`,
         }),
         outputPath: outputMetaPath,
@@ -201,7 +208,7 @@ const main = async () => {
 
   const targetItems = getItemsToDownload({
     archive,
-    archiveUrl,
+    archivePrefix,
     basePath,
     feed,
     limit,
@@ -231,7 +238,7 @@ const main = async () => {
   const { numEpisodesDownloaded, hasErrors } = await downloadItemsAsync({
     addMp3MetadataFlag,
     archive,
-    archiveUrl,
+    archivePrefix,
     attempts,
     basePath,
     bitrate,

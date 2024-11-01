@@ -152,7 +152,7 @@ const getLoopControls = ({ offset, length, reverse }) => {
 
 const getItemsToDownload = ({
   archive,
-  archiveUrl,
+  archivePrefix,
   basePath,
   feed,
   limit,
@@ -216,7 +216,7 @@ const getItemsToDownload = ({
     const { url: episodeAudioUrl, ext: audioFileExt } =
       getEpisodeAudioUrlAndExt(feed.items[i], episodeSourceOrder);
     const key = getArchiveKey({
-      prefix: archiveUrl,
+      prefix: archivePrefix,
       name: getArchiveFilename({
         pubDate,
         name: title,
@@ -239,7 +239,7 @@ const getItemsToDownload = ({
         if (episodeImageUrl) {
           const episodeImageFileExt = getUrlExt(episodeImageUrl);
           const episodeImageArchiveKey = getArchiveKey({
-            prefix: archiveUrl,
+            prefix: archivePrefix,
             name: getArchiveFilename({
               pubDate,
               name: title,
@@ -276,7 +276,7 @@ const getItemsToDownload = ({
         if (episodeTranscriptUrl) {
           const episodeTranscriptFileExt = getUrlExt(episodeTranscriptUrl);
           const episodeTranscriptArchiveKey = getArchiveKey({
-            prefix: archiveUrl,
+            prefix: archivePrefix,
             name: getArchiveFilename({
               pubDate,
               name: title,
