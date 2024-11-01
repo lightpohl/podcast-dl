@@ -1,5 +1,12 @@
 # Changelog
 
+## [10.3.1](https://github.com/lightpohl/podcast-dl/compare/v10.3.0...v10.3.1) (2024-11-01)
+
+
+### Bug Fixes
+
+* handle file feeds with missing 'feedUrl' ([1e6b89a](https://github.com/lightpohl/podcast-dl/commit/1e6b89ae48f33a172705cbc357038e02f901b7ae)), closes [#87](https://github.com/lightpohl/podcast-dl/issues/87)
+
 ## [10.3.0](https://github.com/lightpohl/podcast-dl/compare/v10.2.0...v10.3.0) (2024-10-09)
 
 
