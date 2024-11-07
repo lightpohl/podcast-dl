@@ -28,6 +28,8 @@ import {
 const pipeline = promisify(stream.pipeline);
 
 const BYTES_IN_MB = 1000000;
+const USER_AGENT =
+  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36";
 
 const download = async (options) => {
   const {
@@ -67,6 +69,7 @@ const download = async (options) => {
       responseType: "json",
       headers: {
         accept: "*/*",
+        "user-agent": USER_AGENT,
       },
     });
   } catch (error) {
@@ -108,7 +111,9 @@ const download = async (options) => {
     });
 
     await pipeline(
-      got.stream(url).on("downloadProgress", onDownloadProgress),
+      got
+        .stream(url, { headers: { "user-agent": USER_AGENT } })
+        .on("downloadProgress", onDownloadProgress),
       fs.createWriteStream(tempOutputPath)
     );
   } catch (error) {
