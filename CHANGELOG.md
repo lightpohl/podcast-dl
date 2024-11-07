@@ -1,5 +1,12 @@
 # Changelog
 
+## [10.3.2](https://github.com/lightpohl/podcast-dl/compare/v10.3.1...v10.3.2) (2024-11-07)
+
+
+### Bug Fixes
+
+* spoof user agent to avoid occasional blocks ([494c74b](https://github.com/lightpohl/podcast-dl/commit/494c74bb0f9de913efb666f2c339c0bc88ee3dc2)), closes [#89](https://github.com/lightpohl/podcast-dl/issues/89)
+
 ## [10.3.1](https://github.com/lightpohl/podcast-dl/compare/v10.3.0...v10.3.1) (2024-11-01)
 
 
