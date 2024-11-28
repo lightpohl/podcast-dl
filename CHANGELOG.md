@@ -1,5 +1,12 @@
 # Changelog
 
+## [10.3.3](https://github.com/lightpohl/podcast-dl/compare/v10.3.2...v10.3.3) (2024-11-28)
+
+
+### Bug Fixes
+
+* ignore servers with incorrect 'Accept' handling ([52f2d69](https://github.com/lightpohl/podcast-dl/commit/52f2d693f9580b7f4cb87e7ff417baba0aa6998d))
+
 ## [10.3.2](https://github.com/lightpohl/podcast-dl/compare/v10.3.1...v10.3.2) (2024-11-07)
 
 
