@@ -13,6 +13,9 @@ const isWin = process.platform === "win32";
 
 const defaultRssParserConfig = {
   defaultRSS: 2.0,
+  headers: {
+    Accept: "*/*",
+  },
   customFields: {
     item: [["podcast:transcript", "podcastTranscripts", { keepArray: true }]],
   },
