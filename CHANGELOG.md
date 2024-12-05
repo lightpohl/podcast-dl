@@ -1,5 +1,12 @@
 # Changelog
 
+## [10.4.0](https://github.com/lightpohl/podcast-dl/compare/v10.3.3...v10.4.0) (2024-12-05)
+
+
+### Features
+
+* add 'episode-regex-exclude' option ([553c799](https://github.com/lightpohl/podcast-dl/commit/553c799e2dbe528d082acda1c735a49aa67e0243)), closes [#91](https://github.com/lightpohl/podcast-dl/issues/91)
+
 ## [10.3.3](https://github.com/lightpohl/podcast-dl/compare/v10.3.2...v10.3.3) (2024-11-28)
 
 
