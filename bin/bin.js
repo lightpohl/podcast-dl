@@ -39,6 +39,7 @@ const {
   episodeDigits,
   episodeNumOffset,
   episodeRegex,
+  episodeRegexExclude,
   episodeSourceOrder,
   episodeTemplate,
   episodeCustomTemplateOptions,
@@ -114,6 +115,7 @@ const main = async () => {
         after,
         before,
         episodeRegex,
+        episodeRegexExclude,
       });
     } else {
       logErrorAndExit("No episodes found to list");
@@ -219,6 +221,7 @@ const main = async () => {
     episodeDigits,
     episodeNumOffset,
     episodeRegex,
+    episodeRegexExclude,
     episodeSourceOrder,
     episodeTemplate,
     episodeCustomTemplateOptions,

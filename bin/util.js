@@ -166,6 +166,7 @@ const getItemsToDownload = ({
   episodeDigits,
   episodeNumOffset,
   episodeRegex,
+  episodeRegexExclude,
   episodeSourceOrder,
   episodeTemplate,
   episodeCustomTemplateOptions,
@@ -192,6 +193,13 @@ const getItemsToDownload = ({
     if (episodeRegex) {
       const generatedEpisodeRegex = new RegExp(episodeRegex);
       if (title && !generatedEpisodeRegex.test(title)) {
+        isValid = false;
+      }
+    }
+
+    if (episodeRegexExclude) {
+      const generatedEpisodeRegexExclude = new RegExp(episodeRegexExclude);
+      if (title && generatedEpisodeRegexExclude.test(title)) {
         isValid = false;
       }
     }
@@ -336,6 +344,7 @@ const logItemsList = ({
   before,
   after,
   episodeRegex,
+  episodeRegexExclude,
 }) => {
   const items = getItemsToDownload({
     feed,
@@ -345,6 +354,7 @@ const logItemsList = ({
     before,
     after,
     episodeRegex,
+    episodeRegexExclude,
   });
 
   if (!items.length) {

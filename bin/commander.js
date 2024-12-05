@@ -112,6 +112,10 @@ export const setupCommander = (program) => {
       "match episode title against regex before downloading"
     )
     .option(
+      "--episode-regex-exclude <string>",
+      "matched episode titles against regex will be excluded"
+    )
+    .option(
       "--after <string>",
       "download episodes only after this date (inclusive)"
     )
