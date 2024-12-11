@@ -627,7 +627,7 @@ const runFfmpeg = async ({
     return;
   }
 
-  let command = `ffmpeg -loglevel quiet -i "${outputPath}"`;
+  let command = `ffmpeg -loglevel quiet -i ${escapeArgForShell(outputPath)}`;
 
   if (bitrate) {
     command += ` -b:a ${bitrate}`;
@@ -680,7 +680,7 @@ const runFfmpeg = async ({
   }
 
   const tmpMp3Path = `${outputPath}.tmp${ext}`;
-  command += ` "${tmpMp3Path}"`;
+  command += ` ${escapeArgForShell(tmpMp3Path)}`;
   logMessage("Running command: " + command, LOG_LEVELS.debug);
 
   try {
