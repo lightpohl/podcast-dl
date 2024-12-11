@@ -1,5 +1,13 @@
 # Changelog
 
+## [10.4.1](https://github.com/lightpohl/podcast-dl/compare/v10.4.0...v10.4.1) (2024-12-11)
+
+
+### Bug Fixes
+
+* properly escape params passed to exec ([2a65931](https://github.com/lightpohl/podcast-dl/commit/2a659310f0735b4c9bc7835ec6db8e2051d36292))
+* properly escape params passed to ffmpeg ([88df918](https://github.com/lightpohl/podcast-dl/commit/88df918d73a1f53083562d48f3bf5560c2145714)), closes [#95](https://github.com/lightpohl/podcast-dl/issues/95)
+
 ## [10.4.0](https://github.com/lightpohl/podcast-dl/compare/v10.3.3...v10.4.0) (2024-12-05)
 
 
