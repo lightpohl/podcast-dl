@@ -32,7 +32,7 @@ const escapeArgForShell = (arg) => {
 
   if (/[^A-Za-z0-9_/:=-]/.test(result)) {
     if (isWin) {
-      return null;
+      return `"${result}"`;
     } else {
       result = "'" + result.replace(/'/g, "'\\''") + "'";
       result = result
@@ -710,11 +710,14 @@ const runExec = async ({
   );
 
   const execCmd = exec
-    .replace(/{{episode_path}}/g, `"${outputPodcastPath}"`)
-    .replace(/{{episode_path_base}}/g, `"${basePath}"`)
-    .replace(/{{episode_filename}}/g, `"${episodeFilename}"`)
-    .replace(/{{episode_filename_base}}/g, `"${episodeFilenameBase}"`)
-    .replace(/{{url}}/g, `"${episodeAudioUrl}"`);
+    .replace(/{{episode_path}}/g, escapeArgForShell(outputPodcastPath))
+    .replace(/{{episode_path_base}}/g, escapeArgForShell(basePath))
+    .replace(/{{episode_filename}}/g, escapeArgForShell(episodeFilename))
+    .replace(
+      /{{episode_filename_base}}/g,
+      escapeArgForShell(episodeFilenameBase)
+    )
+    .replace(/{{url}}/g, escapeArgForShell(episodeAudioUrl));
 
   await execWithPromise(execCmd, { stdio: "ignore" });
 };
