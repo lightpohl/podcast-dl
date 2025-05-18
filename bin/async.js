@@ -213,6 +213,25 @@ const downloadItemsAsync = async ({
 
     prepareOutputPath(outputPodcastPath);
 
+    for (const extra of item._extraDownloads) {
+      try {
+        await download({
+          archive,
+          override,
+          marker: extra.url,
+          maxAttempts: attempts,
+          key: extra.key,
+          outputPath: extra.outputPath,
+          url: extra.url,
+        });
+      } catch (error) {
+        hasErrors = true;
+        logError(
+          `${marker} | Error downloading ${extra.url}: ${error.toString()}`
+        );
+      }
+    }
+
     try {
       await download({
         archive,
@@ -240,6 +259,7 @@ const downloadItemsAsync = async ({
               mono,
               itemIndex: item._originalIndex,
               outputPath: outputPodcastPath,
+              episodeImageOutputPath: item._episodeImageOutputPath,
               addMp3Metadata: addMp3MetadataFlag,
               ext: audioFileExt,
             });
@@ -262,25 +282,6 @@ const downloadItemsAsync = async ({
     } catch (error) {
       hasErrors = true;
       logError(`${marker} | Error downloading episode: ${error.toString()}`);
-    }
-
-    for (const extra of item._extra_downloads) {
-      try {
-        await download({
-          archive,
-          override,
-          marker: extra.url,
-          maxAttempts: attempts,
-          key: extra.key,
-          outputPath: extra.outputPath,
-          url: extra.url,
-        });
-      } catch (error) {
-        hasErrors = true;
-        logError(
-          `${marker} | Error downloading ${extra.url}: ${error.toString()}`
-        );
-      }
     }
 
     if (includeEpisodeMeta) {

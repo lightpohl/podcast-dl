@@ -242,7 +242,7 @@ const getItemsToDownload = ({
     if (isValid) {
       const item = feed.items[i];
       item._originalIndex = i;
-      item._extra_downloads = [];
+      item._extraDownloads = [];
 
       if (includeEpisodeImages) {
         const episodeImageUrl = getImageUrl(item);
@@ -270,7 +270,8 @@ const getItemsToDownload = ({
           });
 
           const outputImagePath = path.resolve(basePath, episodeImageName);
-          item._extra_downloads.push({
+          item._episodeImageOutputPath = outputImagePath;
+          item._extraDownloads.push({
             url: episodeImageUrl,
             outputPath: outputImagePath,
             key: episodeImageArchiveKey,
@@ -310,7 +311,7 @@ const getItemsToDownload = ({
             episodeTranscriptName
           );
 
-          item._extra_downloads.push({
+          item._extraDownloads.push({
             url: episodeTranscriptUrl,
             outputPath: outputTranscriptPath,
             key: episodeTranscriptArchiveKey,
@@ -618,6 +619,7 @@ const runFfmpeg = async ({
   item,
   itemIndex,
   outputPath,
+  episodeImageOutputPath,
   bitrate,
   mono,
   addMp3Metadata,
@@ -628,6 +630,10 @@ const runFfmpeg = async ({
   }
 
   let command = `ffmpeg -loglevel quiet -i ${escapeArgForShell(outputPath)}`;
+
+  if (episodeImageOutputPath) {
+    command += ` -i ${escapeArgForShell(episodeImageOutputPath)}`;
+  }
 
   if (bitrate) {
     command += ` -b:a ${bitrate}`;
@@ -677,6 +683,12 @@ const runFfmpeg = async ({
       .join(" ");
 
     command += ` -map_metadata 0 ${metadataString} -codec copy`;
+  }
+
+  if (episodeImageOutputPath) {
+    command += ` -map 0 -map 1`;
+  } else {
+    command += ` -map 0`;
   }
 
   const tmpMp3Path = `${outputPath}.tmp${ext}`;
