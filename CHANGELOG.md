@@ -1,5 +1,17 @@
 # Changelog
 
+## [10.5.0](https://github.com/lightpohl/podcast-dl/compare/v10.4.1...v10.5.0) (2025-05-18)
+
+
+### Features
+
+* embed episode artwork if available when ffmpeg is run ([34eac22](https://github.com/lightpohl/podcast-dl/commit/34eac22ef0d9c804caca054469b77862e5cc16d6)), closes [#100](https://github.com/lightpohl/podcast-dl/issues/100)
+
+
+### Bug Fixes
+
+* use 'contentSnippet' for mp3 metadata comment ([fc92fed](https://github.com/lightpohl/podcast-dl/commit/fc92feda959262245d7f1198cd670b3bd087749b))
+
 ## [10.4.1](https://github.com/lightpohl/podcast-dl/compare/v10.4.0...v10.4.1) (2024-12-11)
 
 
