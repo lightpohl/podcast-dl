@@ -1,5 +1,5 @@
 const path = require("path");
-const { exec } = require("pkg");
+const { exec } = require("@yao-pkg/pkg");
 const webpack = require("webpack");
 
 const { version } = require("./package.json");

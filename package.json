@@ -38,11 +38,11 @@
   "author": "Joshua Pohl",
   "license": "MIT",
   "devDependencies": {
+    "@yao-pkg/pkg": "^5.8.0",
     "eslint": "^6.8.0",
     "eslint-config-prettier": "^6.11.0",
     "husky": "^4.2.5",
     "lint-staged": "^10.1.7",
-    "pkg": "^5.8.0",
     "prettier": "2.3.2",
     "rimraf": "^3.0.2",
     "webpack": "^5.75.0"
