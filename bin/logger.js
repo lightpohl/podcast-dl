@@ -1,25 +1,25 @@
 /* eslint-disable no-console */
 
-const ERROR_STATUSES = {
+export const ERROR_STATUSES = {
   general: 1,
   nothingDownloaded: 2,
   completedWithErrors: 3,
 };
 
-const LOG_LEVEL_TYPES = {
+export const LOG_LEVEL_TYPES = {
   debug: "debug",
   quiet: "quiet",
   silent: "silent",
   static: "static",
 };
 
-const LOG_LEVELS = {
+export const LOG_LEVELS = {
   debug: 0,
   info: 1,
   important: 2,
 };
 
-const getShouldOutputProgressIndicator = () => {
+export const getShouldOutputProgressIndicator = () => {
   return (
     process.stdout.isTTY &&
     process.env.LOG_LEVEL !== LOG_LEVEL_TYPES.static &&
@@ -28,7 +28,7 @@ const getShouldOutputProgressIndicator = () => {
   );
 };
 
-const logMessage = (message = "", logLevel = 1) => {
+export const logMessage = (message = "", logLevel = 1) => {
   if (
     !process.env.LOG_LEVEL ||
     process.env.LOG_LEVEL === LOG_LEVEL_TYPES.debug ||
@@ -51,7 +51,7 @@ const logMessage = (message = "", logLevel = 1) => {
   }
 };
 
-const getLogMessageWithMarker = (marker) => {
+export const getLogMessageWithMarker = (marker) => {
   return (message, logLevel) => {
     if (marker) {
       logMessage(`${marker} | ${message}`, logLevel);
@@ -61,7 +61,7 @@ const getLogMessageWithMarker = (marker) => {
   };
 };
 
-const logError = (msg, error) => {
+export const logError = (msg, error) => {
   if (process.env.LOG_LEVEL === LOG_LEVEL_TYPES.silent) {
     return;
   }
@@ -73,7 +73,7 @@ const logError = (msg, error) => {
   }
 };
 
-const logErrorAndExit = (msg, error) => {
+export const logErrorAndExit = (msg, error) => {
   console.error(msg);
 
   if (error) {
@@ -81,14 +81,4 @@ const logErrorAndExit = (msg, error) => {
   }
 
   process.exit(ERROR_STATUSES.general);
-};
-
-export {
-  ERROR_STATUSES,
-  getShouldOutputProgressIndicator,
-  getLogMessageWithMarker,
-  LOG_LEVELS,
-  logMessage,
-  logError,
-  logErrorAndExit,
 };

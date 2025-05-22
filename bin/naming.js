@@ -1,24 +1,24 @@
-import path from "path";
-import filenamify from "filenamify";
 import dayjs from "dayjs";
+import filenamify from "filenamify";
+import path from "path";
 
 const INVALID_CHAR_REPLACE = "_";
 const MAX_LENGTH_FILENAME = process.env.MAX_LENGTH_FILENAME
   ? parseInt(process.env.MAX_LENGTH_FILENAME)
   : 255;
 
-const getSafeName = (name, maxLength = MAX_LENGTH_FILENAME) => {
+export const getSafeName = (name, maxLength = MAX_LENGTH_FILENAME) => {
   return filenamify(name, {
     replacement: INVALID_CHAR_REPLACE,
     maxLength,
   });
 };
 
-const getSimpleFilename = (name, ext = "") => {
+export const getSimpleFilename = (name, ext = "") => {
   return `${getSafeName(name, MAX_LENGTH_FILENAME - (ext?.length ?? 0))}${ext}`;
 };
 
-const getItemFilename = ({
+export const getItemFilename = ({
   item,
   ext,
   url,
@@ -92,7 +92,7 @@ const getItemFilename = ({
   return nameSegments.join(path.sep);
 };
 
-const getFolderName = ({ feed, template }) => {
+export const getFolderName = ({ feed, template }) => {
   const templateReplacementsTuples = [
     ["podcast_title", feed.title || ""],
     ["podcast_link", feed.link || ""],
@@ -109,22 +109,4 @@ const getFolderName = ({ feed, template }) => {
   });
 
   return name;
-};
-
-const getArchiveFilename = ({ pubDate, name, ext }) => {
-  const formattedPubDate = pubDate
-    ? dayjs(new Date(pubDate)).format("YYYYMMDD")
-    : null;
-
-  const baseName = formattedPubDate ? `${formattedPubDate}-${name}` : name;
-
-  return `${baseName}${ext}`;
-};
-
-export {
-  getArchiveFilename,
-  getFolderName,
-  getItemFilename,
-  getSafeName,
-  getSimpleFilename,
 };

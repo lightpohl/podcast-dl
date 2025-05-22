@@ -1,27 +1,23 @@
-import pLimit from "p-limit";
-import _path from "path";
-import { promisify } from "util";
-import stream from "stream";
 import fs from "fs";
 import got from "got";
+import pLimit from "p-limit";
+import _path from "path";
+import stream from "stream";
 import { throttle } from "throttle-debounce";
-
+import { promisify } from "util";
+import { runExec } from "./exec.js";
+import { runFfmpeg } from "./ffmpeg.js";
 import {
-  logError,
   LOG_LEVELS,
   getLogMessageWithMarker,
   getShouldOutputProgressIndicator,
+  logError,
 } from "./logger.js";
-import { getArchiveFilename, getItemFilename } from "./naming.js";
+import { writeItemMeta } from "./meta.js";
+import { getItemFilename } from "./naming.js";
 import {
   getEpisodeAudioUrlAndExt,
-  getArchiveKey,
   getTempPath,
-  runFfmpeg,
-  runExec,
-  writeItemMeta,
-  writeToArchive,
-  getIsInArchive,
   prepareOutputPath,
 } from "./util.js";
 
@@ -31,13 +27,11 @@ const BYTES_IN_MB = 1000000;
 const USER_AGENT =
   "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36";
 
-const download = async (options) => {
+export const download = async (options) => {
   const {
     marker,
     url,
     outputPath,
-    key,
-    archive,
     override,
     alwaysPostprocess,
     onAfterDownload,
@@ -53,11 +47,6 @@ const download = async (options) => {
       await onAfterDownload();
     }
 
-    return;
-  }
-
-  if (key && archive && getIsInArchive({ key, archive })) {
-    logMessage("Download exists in archive. Skipping...");
     return;
   }
 
@@ -151,20 +140,10 @@ const download = async (options) => {
   if (onAfterDownload) {
     await onAfterDownload();
   }
-
-  if (key && archive) {
-    try {
-      writeToArchive({ key, archive });
-    } catch (error) {
-      throw new Error(`Error writing to archive: ${error.toString()}`);
-    }
-  }
 };
 
-const downloadItemsAsync = async ({
+export const downloadItemsAsync = async ({
   addMp3MetadataFlag,
-  archive,
-  archivePrefix,
   attempts,
   basePath,
   bitrate,
@@ -216,18 +195,9 @@ const downloadItemsAsync = async ({
 
     try {
       await download({
-        archive,
         override,
         alwaysPostprocess,
         marker,
-        key: getArchiveKey({
-          prefix: archivePrefix,
-          name: getArchiveFilename({
-            name: item.title,
-            pubDate: item.pubDate,
-            ext: audioFileExt,
-          }),
-        }),
         maxAttempts: attempts,
         outputPath: outputPodcastPath,
         url: episodeAudioUrl,
@@ -235,11 +205,9 @@ const downloadItemsAsync = async ({
           if (item._episodeImage) {
             try {
               await download({
-                archive,
                 override,
                 marker: item._episodeImage.url,
                 maxAttempts: attempts,
-                key: item._episodeImage.key,
                 outputPath: item._episodeImage.outputPath,
                 url: item._episodeImage.url,
               });
@@ -256,11 +224,9 @@ const downloadItemsAsync = async ({
           if (item._episodeTranscript) {
             try {
               await download({
-                archive,
                 override,
                 marker: item._episodeTranscript.url,
                 maxAttempts: attempts,
-                key: item._episodeTranscript.key,
                 outputPath: item._episodeTranscript.outputPath,
                 url: item._episodeTranscript.url,
               });
@@ -330,17 +296,8 @@ const downloadItemsAsync = async ({
               logMessage("Saving episode metadata...");
               writeItemMeta({
                 marker,
-                archive,
                 override,
                 item,
-                key: getArchiveKey({
-                  prefix: archivePrefix,
-                  name: getArchiveFilename({
-                    pubDate: item.pubDate,
-                    name: item.title,
-                    ext: episodeMetaExt,
-                  }),
-                }),
                 outputPath: outputEpisodeMetaPath,
               });
             } catch (error) {
@@ -366,5 +323,3 @@ const downloadItemsAsync = async ({
 
   return { numEpisodesDownloaded, hasErrors };
 };
-
-export { download, downloadItemsAsync };

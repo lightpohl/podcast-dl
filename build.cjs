@@ -44,9 +44,16 @@ const main = async () => {
         filename: `podcast-dl-${version}.js`,
       },
     },
-    async (error) => {
+    async (error, stats) => {
       if (error) {
-        console.error(error);
+        console.error("Fatal Webpack error:", error);
+        process.exit(1);
+      }
+
+      const info = stats.toJson();
+
+      if (stats.hasErrors()) {
+        console.error("Build errors:", info.errors);
         process.exit(1);
       }
 
