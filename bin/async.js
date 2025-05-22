@@ -175,6 +175,7 @@ const downloadItemsAsync = async ({
   episodeSourceOrder,
   exec,
   feed,
+  includeEpisodeImages,
   includeEpisodeMeta,
   mono,
   override,
@@ -213,25 +214,6 @@ const downloadItemsAsync = async ({
 
     prepareOutputPath(outputPodcastPath);
 
-    for (const extra of item._extraDownloads) {
-      try {
-        await download({
-          archive,
-          override,
-          marker: extra.url,
-          maxAttempts: attempts,
-          key: extra.key,
-          outputPath: extra.outputPath,
-          url: extra.url,
-        });
-      } catch (error) {
-        hasErrors = true;
-        logError(
-          `${marker} | Error downloading ${extra.url}: ${error.toString()}`
-        );
-      }
-    }
-
     try {
       await download({
         archive,
@@ -250,6 +232,51 @@ const downloadItemsAsync = async ({
         outputPath: outputPodcastPath,
         url: episodeAudioUrl,
         onAfterDownload: async () => {
+          if (item._episodeImage) {
+            try {
+              await download({
+                archive,
+                override,
+                marker: item._episodeImage.url,
+                maxAttempts: attempts,
+                key: item._episodeImage.key,
+                outputPath: item._episodeImage.outputPath,
+                url: item._episodeImage.url,
+              });
+            } catch (error) {
+              hasErrors = true;
+              logError(
+                `${marker} | Error downloading ${
+                  item._episodeImage.url
+                }: ${error.toString()}`
+              );
+            }
+          }
+
+          if (item._episodeTranscript) {
+            try {
+              await download({
+                archive,
+                override,
+                marker: item._episodeTranscript.url,
+                maxAttempts: attempts,
+                key: item._episodeTranscript.key,
+                outputPath: item._episodeTranscript.outputPath,
+                url: item._episodeTranscript.url,
+              });
+            } catch (error) {
+              hasErrors = true;
+              logError(
+                `${marker} | Error downloading ${
+                  item._episodeTranscript.url
+                }: ${error.toString()}`
+              );
+            }
+          }
+
+          const hasEpisodeImage =
+            item._episodeImage && fs.existsSync(item._episodeImage.outputPath);
+
           if (addMp3MetadataFlag || bitrate || mono) {
             logMessage("Running ffmpeg...");
             await runFfmpeg({
@@ -259,10 +286,16 @@ const downloadItemsAsync = async ({
               mono,
               itemIndex: item._originalIndex,
               outputPath: outputPodcastPath,
-              episodeImageOutputPath: item._episodeImageOutputPath,
+              episodeImageOutputPath: hasEpisodeImage
+                ? item._episodeImage.outputPath
+                : undefined,
               addMp3Metadata: addMp3MetadataFlag,
               ext: audioFileExt,
             });
+          }
+
+          if (!includeEpisodeImages && hasEpisodeImage) {
+            fs.unlinkSync(item._episodeImage.outputPath);
           }
 
           if (exec) {
@@ -276,49 +309,52 @@ const downloadItemsAsync = async ({
             });
           }
 
+          if (includeEpisodeMeta) {
+            const episodeMetaExt = ".meta.json";
+            const episodeMetaName = getItemFilename({
+              item,
+              feed,
+              url: episodeAudioUrl,
+              ext: episodeMetaExt,
+              template: episodeTemplate,
+              customTemplateOptions: episodeCustomTemplateOptions,
+              width: episodeDigits,
+              offset: episodeNumOffset,
+            });
+            const outputEpisodeMetaPath = _path.resolve(
+              basePath,
+              episodeMetaName
+            );
+
+            try {
+              logMessage("Saving episode metadata...");
+              writeItemMeta({
+                marker,
+                archive,
+                override,
+                item,
+                key: getArchiveKey({
+                  prefix: archivePrefix,
+                  name: getArchiveFilename({
+                    pubDate: item.pubDate,
+                    name: item.title,
+                    ext: episodeMetaExt,
+                  }),
+                }),
+                outputPath: outputEpisodeMetaPath,
+              });
+            } catch (error) {
+              hasErrors = true;
+              logError(`${marker} | ${error.toString()}`);
+            }
+          }
+
           numEpisodesDownloaded += 1;
         },
       });
     } catch (error) {
       hasErrors = true;
       logError(`${marker} | Error downloading episode: ${error.toString()}`);
-    }
-
-    if (includeEpisodeMeta) {
-      const episodeMetaExt = ".meta.json";
-      const episodeMetaName = getItemFilename({
-        item,
-        feed,
-        url: episodeAudioUrl,
-        ext: episodeMetaExt,
-        template: episodeTemplate,
-        customTemplateOptions: episodeCustomTemplateOptions,
-        width: episodeDigits,
-        offset: episodeNumOffset,
-      });
-      const outputEpisodeMetaPath = _path.resolve(basePath, episodeMetaName);
-
-      try {
-        logMessage("Saving episode metadata...");
-        writeItemMeta({
-          marker,
-          archive,
-          override,
-          item,
-          key: getArchiveKey({
-            prefix: archivePrefix,
-            name: getArchiveFilename({
-              pubDate: item.pubDate,
-              name: item.title,
-              ext: episodeMetaExt,
-            }),
-          }),
-          outputPath: outputEpisodeMetaPath,
-        });
-      } catch (error) {
-        hasErrors = true;
-        logError(`${marker} | ${error.toString()}`);
-      }
     }
   };
 

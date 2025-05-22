@@ -209,6 +209,7 @@ const main = async () => {
   }
 
   const targetItems = getItemsToDownload({
+    addMp3MetadataFlag,
     archive,
     archivePrefix,
     basePath,
@@ -252,6 +253,7 @@ const main = async () => {
     episodeSourceOrder,
     exec,
     feed,
+    includeEpisodeImages,
     includeEpisodeMeta,
     mono,
     override,

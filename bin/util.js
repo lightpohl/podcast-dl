@@ -154,6 +154,7 @@ const getLoopControls = ({ offset, length, reverse }) => {
 };
 
 const getItemsToDownload = ({
+  addMp3MetadataFlag,
   archive,
   archivePrefix,
   basePath,
@@ -242,9 +243,8 @@ const getItemsToDownload = ({
     if (isValid) {
       const item = feed.items[i];
       item._originalIndex = i;
-      item._extraDownloads = [];
 
-      if (includeEpisodeImages) {
+      if (includeEpisodeImages || addMp3MetadataFlag) {
         const episodeImageUrl = getImageUrl(item);
 
         if (episodeImageUrl) {
@@ -270,12 +270,11 @@ const getItemsToDownload = ({
           });
 
           const outputImagePath = path.resolve(basePath, episodeImageName);
-          item._episodeImageOutputPath = outputImagePath;
-          item._extraDownloads.push({
+          item._episodeImage = {
             url: episodeImageUrl,
             outputPath: outputImagePath,
             key: episodeImageArchiveKey,
-          });
+          };
         }
       }
 
@@ -311,11 +310,11 @@ const getItemsToDownload = ({
             episodeTranscriptName
           );
 
-          item._extraDownloads.push({
+          item._episodeTranscript = {
             url: episodeTranscriptUrl,
             outputPath: outputTranscriptPath,
             key: episodeTranscriptArchiveKey,
-          });
+          };
         }
       }
 
@@ -629,9 +628,10 @@ const runFfmpeg = async ({
     return;
   }
 
+  const shouldEmbedImage = addMp3Metadata && episodeImageOutputPath;
   let command = `ffmpeg -loglevel quiet -i ${escapeArgForShell(outputPath)}`;
 
-  if (episodeImageOutputPath) {
+  if (shouldEmbedImage) {
     command += ` -i ${escapeArgForShell(episodeImageOutputPath)}`;
   }
 
@@ -685,7 +685,7 @@ const runFfmpeg = async ({
     command += ` -map_metadata 0 ${metadataString} -codec copy`;
   }
 
-  if (episodeImageOutputPath) {
+  if (shouldEmbedImage) {
     command += ` -map 0 -map 1`;
   } else {
     command += ` -map 0`;
