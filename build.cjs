@@ -6,15 +6,15 @@ const { version } = require("./package.json");
 
 const targetMap = [
   {
-    target: "node18-linux-x64",
+    target: "node22-linux-x64",
     output: `./binaries/podcast-dl-${version}-linux-x64`,
   },
   {
-    target: "node18-macos-x64",
+    target: "node22-macos-x64",
     output: `./binaries/podcast-dl-${version}-macos-x64`,
   },
   {
-    target: "node18-win-x64",
+    target: "node22-win-x64",
     output: `./binaries/podcast-dl-${version}-win-x64`,
   },
 ];
