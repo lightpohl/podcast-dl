@@ -1,5 +1,28 @@
 # Changelog
 
+## [11.0.0](https://github.com/lightpohl/podcast-dl/compare/v10.5.0...v11.0.0) (2025-05-22)
+
+
+### ⚠ BREAKING CHANGES
+
+* update to Node 22 LTS
+* remove legacy archive behavior
+
+### Features
+
+* always attempt image embed with '--add-mp3-metadata' ([644bcf7](https://github.com/lightpohl/podcast-dl/commit/644bcf78adc56c825cfa8ed793232ea723143f48))
+* remove legacy archive behavior ([85d51d4](https://github.com/lightpohl/podcast-dl/commit/85d51d466cb324edaceb5c8b43c6febb3154a4d1))
+
+
+### Bug Fixes
+
+* do not embed image if '--add-mp3-metadata' is not provided ([644bcf7](https://github.com/lightpohl/podcast-dl/commit/644bcf78adc56c825cfa8ed793232ea723143f48))
+
+
+### Miscellaneous Chores
+
+* update to Node 22 LTS ([33fa2cf](https://github.com/lightpohl/podcast-dl/commit/33fa2cfb9593f39094cc4c11d3d7aa286d4a8573))
+
 ## [10.5.0](https://github.com/lightpohl/podcast-dl/compare/v10.4.1...v10.5.0) (2025-05-18)
 
 
