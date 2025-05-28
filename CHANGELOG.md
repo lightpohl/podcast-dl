@@ -1,5 +1,12 @@
 # Changelog
 
+## [11.0.1](https://github.com/lightpohl/podcast-dl/compare/v11.0.0...v11.0.1) (2025-05-28)
+
+
+### Bug Fixes
+
+* do not enforce higher Node engine version ([3a2adcb](https://github.com/lightpohl/podcast-dl/commit/3a2adcb1a06a176fe28534201ecf30b2dd9b071c)), closes [#104](https://github.com/lightpohl/podcast-dl/issues/104)
+
 ## [11.0.0](https://github.com/lightpohl/podcast-dl/compare/v10.5.0...v11.0.0) (2025-05-22)
 
 
