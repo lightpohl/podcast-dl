@@ -5,6 +5,7 @@ import fs from "fs";
 import { bootstrap as bootstrapProxy } from "global-agent";
 import _path from "path";
 import pluralize from "pluralize";
+import { getArchiveKey } from "./archive.js";
 import { download, downloadItemsAsync } from "./async.js";
 import { setupCommander } from "./commander.js";
 import { getItemsToDownload, logItemsList } from "./items.js";
@@ -62,6 +63,8 @@ const {
   adjustBitrate: bitrate,
 } = opts;
 
+let { archive } = opts;
+
 const main = async () => {
   if (!url && !file) {
     logErrorAndExit("No URL or file location provided");
@@ -78,6 +81,15 @@ const main = async () => {
   const feed = url
     ? await getUrlFeed(url, parserConfig)
     : await getFileFeed(file, parserConfig);
+
+  const archivePrefix = (() => {
+    if (feed.feedUrl || url) {
+      const { hostname, pathname } = new URL(feed.feedUrl || url);
+      return `${hostname}${pathname}`;
+    }
+
+    return feed.title || file;
+  })();
 
   const basePath = _path.resolve(
     process.cwd(),
@@ -118,6 +130,14 @@ const main = async () => {
     fs.mkdirSync(basePath, { recursive: true });
   }
 
+  if (archive) {
+    archive =
+      typeof archive === "boolean"
+        ? "./{{podcast_title}}/archive.json"
+        : archive;
+    archive = getFolderName({ feed, template: archive });
+  }
+
   if (includeMeta) {
     const podcastImageUrl = getImageUrl(feed);
 
@@ -134,8 +154,15 @@ const main = async () => {
       try {
         logMessage("\nDownloading podcast image...");
         await download({
+          archive,
           override,
           marker: podcastImageUrl,
+          key: getArchiveKey({
+            prefix: archivePrefix,
+            name: `${
+              feed.title ? `${feed.title}.image` : "image"
+            }${podcastImageFileExt}`,
+          }),
           outputPath: outputImagePath,
           url: podcastImageUrl,
           maxAttempts: attempts,
@@ -156,8 +183,13 @@ const main = async () => {
     try {
       logMessage("\nSaving podcast metadata...");
       writeFeedMeta({
+        archive,
         override,
         feed,
+        key: getArchiveKey({
+          prefix: archivePrefix,
+          name: `${feed.title ? `${feed.title}.meta` : "meta"}.json`,
+        }),
         outputPath: outputMetaPath,
       });
     } catch (error) {
@@ -174,6 +206,8 @@ const main = async () => {
   }
 
   const targetItems = getItemsToDownload({
+    archive,
+    archivePrefix,
     addMp3MetadataFlag,
     basePath,
     feed,
@@ -204,6 +238,8 @@ const main = async () => {
 
   const { numEpisodesDownloaded, hasErrors } = await downloadItemsAsync({
     addMp3MetadataFlag,
+    archive,
+    archivePrefix,
     attempts,
     basePath,
     bitrate,

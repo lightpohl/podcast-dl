@@ -5,6 +5,12 @@ import _path from "path";
 import stream from "stream";
 import { throttle } from "throttle-debounce";
 import { promisify } from "util";
+import {
+  getArchiveFilename,
+  getArchiveKey,
+  getIsInArchive,
+  writeToArchive,
+} from "./archive.js";
 import { runExec } from "./exec.js";
 import { runFfmpeg } from "./ffmpeg.js";
 import {
@@ -32,6 +38,8 @@ export const download = async (options) => {
     marker,
     url,
     outputPath,
+    key,
+    archive,
     override,
     alwaysPostprocess,
     onAfterDownload,
@@ -47,6 +55,11 @@ export const download = async (options) => {
       await onAfterDownload();
     }
 
+    return;
+  }
+
+  if (key && archive && getIsInArchive({ key, archive })) {
+    logMessage("Download exists in archive. Skipping...");
     return;
   }
 
@@ -140,10 +153,20 @@ export const download = async (options) => {
   if (onAfterDownload) {
     await onAfterDownload();
   }
+
+  if (key && archive) {
+    try {
+      writeToArchive({ key, archive });
+    } catch (error) {
+      throw new Error(`Error writing to archive: ${error.toString()}`);
+    }
+  }
 };
 
 export const downloadItemsAsync = async ({
   addMp3MetadataFlag,
+  archive,
+  archivePrefix,
   attempts,
   basePath,
   bitrate,
@@ -195,9 +218,18 @@ export const downloadItemsAsync = async ({
 
     try {
       await download({
+        archive,
         override,
         alwaysPostprocess,
         marker,
+        key: getArchiveKey({
+          prefix: archivePrefix,
+          name: getArchiveFilename({
+            name: item.title,
+            pubDate: item.pubDate,
+            ext: audioFileExt,
+          }),
+        }),
         maxAttempts: attempts,
         outputPath: outputPodcastPath,
         url: episodeAudioUrl,
@@ -205,7 +237,9 @@ export const downloadItemsAsync = async ({
           if (item._episodeImage) {
             try {
               await download({
+                archive,
                 override,
+                key: item._episodeImage.key,
                 marker: item._episodeImage.url,
                 maxAttempts: attempts,
                 outputPath: item._episodeImage.outputPath,
@@ -224,7 +258,9 @@ export const downloadItemsAsync = async ({
           if (item._episodeTranscript) {
             try {
               await download({
+                archive,
                 override,
+                key: item._episodeTranscript.key,
                 marker: item._episodeTranscript.url,
                 maxAttempts: attempts,
                 outputPath: item._episodeTranscript.outputPath,
@@ -296,8 +332,17 @@ export const downloadItemsAsync = async ({
               logMessage("Saving episode metadata...");
               writeItemMeta({
                 marker,
+                archive,
                 override,
                 item,
+                key: getArchiveKey({
+                  prefix: archivePrefix,
+                  name: getArchiveFilename({
+                    pubDate: item.pubDate,
+                    name: item.title,
+                    ext: episodeMetaExt,
+                  }),
+                }),
                 outputPath: outputEpisodeMetaPath,
               });
             } catch (error) {

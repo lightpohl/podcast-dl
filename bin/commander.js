@@ -1,7 +1,7 @@
+import { ITEM_LIST_FORMATS } from "./items.js";
+import { logErrorAndExit } from "./logger.js";
 import { AUDIO_ORDER_TYPES, TRANSCRIPT_TYPES } from "./util.js";
 import { createParseNumber, hasFfmpeg } from "./validate.js";
-import { logErrorAndExit } from "./logger.js";
-import { ITEM_LIST_FORMATS } from "./items.js";
 
 export const setupCommander = (program) => {
   program
@@ -11,6 +11,10 @@ export const setupCommander = (program) => {
       "--out-dir <path>",
       "specify output directory",
       "./{{podcast_title}}"
+    )
+    .option(
+      "--archive [path]",
+      "download or write only items not listed in archive file"
     )
     .option(
       "--episode-template <string>",

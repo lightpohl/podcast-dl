@@ -1,5 +1,7 @@
 import dayjs from "dayjs";
 import path from "path";
+import { getArchive, getArchiveFilename, getArchiveKey } from "./archive.js";
+import { logErrorAndExit } from "./logger.js";
 import { getItemFilename } from "./naming.js";
 import {
   getEpisodeAudioUrlAndExt,
@@ -8,11 +10,12 @@ import {
   getTranscriptUrl,
   getUrlExt,
 } from "./util.js";
-import { logErrorAndExit } from "./logger.js";
 
 export const ITEM_LIST_FORMATS = ["table", "json"];
 
 export const getItemsToDownload = ({
+  archive,
+  archivePrefix,
   addMp3MetadataFlag,
   basePath,
   feed,
@@ -40,6 +43,8 @@ export const getItemsToDownload = ({
 
   let i = startIndex;
   const items = [];
+
+  const savedArchive = archive ? getArchive(archive) : [];
 
   while (shouldGo(i)) {
     const { title, pubDate } = feed.items[i];
@@ -80,10 +85,21 @@ export const getItemsToDownload = ({
       }
     }
 
-    const { url: episodeAudioUrl } = getEpisodeAudioUrlAndExt(
-      feed.items[i],
-      episodeSourceOrder
-    );
+    const { url: episodeAudioUrl, ext: audioFileExt } =
+      getEpisodeAudioUrlAndExt(feed.items[i], episodeSourceOrder);
+
+    const key = getArchiveKey({
+      prefix: archivePrefix,
+      name: getArchiveFilename({
+        pubDate,
+        name: title,
+        ext: audioFileExt,
+      }),
+    });
+
+    if (key && savedArchive.includes(key)) {
+      isValid = false;
+    }
 
     if (isValid) {
       const item = feed.items[i];
@@ -94,6 +110,14 @@ export const getItemsToDownload = ({
 
         if (episodeImageUrl) {
           const episodeImageFileExt = getUrlExt(episodeImageUrl);
+          const episodeImageArchiveKey = getArchiveKey({
+            prefix: archivePrefix,
+            name: getArchiveFilename({
+              pubDate,
+              name: title,
+              ext: episodeImageFileExt,
+            }),
+          });
 
           const episodeImageName = getItemFilename({
             item,
@@ -110,6 +134,7 @@ export const getItemsToDownload = ({
           item._episodeImage = {
             url: episodeImageUrl,
             outputPath: outputImagePath,
+            key: episodeImageArchiveKey,
           };
         }
       }
@@ -122,6 +147,14 @@ export const getItemsToDownload = ({
 
         if (episodeTranscriptUrl) {
           const episodeTranscriptFileExt = getUrlExt(episodeTranscriptUrl);
+          const episodeTranscriptArchiveKey = getArchiveKey({
+            prefix: archivePrefix,
+            name: getArchiveFilename({
+              pubDate,
+              name: title,
+              ext: episodeTranscriptFileExt,
+            }),
+          });
 
           const episodeTranscriptName = getItemFilename({
             item,
@@ -141,6 +174,7 @@ export const getItemsToDownload = ({
           item._episodeTranscript = {
             url: episodeTranscriptUrl,
             outputPath: outputTranscriptPath,
+            key: episodeTranscriptArchiveKey,
           };
         }
       }
