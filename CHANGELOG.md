@@ -1,5 +1,12 @@
 # Changelog
 
+## [11.1.0](https://github.com/lightpohl/podcast-dl/compare/v11.0.1...v11.1.0) (2025-05-30)
+
+
+### Features
+
+* add back '--archive' ([6f12a29](https://github.com/lightpohl/podcast-dl/commit/6f12a2966445c0abd5d3449a08ab3a637296ad82)), closes [#106](https://github.com/lightpohl/podcast-dl/issues/106)
+
 ## [11.0.1](https://github.com/lightpohl/podcast-dl/compare/v11.0.0...v11.0.1) (2025-05-28)
 
 
