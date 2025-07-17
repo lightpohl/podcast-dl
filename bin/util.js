@@ -3,7 +3,7 @@ import path from "path";
 import rssParser from "rss-parser";
 import { logErrorAndExit, logMessage } from "./logger.js";
 
-const isWin = process.platform === "win32";
+export const isWin = process.platform === "win32";
 
 export const defaultRssParserConfig = {
   defaultRSS: 2.0,

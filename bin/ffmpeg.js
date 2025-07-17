@@ -2,7 +2,7 @@ import dayjs from "dayjs";
 import fs from "fs";
 import { execWithPromise } from "./exec.js";
 import { LOG_LEVELS, logMessage } from "./logger.js";
-import { escapeArgForShell } from "./util.js";
+import { escapeArgForShell, isWin } from "./util.js";
 
 export const runFfmpeg = async ({
   feed,
@@ -52,13 +52,17 @@ export const runFfmpeg = async ({
       artist,
       album_artist: artist,
       title,
-      subtitle,
-      comment,
       disc,
       track,
       "episode-type": episodeType,
       date,
     };
+
+    if (!isWin) {
+      // Due to limited escape options, these metadata fields often break in Windows
+      metaKeysToValues.comment = comment;
+      metaKeysToValues.subtitle = subtitle
+    }
 
     const metadataString = Object.keys(metaKeysToValues)
       .map((key) => {
