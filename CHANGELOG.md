@@ -1,5 +1,12 @@
 # Changelog
 
+## [11.1.1](https://github.com/lightpohl/podcast-dl/compare/v11.1.0...v11.1.1) (2025-07-17)
+
+
+### Bug Fixes
+
+* skip problematic ffmpeg metadata on Windows ([abb9ca5](https://github.com/lightpohl/podcast-dl/commit/abb9ca5060359a4bc46f707b56f2efd27b39a663)), closes [#109](https://github.com/lightpohl/podcast-dl/issues/109)
+
 ## [11.1.0](https://github.com/lightpohl/podcast-dl/compare/v11.0.1...v11.1.0) (2025-05-30)
 
 
