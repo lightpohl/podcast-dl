@@ -1,0 +1,17 @@
+on:
+  release:
+    types: [published]
+
+name: delete-old-assets
+
+jobs:
+  delete-assets:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: tinoji/delete-older-release-assets@v1.0.1
+        with:
+          keep_latest: 3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+
