@@ -208,15 +208,15 @@ export const getEpisodeAudioUrlAndExt = (
 };
 
 export const getImageUrl = ({ image, itunes }) => {
-  if (image?.url) {
+  if (image?.url && typeof image.url === "string") {
     return image.url;
   }
 
-  if (image?.link) {
+  if (image?.link && typeof image.link === "string") {
     return image.link;
   }
 
-  if (itunes?.image) {
+  if (itunes?.image && typeof itunes.image === "string") {
     return itunes.image;
   }
 
