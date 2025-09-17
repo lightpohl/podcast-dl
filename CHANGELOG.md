@@ -1,5 +1,12 @@
 # Changelog
 
+## [11.1.2](https://github.com/lightpohl/podcast-dl/compare/v11.1.1...v11.1.2) (2025-09-17)
+
+
+### Bug Fixes
+
+* handle invalid image objects found in some RSS feeds ([2a8f643](https://github.com/lightpohl/podcast-dl/commit/2a8f643b27581626b4d85f2a44f5e81a7d43a976))
+
 ## [11.1.1](https://github.com/lightpohl/podcast-dl/compare/v11.1.0...v11.1.1) (2025-07-17)
 
 
