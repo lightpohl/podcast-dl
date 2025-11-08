@@ -14,6 +14,10 @@ const targetMap = [
     output: `./binaries/podcast-dl-${version}-macos-x64`,
   },
   {
+    target: "node18-macos-arm64",
+    output: `./binaries/podcast-dl-${version}-macos-arm64`,
+  },
+  {
     target: "node18-win-x64",
     output: `./binaries/podcast-dl-${version}-win-x64`,
   },
