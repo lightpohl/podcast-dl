@@ -113,6 +113,11 @@ export const setupCommander = (program) => {
       "matched episode titles against regex will be excluded"
     )
     .option(
+      "--season <number>",
+      "download only episodes from this season",
+      createParseNumber({ min: 0, name: "--season" })
+    )
+    .option(
       "--after <string>",
       "download episodes only after this date (inclusive)"
     )

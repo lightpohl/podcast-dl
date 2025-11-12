@@ -34,6 +34,7 @@ export const getItemsToDownload = ({
   includeEpisodeImages,
   includeEpisodeTranscripts,
   episodeTranscriptTypes,
+  season,
 }) => {
   const { startIndex, shouldGo, next } = getLoopControls({
     offset,
@@ -47,7 +48,8 @@ export const getItemsToDownload = ({
   const savedArchive = archive ? getArchive(archive) : [];
 
   while (shouldGo(i)) {
-    const { title, pubDate } = feed.items[i];
+    const { title, pubDate, itunes } = feed.items[i];
+    const actualSeasonNum = itunes?.season ? parseInt(itunes.season) : null;
     const pubDateDay = dayjs(new Date(pubDate));
     let isValid = true;
 
@@ -85,6 +87,10 @@ export const getItemsToDownload = ({
       }
     }
 
+    if (season && season != actualSeasonNum) {
+      isValid = false;
+    }
+
     const { url: episodeAudioUrl, ext: audioFileExt } =
       getEpisodeAudioUrlAndExt(feed.items[i], episodeSourceOrder);
 
@@ -104,13 +110,7 @@ export const getItemsToDownload = ({
     if (isValid) {
       const item = feed.items[i];
       item._originalIndex = i;
-
-      // Parse and store season number
-      if (item.itunes?.season) {
-        item.seasonNum = parseInt(item.itunes.season);
-      } else {
-        item.seasonNum = null;
-      }
+      item.seasonNum = actualSeasonNum;
 
       if (includeEpisodeImages || addMp3MetadataFlag) {
         const episodeImageUrl = getImageUrl(item);
@@ -205,6 +205,7 @@ export const logItemsList = ({
   after,
   episodeRegex,
   episodeRegexExclude,
+  season,
 }) => {
   const items = getItemsToDownload({
     feed,
@@ -215,6 +216,7 @@ export const logItemsList = ({
     after,
     episodeRegex,
     episodeRegexExclude,
+    season,
   });
 
   if (!items.length) {
