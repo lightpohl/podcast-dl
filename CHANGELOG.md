@@ -1,5 +1,12 @@
 # Changelog
 
+## [11.2.0](https://github.com/lightpohl/podcast-dl/compare/v11.1.2...v11.2.0) (2025-11-12)
+
+
+### Features
+
+* add option to filter downloads by season ([#116](https://github.com/lightpohl/podcast-dl/issues/116)) ([4be7b8b](https://github.com/lightpohl/podcast-dl/commit/4be7b8be99ce8b4364974fb1e012ebd0dffb707f))
+
 ## [11.1.2](https://github.com/lightpohl/podcast-dl/compare/v11.1.1...v11.1.2) (2025-09-17)
 
 
