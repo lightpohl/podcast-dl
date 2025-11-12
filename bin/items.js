@@ -105,6 +105,13 @@ export const getItemsToDownload = ({
       const item = feed.items[i];
       item._originalIndex = i;
 
+      // Parse and store season number
+      if (item.itunes?.season) {
+        item.seasonNum = parseInt(item.itunes.season);
+      } else {
+        item.seasonNum = null;
+      }
+
       if (includeEpisodeImages || addMp3MetadataFlag) {
         const episodeImageUrl = getImageUrl(item);
 
@@ -218,7 +225,7 @@ export const logItemsList = ({
 
   const output = items.map((item) => {
     const data = {
-      seasonNum: item.itunes?.season ? parseInt(item.itunes.season) : null,
+      seasonNum: item.seasonNum,
       episodeNum: feed.items.length - item._originalIndex,
       title: item.title,
       pubDate: item.pubDate,
