@@ -218,6 +218,7 @@ export const logItemsList = ({
 
   const output = items.map((item) => {
     const data = {
+      seasonNum: item.itunes?.season ? parseInt(item.itunes.season) : null,
       episodeNum: feed.items.length - item._originalIndex,
       title: item.title,
       pubDate: item.pubDate,
