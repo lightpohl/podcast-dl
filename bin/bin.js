@@ -61,6 +61,7 @@ const {
   url,
   addMp3Metadata: addMp3MetadataFlag,
   adjustBitrate: bitrate,
+  season,
 } = opts;
 
 let { archive } = opts;
@@ -113,6 +114,7 @@ const main = async () => {
         before,
         episodeRegex,
         episodeRegexExclude,
+        season,
       });
     } else {
       logErrorAndExit("No episodes found to list");
@@ -226,6 +228,7 @@ const main = async () => {
     includeEpisodeImages,
     includeEpisodeTranscripts,
     episodeTranscriptTypes,
+    season,
   });
 
   if (!targetItems.length) {
