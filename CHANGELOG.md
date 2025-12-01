@@ -1,5 +1,12 @@
 # Changelog
 
+## [11.3.0](https://github.com/lightpohl/podcast-dl/compare/v11.2.0...v11.3.0) (2025-12-01)
+
+
+### Features
+
+* add support for specifying '--user-agent' ([#119](https://github.com/lightpohl/podcast-dl/issues/119)) ([8a20489](https://github.com/lightpohl/podcast-dl/commit/8a20489daea6dac4a0dd818803ef48e82cff9c02))
+
 ## [11.2.0](https://github.com/lightpohl/podcast-dl/compare/v11.1.2...v11.2.0) (2025-11-12)
 
 
