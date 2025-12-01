@@ -59,6 +59,7 @@ const {
   reverse,
   threads,
   url,
+  userAgent,
   addMp3Metadata: addMp3MetadataFlag,
   adjustBitrate: bitrate,
   season,
@@ -158,6 +159,7 @@ const main = async () => {
         await download({
           archive,
           override,
+          userAgent,
           marker: podcastImageUrl,
           key: getArchiveKey({
             prefix: archivePrefix,
@@ -260,6 +262,7 @@ const main = async () => {
     alwaysPostprocess,
     targetItems,
     threads,
+    userAgent,
   });
 
   if (hasErrors && numEpisodesDownloaded !== targetItems.length) {

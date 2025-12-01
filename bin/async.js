@@ -31,7 +31,7 @@ const pipeline = promisify(stream.pipeline);
 
 const BYTES_IN_MB = 1000000;
 const USER_AGENT =
-  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36";
+  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36";
 
 export const download = async (options) => {
   const {
@@ -45,6 +45,7 @@ export const download = async (options) => {
     onAfterDownload,
     attempt = 1,
     maxAttempts = 3,
+    userAgent = USER_AGENT,
   } = options;
 
   const logMessage = getLogMessageWithMarker(marker);
@@ -71,7 +72,7 @@ export const download = async (options) => {
       responseType: "json",
       headers: {
         accept: "*/*",
-        "user-agent": USER_AGENT,
+        "user-agent": userAgent,
       },
     });
   } catch (error) {
@@ -114,7 +115,7 @@ export const download = async (options) => {
 
     await pipeline(
       got
-        .stream(url, { headers: { "user-agent": USER_AGENT } })
+        .stream(url, { headers: { "user-agent": userAgent } })
         .on("downloadProgress", onDownloadProgress),
       fs.createWriteStream(tempOutputPath)
     );
@@ -184,6 +185,7 @@ export const downloadItemsAsync = async ({
   alwaysPostprocess,
   targetItems,
   threads = 1,
+  userAgent = USER_AGENT,
 }) => {
   let numEpisodesDownloaded = 0;
   let hasErrors = false;
@@ -222,6 +224,7 @@ export const downloadItemsAsync = async ({
         override,
         alwaysPostprocess,
         marker,
+        userAgent,
         key: getArchiveKey({
           prefix: archivePrefix,
           name: getArchiveFilename({
@@ -239,6 +242,7 @@ export const downloadItemsAsync = async ({
               await download({
                 archive,
                 override,
+                userAgent,
                 key: item._episodeImage.key,
                 marker: item._episodeImage.url,
                 maxAttempts: attempts,
@@ -265,6 +269,7 @@ export const downloadItemsAsync = async ({
                 maxAttempts: attempts,
                 outputPath: item._episodeTranscript.outputPath,
                 url: item._episodeTranscript.url,
+                userAgent,
               });
             } catch (error) {
               hasErrors = true;
