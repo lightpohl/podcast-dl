@@ -1,5 +1,12 @@
 # Changelog
 
+## [11.4.0](https://github.com/lightpohl/podcast-dl/compare/v11.3.0...v11.4.0) (2025-12-31)
+
+
+### Features
+
+* add support for simple template filters ([84d7105](https://github.com/lightpohl/podcast-dl/commit/84d7105a98b745bbb0a22bb49ec464517f60d4f8))
+
 ## [11.3.0](https://github.com/lightpohl/podcast-dl/compare/v11.2.0...v11.3.0) (2025-12-01)
 
 
