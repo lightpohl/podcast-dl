@@ -109,6 +109,30 @@ If no match is found, the `custom_<n>` keyword will be replaced with an empty st
 - `episode_filename_base`: The filename of the episode without its extension.
 - `url`: URL of episode audio file.
 
+### Template Filters
+
+Template variables can be transformed using filters. Filters are applied using the pipe (`|`) character and can be chained:
+
+`--episode-template "{{podcast_title|underscore}}-{{title|strip_special|camelcase}}"`
+
+For example, given `title` = "Serial- S01 E01: The Alibi":
+
+- `{{title|strip_special|underscore}}` produces `Serial S01 E01 The Alibi` then `Serial_S01_E01_The_Alibi`
+- `{{title|strip_special|camelcase}}` produces `SerialS01E01TheAlibi`
+
+#### Available Filters
+
+| Filter          | Description                                   | Example Input | Example Output |
+| --------------- | --------------------------------------------- | ------------- | -------------- |
+| `strip`         | Remove all whitespace                         | `"foo bar"`   | `"foobar"`     |
+| `strip_special` | Remove non-alphanumeric chars (except spaces) | `"S01: E01!"` | `"S01 E01"`    |
+| `underscore`    | Replace whitespace with underscores           | `"foo bar"`   | `"foo_bar"`    |
+| `dash`          | Replace whitespace with dashes                | `"foo bar"`   | `"foo-bar"`    |
+| `camelcase`     | Convert to UpperCamelCase                     | `"the alibi"` | `"TheAlibi"`   |
+| `lowercase`     | Convert to lowercase                          | `"FOO Bar"`   | `"foo bar"`    |
+| `uppercase`     | Convert to UPPERCASE                          | `"foo bar"`   | `"FOO BAR"`    |
+| `trim`          | Remove leading/trailing whitespace            | `" foo "`     | `"foo"`        |
+
 ## Log Levels
 
 By default, all logs and errors are outputted to the console. The amount of logs can be controlled using the environment variable `LOG_LEVEL` with the following options:
