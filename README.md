@@ -22,7 +22,7 @@ A humble CLI for downloading and archiving podcasts.
 
 Either `--url` or `--file` must be provided.
 
-Type values surrounded in square brackets (`[]`) can be used as used as boolean options (no argument required).
+Type values surrounded in square brackets (`[]`) can be used as boolean options (no argument required).
 
 | Option                            | Type                | Required | Description                                                                                                                                                                                                                   |
 | --------------------------------- | ------------------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -35,17 +35,17 @@ Type values surrounded in square brackets (`[]`) can be used as used as boolean 
 | --episode-template                | String              | false    | Template for generating episode related filenames. See "Template Options" for details.                                                                                                                                        |
 | --episode-custom-template-options | <String...>         | false    | Provide custom options for the episode template. See "Template Options" for details.                                                                                                                                          |
 | --include-meta                    |                     | false    | Write out podcast metadata to JSON.                                                                                                                                                                                           |
-| --include-episode-meta            |                     | false    | Write out individual episode metadata **to** JSON.                                                                                                                                                                            |
+| --include-episode-meta            |                     | false    | Write out individual episode metadata to JSON.                                                                                                                                                                                |
 | --include-episode-images          |                     | false    | Download found episode images.                                                                                                                                                                                                |
 | --include-episode-transcripts     |                     | false    | Download found episode transcripts.                                                                                                                                                                                           |
 | --offset                          | Number              | false    | Offset starting download position. Default is `0`.                                                                                                                                                                            |
 | --limit                           | Number              | false    | Max number of episodes to download. Downloads all by default.                                                                                                                                                                 |
-| --after                           | String              | false    | Only download episodes after this date (i.e. MM/DD/YYY, inclusive).                                                                                                                                                           |
-| --before                          | String              | false    | Only download episodes before this date (i.e. MM/DD/YYY, inclusive)                                                                                                                                                           |
+| --after                           | String              | false    | Only download episodes after this date (i.e. MM/DD/YYYY, inclusive).                                                                                                                                                          |
+| --before                          | String              | false    | Only download episodes before this date (i.e. MM/DD/YYYY, inclusive).                                                                                                                                                         |
 | --episode-regex                   | String              | false    | Match episode title against provided regex before starting download.                                                                                                                                                          |
-| --episode-regex-exclude           | String              | false    | Matched episode titles against provided regex will be excluded.                                                                                                                                                               |
+| --episode-regex-exclude           | String              | false    | Episode titles matching provided regex will be excluded.                                                                                                                                                                      |
 | --episode-digits                  | Number              | false    | Minimum number of digits to use for episode numbering (e.g. 3 would generate "001" instead of "1"). Default is `0`.                                                                                                           |
-| --episode-num-offset              | Number              | false    | Offset the acquired episode number. Default is 0.                                                                                                                                                                             |
+| --episode-num-offset              | Number              | false    | Offset the acquired episode number. Default is `0`.                                                                                                                                                                           |
 | --episode-source-order            | String              | false    | Attempted order to extract episode audio URL from RSS feed. Default is `"enclosure,link"`.                                                                                                                                    |
 | --episode-transcript-types        | String              | false    | List of allowed transcript types in preferred order. Default is "application/json,application/x-subrip,application/srr,application/srt,text/vtt,text/html,text/plain".                                                        |
 | --season                          | Number              | false    | Only download episodes from specified season. Note: this will only work if the RSS feed includes the `itunes:season` tag on episodes.                                                                                         |
@@ -88,7 +88,7 @@ Options that support templates allow users to specify a template for the generat
 - `release_year`: The release year (`YYYY`) of the episode.
 - `release_month`: The release month (`MM`) of the episode.
 - `release_day`: The release day (`DD`) of the episode.
-- `episode_num`: The location number of where the episodes appears in the feed.
+- `episode_num`: The position number of where the episode appears in the feed.
 - `url`: URL of episode audio file.
 - `duration`: Provided `mm:ss` duration (if found).
 - `podcast_title`: Title of the podcast feed.
@@ -122,16 +122,16 @@ For example, given `title` = "Serial- S01 E01: The Alibi":
 
 #### Available Filters
 
-| Filter          | Description                                   | Example Input | Example Output |
-| --------------- | --------------------------------------------- | ------------- | -------------- |
-| `strip`         | Remove all whitespace                         | `"foo bar"`   | `"foobar"`     |
-| `strip_special` | Remove non-alphanumeric chars (except spaces) | `"S01: E01!"` | `"S01 E01"`    |
-| `underscore`    | Replace whitespace with underscores           | `"foo bar"`   | `"foo_bar"`    |
-| `dash`          | Replace whitespace with dashes                | `"foo bar"`   | `"foo-bar"`    |
-| `camelcase`     | Convert to UpperCamelCase                     | `"foo bar"`   | `"FooBar"`     |
-| `lowercase`     | Convert to lowercase                          | `"FOO Bar"`   | `"foo bar"`    |
-| `uppercase`     | Convert to UPPERCASE                          | `"foo bar"`   | `"FOO BAR"`    |
-| `trim`          | Remove leading/trailing whitespace            | `" foo "`     | `"foo"`        |
+| Filter          | Description                                   | Input         | Output      |
+| --------------- | --------------------------------------------- | ------------- | ----------- |
+| `strip`         | Remove all whitespace                         | `"foo bar"`   | `"foobar"`  |
+| `strip_special` | Remove non-alphanumeric chars (except spaces) | `"S01: E01!"` | `"S01 E01"` |
+| `underscore`    | Replace whitespace with underscores           | `"foo bar"`   | `"foo_bar"` |
+| `dash`          | Replace whitespace with dashes                | `"foo bar"`   | `"foo-bar"` |
+| `camelcase`     | Convert to UpperCamelCase                     | `"foo bar"`   | `"FooBar"`  |
+| `lowercase`     | Convert to lowercase                          | `"FOO Bar"`   | `"foo bar"` |
+| `uppercase`     | Convert to UPPERCASE                          | `"foo bar"`   | `"FOO BAR"` |
+| `trim`          | Remove leading/trailing whitespace            | `" foo "`     | `"foo"`     |
 
 ## Log Levels
 
@@ -139,7 +139,7 @@ By default, all logs and errors are outputted to the console. The amount of logs
 
 - `static`: All logs and errors are outputted to the console, but disables any animations.
 - `quiet`: Only important info and non-critical errors will be logged (e.g. episode download started).
-- `silent`: Only critical error messages will be be logged.
+- `silent`: Only critical error messages will be logged.
 
 ## OS Filename Limits
 
