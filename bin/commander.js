@@ -110,7 +110,7 @@ export const setupCommander = (program) => {
     )
     .option(
       "--episode-regex-exclude <string>",
-      "matched episode titles against regex will be excluded"
+      "episode titles matching regex will be excluded"
     )
     .option(
       "--season <number>",
