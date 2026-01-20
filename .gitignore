@@ -2,8 +2,6 @@ node_modules/
 npm-debug.log
 coverage/
 dist/
-podcast-dl-cache.json
-test/
 binaries/
 .DS_STORE
 *.mp3

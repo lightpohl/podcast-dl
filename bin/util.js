@@ -229,7 +229,7 @@ export const getIsAudioUrl = (url) => {
   let ext;
   try {
     ext = getUrlExt(url);
-  } catch (err) {
+  } catch {
     return false;
   }
 

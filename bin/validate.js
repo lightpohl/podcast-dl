@@ -13,11 +13,11 @@ export const createParseNumber = ({ min, max, name, required = true }) => {
         logErrorAndExit(`${name} must be a number`);
       }
 
-      if (typeof min !== undefined && number < min) {
+      if (min !== undefined && number < min) {
         logErrorAndExit(`${name} must be >= ${min}`);
       }
 
-      if (typeof max !== undefined && number > max) {
+      if (max !== undefined && number > max) {
         logErrorAndExit(
           `${name} must be <= ${
             max === Number.MAX_SAFE_INTEGER ? "Number.MAX_SAFE_INTEGER" : max
@@ -26,7 +26,7 @@ export const createParseNumber = ({ min, max, name, required = true }) => {
       }
 
       return number;
-    } catch (error) {
+    } catch {
       logErrorAndExit(`Unable to parse ${name}`);
     }
   };

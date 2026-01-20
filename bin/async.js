@@ -76,7 +76,7 @@ export const download = async (options) => {
         "user-agent": userAgent,
       },
     });
-  } catch (error) {
+  } catch {
     // unable to retrieve head response
   }
 
