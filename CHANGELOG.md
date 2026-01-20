@@ -1,5 +1,12 @@
 # Changelog
 
+## [11.4.1](https://github.com/lightpohl/podcast-dl/compare/v11.4.0...v11.4.1) (2026-01-20)
+
+
+### Bug Fixes
+
+* correct file extensions using Content-Type header ([4cd74c2](https://github.com/lightpohl/podcast-dl/commit/4cd74c2e8d6861eb87c121f1bf177cd532a60521))
+
 ## [11.4.0](https://github.com/lightpohl/podcast-dl/compare/v11.3.0...v11.4.0) (2025-12-31)
 
 
