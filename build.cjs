@@ -4,27 +4,45 @@ const webpack = require("webpack");
 
 const { version } = require("./package.json");
 
-const targetMap = [
-  {
+const allTargets = {
+  "linux-x64": {
     target: "node18-linux-x64",
     output: `./binaries/podcast-dl-${version}-linux-x64`,
   },
-  {
+  "macos-x64": {
     target: "node18-macos-x64",
     output: `./binaries/podcast-dl-${version}-macos-x64`,
   },
-  {
+  "macos-arm64": {
     target: "node18-macos-arm64",
     output: `./binaries/podcast-dl-${version}-macos-arm64`,
   },
-  {
+  "win-x64": {
     target: "node18-win-x64",
     output: `./binaries/podcast-dl-${version}-win-x64`,
   },
-];
+};
+
+const parseTargets = () => {
+  const targetsArg = process.argv.find((arg) => arg.startsWith("--targets"));
+  if (!targetsArg) {
+    return Object.values(allTargets);
+  }
+
+  const targetsValue =
+    targetsArg.includes("=")
+      ? targetsArg.split("=")[1]
+      : process.argv[process.argv.indexOf(targetsArg) + 1];
+
+  return targetsValue
+    .split(",")
+    .map((t) => allTargets[t.trim()])
+    .filter(Boolean);
+};
 
 const buildBinaries = async () => {
-  for (const targetMapping of targetMap) {
+  const targets = parseTargets();
+  for (const targetMapping of targets) {
     await exec([
       `./dist/podcast-dl-${version}.js`,
       "--target",
