@@ -190,6 +190,49 @@ export const MIME_TO_EXT = {
 
 export const getExtFromMime = (mime) => MIME_TO_EXT[mime] || null;
 
+const MEDIA_CATEGORIES = {
+  audio: "audio",
+  image: "image",
+  transcript: "transcript",
+};
+
+const VALID_AUDIO_EXTS_SET = new Set(Object.values(AUDIO_TYPES_TO_EXTS));
+const VALID_IMAGE_EXTS_SET = new Set(Object.values(IMAGE_TYPES_TO_EXTS));
+const VALID_TRANSCRIPT_EXTS_SET = new Set(
+  Object.values(TRANSCRIPT_TYPES_TO_EXTS)
+);
+
+const getExtCategory = (ext) => {
+  if (VALID_AUDIO_EXTS_SET.has(ext)) {
+    return MEDIA_CATEGORIES.audio;
+  }
+
+  if (VALID_IMAGE_EXTS_SET.has(ext)) {
+    return MEDIA_CATEGORIES.image;
+  }
+
+  if (VALID_TRANSCRIPT_EXTS_SET.has(ext)) {
+    return MEDIA_CATEGORIES.transcript;
+  }
+  return null;
+};
+
+const getMimeCategory = (mime) => {
+  if (AUDIO_TYPES_TO_EXTS[mime]) {
+    return MEDIA_CATEGORIES.audio;
+  }
+
+  if (IMAGE_TYPES_TO_EXTS[mime]) {
+    return MEDIA_CATEGORIES.image;
+  }
+
+  if (TRANSCRIPT_TYPES_TO_EXTS[mime]) {
+    return MEDIA_CATEGORIES.transcript;
+  }
+
+  return null;
+};
+
 export const correctExtensionFromMime = ({
   outputPath,
   key,
@@ -205,6 +248,13 @@ export const correctExtensionFromMime = ({
 
   const currentExt = path.extname(outputPath);
   if (mimeExt === currentExt) {
+    return { outputPath, key };
+  }
+
+  const currentCategory = getExtCategory(currentExt);
+  const mimeCategory = getMimeCategory(mimeType);
+
+  if (currentCategory && mimeCategory && currentCategory !== mimeCategory) {
     return { outputPath, key };
   }
 
