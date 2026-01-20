@@ -1,5 +1,17 @@
 # Changelog
 
+## [11.5.0](https://github.com/lightpohl/podcast-dl/compare/v11.4.1...v11.5.0) (2026-01-20)
+
+
+### Features
+
+* add --trust-ext option to skip MIME-based extension correction ([ae10fc5](https://github.com/lightpohl/podcast-dl/commit/ae10fc5622436493e1390c18b6677837dce43338))
+
+
+### Bug Fixes
+
+* validate media category before correcting extension from MIME ([d7a21e8](https://github.com/lightpohl/podcast-dl/commit/d7a21e8f23682c55e41f72f8a32d5dcde92941fa))
+
 ## [11.4.1](https://github.com/lightpohl/podcast-dl/compare/v11.4.0...v11.4.1) (2026-01-20)
 
 
