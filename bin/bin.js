@@ -148,10 +148,7 @@ const main = async () => {
       const podcastImageFileExt = getUrlExt(podcastImageUrl);
       const outputImagePath = _path.resolve(
         basePath,
-        getSimpleFilename(
-          feed.title ? feed.title : "image",
-          feed.title ? `.image${podcastImageFileExt}` : podcastImageFileExt
-        )
+        getSimpleFilename(feed.title || "image", podcastImageFileExt)
       );
 
       try {
@@ -163,9 +160,7 @@ const main = async () => {
           marker: podcastImageUrl,
           key: getArchiveKey({
             prefix: archivePrefix,
-            name: `${
-              feed.title ? `${feed.title}.image` : "image"
-            }${podcastImageFileExt}`,
+            name: `${feed.title || "image"}${podcastImageFileExt}`,
           }),
           outputPath: outputImagePath,
           url: podcastImageUrl,

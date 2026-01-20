@@ -22,6 +22,7 @@ import {
 import { writeItemMeta } from "./meta.js";
 import { getItemFilename } from "./naming.js";
 import {
+  correctExtensionFromMime,
   getEpisodeAudioUrlAndExt,
   getTempPath,
   prepareOutputPath,
@@ -56,12 +57,12 @@ export const download = async (options) => {
       await onAfterDownload();
     }
 
-    return;
+    return outputPath;
   }
 
   if (key && archive && getIsInArchive({ key, archive })) {
     logMessage("Download exists in archive. Skipping...");
-    return;
+    return null;
   }
 
   let headResponse = null;
@@ -125,7 +126,7 @@ export const download = async (options) => {
     if (attempt <= maxAttempts) {
       logMessage(`Download attempt #${attempt} failed. Retrying...`);
 
-      await download({
+      return await download({
         ...options,
         attempt: attempt + 1,
       });
@@ -144,24 +145,38 @@ export const download = async (options) => {
       LOG_LEVELS.important
     );
 
-    return;
+    return null;
   }
 
-  fs.renameSync(tempOutputPath, outputPath);
+  const { outputPath: finalOutputPath, key: finalKey } =
+    correctExtensionFromMime({
+      outputPath,
+      key,
+      contentType: headResponse?.headers?.["content-type"],
+      onCorrect: (from, to) =>
+        logMessage(
+          `Correcting extension: ${from} --> ${to}`,
+          LOG_LEVELS.important
+        ),
+    });
+
+  fs.renameSync(tempOutputPath, finalOutputPath);
 
   logMessage("Download complete!");
 
   if (onAfterDownload) {
-    await onAfterDownload();
+    await onAfterDownload(finalOutputPath);
   }
 
-  if (key && archive) {
+  if (finalKey && archive) {
     try {
-      writeToArchive({ key, archive });
+      writeToArchive({ key: finalKey, archive });
     } catch (error) {
       throw new Error(`Error writing to archive: ${error.toString()}`);
     }
   }
+
+  return finalOutputPath;
 };
 
 export const downloadItemsAsync = async ({
@@ -236,10 +251,10 @@ export const downloadItemsAsync = async ({
         maxAttempts: attempts,
         outputPath: outputPodcastPath,
         url: episodeAudioUrl,
-        onAfterDownload: async () => {
+        onAfterDownload: async (finalEpisodePath) => {
           if (item._episodeImage) {
             try {
-              await download({
+              const finalImagePath = await download({
                 archive,
                 override,
                 userAgent,
@@ -249,6 +264,10 @@ export const downloadItemsAsync = async ({
                 outputPath: item._episodeImage.outputPath,
                 url: item._episodeImage.url,
               });
+
+              if (finalImagePath) {
+                item._episodeImage.outputPath = finalImagePath;
+              }
             } catch (error) {
               hasErrors = true;
               logError(
@@ -261,7 +280,7 @@ export const downloadItemsAsync = async ({
 
           if (item._episodeTranscript) {
             try {
-              await download({
+              const finalTranscriptPath = await download({
                 archive,
                 override,
                 key: item._episodeTranscript.key,
@@ -271,6 +290,10 @@ export const downloadItemsAsync = async ({
                 url: item._episodeTranscript.url,
                 userAgent,
               });
+
+              if (finalTranscriptPath) {
+                item._episodeTranscript.outputPath = finalTranscriptPath;
+              }
             } catch (error) {
               hasErrors = true;
               logError(
@@ -292,7 +315,7 @@ export const downloadItemsAsync = async ({
               bitrate,
               mono,
               itemIndex: item._originalIndex,
-              outputPath: outputPodcastPath,
+              outputPath: finalEpisodePath,
               episodeImageOutputPath: hasEpisodeImage
                 ? item._episodeImage.outputPath
                 : undefined,
@@ -310,7 +333,7 @@ export const downloadItemsAsync = async ({
             await runExec({
               exec,
               basePath,
-              outputPodcastPath,
+              outputPodcastPath: finalEpisodePath,
               episodeFilename,
               episodeAudioUrl,
             });

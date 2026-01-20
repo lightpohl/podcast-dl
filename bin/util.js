@@ -160,6 +160,67 @@ export const AUDIO_TYPES_TO_EXTS = {
   "video/x-m4v": ".m4v",
 };
 
+export const IMAGE_TYPES_TO_EXTS = {
+  "image/jpeg": ".jpg",
+  "image/jpg": ".jpg",
+  "image/png": ".png",
+  "image/gif": ".gif",
+  "image/webp": ".webp",
+  "image/bmp": ".bmp",
+  "image/tiff": ".tiff",
+  "image/avif": ".avif",
+};
+
+export const TRANSCRIPT_TYPES_TO_EXTS = {
+  "application/json": ".json",
+  "application/srt": ".srt",
+  "application/ttml+xml": ".ttml",
+  "application/x-subrip": ".srt",
+  "text/html": ".html",
+  "text/plain": ".txt",
+  "text/srt": ".srt",
+  "text/vtt": ".vtt",
+};
+
+export const MIME_TO_EXT = {
+  ...AUDIO_TYPES_TO_EXTS,
+  ...IMAGE_TYPES_TO_EXTS,
+  ...TRANSCRIPT_TYPES_TO_EXTS,
+};
+
+export const getExtFromMime = (mime) => MIME_TO_EXT[mime] || null;
+
+export const correctExtensionFromMime = ({
+  outputPath,
+  key,
+  contentType,
+  onCorrect,
+}) => {
+  const mimeType = contentType?.split(";")[0];
+  const mimeExt = mimeType ? getExtFromMime(mimeType) : null;
+
+  if (!mimeExt) {
+    return { outputPath, key };
+  }
+
+  const currentExt = path.extname(outputPath);
+  if (mimeExt === currentExt) {
+    return { outputPath, key };
+  }
+
+  const basePath = currentExt
+    ? outputPath.slice(0, -currentExt.length)
+    : outputPath;
+  const baseKey = key && currentExt ? key.slice(0, -currentExt.length) : key;
+
+  onCorrect?.(currentExt || "(none)", mimeExt);
+
+  return {
+    outputPath: basePath + mimeExt,
+    key: baseKey ? baseKey + mimeExt : null,
+  };
+};
+
 export const VALID_AUDIO_EXTS = [
   ...new Set(Object.values(AUDIO_TYPES_TO_EXTS)),
 ];
