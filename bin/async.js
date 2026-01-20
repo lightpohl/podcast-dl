@@ -46,6 +46,7 @@ export const download = async (options) => {
     onAfterDownload,
     attempt = 1,
     maxAttempts = 3,
+    trustExt,
     userAgent = USER_AGENT,
   } = options;
 
@@ -148,17 +149,18 @@ export const download = async (options) => {
     return null;
   }
 
-  const { outputPath: finalOutputPath, key: finalKey } =
-    correctExtensionFromMime({
-      outputPath,
-      key,
-      contentType: headResponse?.headers?.["content-type"],
-      onCorrect: (from, to) =>
-        logMessage(
-          `Correcting extension: ${from} --> ${to}`,
-          LOG_LEVELS.important
-        ),
-    });
+  const { outputPath: finalOutputPath, key: finalKey } = trustExt
+    ? { outputPath, key }
+    : correctExtensionFromMime({
+        outputPath,
+        key,
+        contentType: headResponse?.headers?.["content-type"],
+        onCorrect: (from, to) =>
+          logMessage(
+            `Correcting extension: ${from} --> ${to}`,
+            LOG_LEVELS.important
+          ),
+      });
 
   fs.renameSync(tempOutputPath, finalOutputPath);
 
@@ -200,6 +202,7 @@ export const downloadItemsAsync = async ({
   alwaysPostprocess,
   targetItems,
   threads = 1,
+  trustExt,
   userAgent = USER_AGENT,
 }) => {
   let numEpisodesDownloaded = 0;
@@ -239,6 +242,7 @@ export const downloadItemsAsync = async ({
         override,
         alwaysPostprocess,
         marker,
+        trustExt,
         userAgent,
         key: getArchiveKey({
           prefix: archivePrefix,
@@ -257,6 +261,7 @@ export const downloadItemsAsync = async ({
               const finalImagePath = await download({
                 archive,
                 override,
+                trustExt,
                 userAgent,
                 key: item._episodeImage.key,
                 marker: item._episodeImage.url,
@@ -287,6 +292,7 @@ export const downloadItemsAsync = async ({
                 marker: item._episodeTranscript.url,
                 maxAttempts: attempts,
                 outputPath: item._episodeTranscript.outputPath,
+                trustExt,
                 url: item._episodeTranscript.url,
                 userAgent,
               });

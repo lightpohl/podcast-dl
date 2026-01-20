@@ -191,7 +191,8 @@ export const setupCommander = (program) => {
       "path to JSON config to override RSS parser"
     )
     .option("--proxy", "enable proxy support via global-agent")
-    .option("--user-agent <string>", "specify custom user agent string");
+    .option("--user-agent <string>", "specify custom user agent string")
+    .option("--trust-ext", "trust file extension, skip MIME-based correction");
 
   program.parse();
 

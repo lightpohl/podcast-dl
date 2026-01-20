@@ -63,6 +63,7 @@ const {
   addMp3Metadata: addMp3MetadataFlag,
   adjustBitrate: bitrate,
   season,
+  trustExt,
 } = opts;
 
 let { archive } = opts;
@@ -156,6 +157,7 @@ const main = async () => {
         await download({
           archive,
           override,
+          trustExt,
           userAgent,
           marker: podcastImageUrl,
           key: getArchiveKey({
@@ -257,6 +259,7 @@ const main = async () => {
     alwaysPostprocess,
     targetItems,
     threads,
+    trustExt,
     userAgent,
   });
 

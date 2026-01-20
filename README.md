@@ -61,6 +61,7 @@ Type values surrounded in square brackets (`[]`) can be used as boolean options 
 | --parser-config                   | String              | false    | Path to JSON file that will be parsed and used to override the default config passed to [rss-parser](https://github.com/rbren/rss-parser#xml-options).                                                                        |
 | --user-agent                      | String              | false    | Specify custom user agent string for HTTP requests. Defaults to a Chrome user agent if not specified.                                                                                                                         |
 | --proxy                           |                     | false    | Enable proxy support. Specify environment variables listed by [global-agent](https://github.com/gajus/global-agent#environment-variables).                                                                                    |
+| --trust-ext                       |                     | false    | Trust file extension from URL, skip MIME-based correction.                                                                                                                                                                    |
 | --help                            |                     | false    | Output usage information.                                                                                                                                                                                                     |
 
 ## Archive
