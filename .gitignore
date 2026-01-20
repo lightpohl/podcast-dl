@@ -2,7 +2,6 @@ node_modules/
 npm-debug.log
 coverage/
 dist/
-package-lock.json
 podcast-dl-cache.json
 test/
 binaries/
