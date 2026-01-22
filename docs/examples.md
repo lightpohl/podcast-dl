@@ -48,6 +48,12 @@ npx podcast-dl --after "01/01/2021" --before "12/31/2021" --url "http://eightfou
 npx podcast-dl --episode-regex "Zelda" --url "http://eightfour.libsyn.com/rss"
 ```
 
+## Convert all episodes to M4A
+
+```bash
+npx podcast-dl --audio-format m4a --url "http://eightfour.libsyn.com/rss"
+```
+
 ## Convert all episodes to MP3s at 192k bitrate with ffmpeg
 
 ```bash
