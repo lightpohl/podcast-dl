@@ -23,7 +23,7 @@ export const runFfmpeg = async ({
   bitrate,
   mono,
   audioFormat,
-  addMp3Metadata,
+  addMetadata,
   ext,
 }) => {
   if (!fs.existsSync(outputPath)) {
@@ -36,7 +36,7 @@ export const runFfmpeg = async ({
     ? outputPath.replace(/\.[^.]+$/, outputExt)
     : null;
 
-  const shouldEmbedImage = addMp3Metadata && episodeImageOutputPath;
+  const shouldEmbedImage = addMetadata && episodeImageOutputPath;
 
   let command = `ffmpeg -loglevel quiet -i ${escapeArgForShell(outputPath)}`;
 
@@ -46,7 +46,7 @@ export const runFfmpeg = async ({
 
   // Build metadata if needed
   let metadataString = "";
-  if (addMp3Metadata) {
+  if (addMetadata) {
     const album = feed.title || "";
     const artist = item.itunes?.author || item.author || "";
     const title = item.title || "";

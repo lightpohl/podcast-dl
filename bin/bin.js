@@ -60,7 +60,7 @@ const {
   threads,
   url,
   userAgent,
-  addMp3Metadata: addMp3MetadataFlag,
+  addMetadata: addMetadataFlag,
   adjustBitrate: bitrate,
   season,
   trustExt,
@@ -210,7 +210,7 @@ const main = async () => {
   const targetItems = getItemsToDownload({
     archive,
     archivePrefix,
-    addMp3MetadataFlag,
+    addMetadataFlag,
     basePath,
     feed,
     limit,
@@ -240,7 +240,7 @@ const main = async () => {
   );
 
   const { numEpisodesDownloaded, hasErrors } = await downloadItemsAsync({
-    addMp3MetadataFlag,
+    addMetadataFlag,
     archive,
     archivePrefix,
     attempts,

@@ -16,7 +16,7 @@ export const ITEM_LIST_FORMATS = ["table", "json"];
 export const getItemsToDownload = ({
   archive,
   archivePrefix,
-  addMp3MetadataFlag,
+  addMetadataFlag,
   basePath,
   feed,
   limit,
@@ -112,7 +112,7 @@ export const getItemsToDownload = ({
       item._originalIndex = i;
       item.seasonNum = actualSeasonNum;
 
-      if (includeEpisodeImages || addMp3MetadataFlag) {
+      if (includeEpisodeImages || addMetadataFlag) {
         const episodeImageUrl = getImageUrl(item);
 
         if (episodeImageUrl) {

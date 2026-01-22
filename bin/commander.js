@@ -126,7 +126,7 @@ export const setupCommander = (program) => {
       "download episodes only before this date (inclusive)"
     )
     .option(
-      "--add-mp3-metadata",
+      "--add-metadata",
       "attempts to add a base level of metadata to episode files using ffmpeg",
       hasFfmpeg
     )
