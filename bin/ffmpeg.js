@@ -61,7 +61,7 @@ export const runFfmpeg = async ({
     if (!isWin) {
       // Due to limited escape options, these metadata fields often break in Windows
       metaKeysToValues.comment = comment;
-      metaKeysToValues.subtitle = subtitle
+      metaKeysToValues.subtitle = subtitle;
     }
 
     const metadataString = Object.keys(metaKeysToValues)
@@ -77,7 +77,11 @@ export const runFfmpeg = async ({
       .filter((segment) => !!segment)
       .join(" ");
 
-    command += ` -map_metadata 0 ${metadataString} -codec copy`;
+    command += ` -map_metadata 0 ${metadataString}`;
+
+    if (!bitrate && !mono) {
+      command += ` -codec copy`;
+    }
   }
 
   if (shouldEmbedImage) {
