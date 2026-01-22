@@ -36,9 +36,9 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            targets: linux-x64,win-x64
+            targets: linux-x64 win-x64
           - os: macos-14
-            targets: macos-x64,macos-arm64
+            targets: macos-x64 macos-arm64
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -53,7 +53,7 @@ jobs:
         run: npm ci
 
       - name: Build binaries
-        run: npm run build -- --targets ${{ matrix.targets }}
+        run: npm run build -- ${{ matrix.targets }}
 
       - name: Sign macOS binaries
         if: runner.os == 'macOS'

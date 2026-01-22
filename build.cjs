@@ -24,20 +24,11 @@ const allTargets = {
 };
 
 const parseTargets = () => {
-  const targetsArg = process.argv.find((arg) => arg.startsWith("--targets"));
-  if (!targetsArg) {
+  const args = process.argv.slice(2);
+  if (!args.length) {
     return Object.values(allTargets);
   }
-
-  const targetsValue =
-    targetsArg.includes("=")
-      ? targetsArg.split("=")[1]
-      : process.argv[process.argv.indexOf(targetsArg) + 1];
-
-  return targetsValue
-    .split(",")
-    .map((t) => allTargets[t.trim()])
-    .filter(Boolean);
+  return args.map((t) => allTargets[t]).filter(Boolean);
 };
 
 const buildBinaries = async () => {
