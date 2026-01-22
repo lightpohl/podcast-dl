@@ -186,6 +186,7 @@ export const downloadItemsAsync = async ({
   archive,
   archivePrefix,
   attempts,
+  audioFormat,
   basePath,
   bitrate,
   episodeTemplate,
@@ -313,13 +314,14 @@ export const downloadItemsAsync = async ({
           const hasEpisodeImage =
             item._episodeImage && fs.existsSync(item._episodeImage.outputPath);
 
-          if (addMp3MetadataFlag || bitrate || mono) {
+          if (addMp3MetadataFlag || bitrate || mono || audioFormat) {
             logMessage("Running ffmpeg...");
-            await runFfmpeg({
+            const convertedPath = await runFfmpeg({
               feed,
               item,
               bitrate,
               mono,
+              audioFormat,
               itemIndex: item._originalIndex,
               outputPath: finalEpisodePath,
               episodeImageOutputPath: hasEpisodeImage
@@ -328,6 +330,10 @@ export const downloadItemsAsync = async ({
               addMp3Metadata: addMp3MetadataFlag,
               ext: audioFileExt,
             });
+
+            if (convertedPath) {
+              finalEpisodePath = convertedPath;
+            }
           }
 
           if (!includeEpisodeImages && hasEpisodeImage) {

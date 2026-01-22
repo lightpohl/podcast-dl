@@ -140,6 +140,11 @@ export const setupCommander = (program) => {
       "attempts to force episode files into mono using ffmpeg",
       hasFfmpeg
     )
+    .option(
+      "--audio-format <string>",
+      "convert audio to specified format using ffmpeg (e.g., m4a, mp3, opus)",
+      hasFfmpeg
+    )
     .option("--override", "override local files on collision")
     .option(
       "--always-postprocess",

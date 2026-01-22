@@ -64,6 +64,7 @@ const {
   adjustBitrate: bitrate,
   season,
   trustExt,
+  audioFormat,
 } = opts;
 
 let { archive } = opts;
@@ -243,6 +244,7 @@ const main = async () => {
     archive,
     archivePrefix,
     attempts,
+    audioFormat,
     basePath,
     bitrate,
     episodeTemplate,
