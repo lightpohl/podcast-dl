@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import rssParser from "rss-parser";
+import rssParser from "../lib/rss-parser/parser.js";
 import { logErrorAndExit, logMessage } from "./logger.js";
 
 export const isWin = process.platform === "win32";
@@ -9,9 +9,6 @@ export const defaultRssParserConfig = {
   defaultRSS: 2.0,
   headers: {
     Accept: "*/*",
-  },
-  customFields: {
-    item: [["podcast:transcript", "podcastTranscripts", { keepArray: true }]],
   },
 };
 
