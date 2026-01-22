@@ -57,7 +57,7 @@ npx podcast-dl --adjust-bitrate "128k" --url "http://eightfour.libsyn.com/rss"
 ## Convert all episodes to MP3s at 192k bitrate with ffmpeg
 
 ```bash
-npx podcast-dl  --url "http://eightfour.libsyn.com/rss" --exec "ffmpeg -i {{episode_path}} -b:a 192k -f mp3 {{episode_path_base}}/{{episode_filename_base}}-192k.mp3"
+npx podcast-dl --url "http://eightfour.libsyn.com/rss" --exec "ffmpeg -i {{episode_path}} -b:a 192k -f mp3 {{episode_path_base}}/{{episode_filename_base}}-192k.mp3"
 ```
 
 ## Extract "foo" and "bar" from the episode title and place it in the episode filename
