@@ -1,5 +1,17 @@
 # Changelog
 
+## [11.6.0](https://github.com/lightpohl/podcast-dl/compare/v11.5.1...v11.6.0) (2026-01-22)
+
+
+### Features
+
+* add --audio-format option and rename --add-mp3-metadata to --embed-metadata ([504845a](https://github.com/lightpohl/podcast-dl/commit/504845afc1bab6e2c3ae05ceb091220c62efc058))
+
+
+### Bug Fixes
+
+* replace deprecated url.parse() with WHATWG URL API ([ed0659d](https://github.com/lightpohl/podcast-dl/commit/ed0659deab48e5cac01e688c5f948f7f01e3191b))
+
 ## [11.5.1](https://github.com/lightpohl/podcast-dl/compare/v11.5.0...v11.5.1) (2026-01-22)
 
 
