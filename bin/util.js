@@ -3,6 +3,16 @@ import path from "path";
 import rssParser from "../lib/rss-parser/parser.js";
 import { logErrorAndExit, logMessage } from "./logger.js";
 
+export const AUDIO_FORMATS = {
+  m4a: { codec: "aac", ext: ".m4a", attachedPic: true },
+  aac: { codec: "aac", ext: ".aac" },
+  mp3: { codec: "libmp3lame", ext: ".mp3", attachedPic: true },
+  opus: { codec: "libopus", ext: ".opus" },
+  ogg: { codec: "libvorbis", ext: ".ogg" },
+  flac: { codec: "flac", ext: ".flac" },
+  wav: { codec: "pcm_s16le", ext: ".wav" },
+};
+
 export const isWin = process.platform === "win32";
 
 export const defaultRssParserConfig = {

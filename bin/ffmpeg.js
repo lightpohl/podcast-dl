@@ -2,24 +2,28 @@ import dayjs from "dayjs";
 import fs from "fs";
 import { execWithPromise } from "./exec.js";
 import { LOG_LEVELS, logMessage } from "./logger.js";
-import { escapeArgForShell, isWin } from "./util.js";
+import { AUDIO_FORMATS, escapeArgForShell, isWin } from "./util.js";
 
 export const runFfmpeg = async ({
+  audioFormat,
+  bitrate,
+  embedMetadata,
+  episodeImageOutputPath,
+  ext,
   feed,
   item,
   itemIndex,
-  outputPath,
-  episodeImageOutputPath,
-  bitrate,
   mono,
-  addMp3Metadata,
-  ext,
+  outputPath,
 }) => {
   if (!fs.existsSync(outputPath)) {
     return;
   }
 
-  const shouldEmbedImage = addMp3Metadata && episodeImageOutputPath;
+  const shouldEmbedImage = embedMetadata && episodeImageOutputPath;
+  const targetFormat = audioFormat ? AUDIO_FORMATS[audioFormat] : null;
+  const outputExt = targetFormat ? targetFormat.ext : ext;
+
   let command = `ffmpeg -loglevel quiet -i ${escapeArgForShell(outputPath)}`;
 
   if (shouldEmbedImage) {
@@ -34,7 +38,22 @@ export const runFfmpeg = async ({
     command += " -ac 1";
   }
 
-  if (addMp3Metadata) {
+  if (targetFormat) {
+    command += ` -c:a ${targetFormat.codec}`;
+  } else if (embedMetadata && !bitrate && !mono) {
+    command += ` -c:a copy`;
+  }
+
+  if (shouldEmbedImage) {
+    const supportsAttachedPic = targetFormat
+      ? targetFormat.attachedPic
+      : Object.values(AUDIO_FORMATS).find((f) => f.ext === ext)?.attachedPic;
+    command += supportsAttachedPic
+      ? ` -c:v copy -disposition:v:0 attached_pic`
+      : ` -c:v copy`;
+  }
+
+  if (embedMetadata) {
     const album = feed.title || "";
     const artist = item.itunes?.author || item.author || "";
     const title = item.title || "";
@@ -78,32 +97,42 @@ export const runFfmpeg = async ({
       .join(" ");
 
     command += ` -map_metadata 0 ${metadataString}`;
-
-    if (!bitrate && !mono) {
-      command += ` -codec copy`;
-    }
   }
 
   if (shouldEmbedImage) {
-    command += ` -map 0 -map 1`;
+    command += ` -map 0:a -map 1`;
+  } else if (targetFormat) {
+    command += ` -map 0:a`;
   } else {
     command += ` -map 0`;
   }
 
-  const tmpMp3Path = `${outputPath}.tmp${ext}`;
-  command += ` ${escapeArgForShell(tmpMp3Path)}`;
+  const tmpPath = `${outputPath}.tmp${outputExt}`;
+  command += ` ${escapeArgForShell(tmpPath)}`;
   logMessage("Running command: " + command, LOG_LEVELS.debug);
 
   try {
     await execWithPromise(command, { stdio: "ignore" });
   } catch (error) {
-    if (fs.existsSync(tmpMp3Path)) {
-      fs.unlinkSync(tmpMp3Path);
+    if (fs.existsSync(tmpPath)) {
+      fs.unlinkSync(tmpPath);
     }
 
     throw error;
   }
 
   fs.unlinkSync(outputPath);
-  fs.renameSync(tmpMp3Path, outputPath);
+
+  const finalOutputPath = (() => {
+    if (!targetFormat) {
+      return outputPath;
+    }
+
+    const hasExt = /\.[^.]+$/.test(outputPath);
+    return hasExt
+      ? outputPath.replace(/\.[^.]+$/, outputExt)
+      : outputPath + outputExt;
+  })();
+
+  fs.renameSync(tmpPath, finalOutputPath);
 };

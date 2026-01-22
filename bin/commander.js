@@ -1,6 +1,6 @@
 import { ITEM_LIST_FORMATS } from "./items.js";
 import { logErrorAndExit } from "./logger.js";
-import { AUDIO_ORDER_TYPES, TRANSCRIPT_TYPES } from "./util.js";
+import { AUDIO_FORMATS, AUDIO_ORDER_TYPES, TRANSCRIPT_TYPES } from "./util.js";
 import { createParseNumber, hasFfmpeg } from "./validate.js";
 
 export const setupCommander = (program) => {
@@ -126,20 +126,36 @@ export const setupCommander = (program) => {
       "download episodes only before this date (inclusive)"
     )
     .option(
-      "--add-mp3-metadata",
-      "attempts to add a base level of metadata to episode files using ffmpeg",
+      "--embed-metadata",
+      "add metadata to episode files using ffmpeg",
       hasFfmpeg
+    )
+    .option(
+      "--add-mp3-metadata",
+      "deprecated: use --embed-metadata instead",
+      hasFfmpeg
+    )
+    .option(
+      "--audio-format <string>",
+      "convert audio to format (mp3, m4a, aac, opus, ogg, flac, wav)",
+      (value) => {
+        if (!AUDIO_FORMATS[value]) {
+          logErrorAndExit(
+            `Invalid audio format: ${value}\nSupported formats: ${Object.keys(
+              AUDIO_FORMATS
+            ).join(", ")}`
+          );
+        }
+
+        return hasFfmpeg(value);
+      }
     )
     .option(
       "--adjust-bitrate <string>",
-      "attempts to adjust bitrate of episode files using ffmpeg",
+      "adjust bitrate of episode files using ffmpeg",
       hasFfmpeg
     )
-    .option(
-      "--mono",
-      "attempts to force episode files into mono using ffmpeg",
-      hasFfmpeg
-    )
+    .option("--mono", "force episode files into mono using ffmpeg", hasFfmpeg)
     .option("--override", "override local files on collision")
     .option(
       "--always-postprocess",

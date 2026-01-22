@@ -32,6 +32,7 @@ const {
   after,
   alwaysPostprocess,
   attempts,
+  audioFormat,
   before,
   episodeDigits,
   episodeNumOffset,
@@ -60,11 +61,14 @@ const {
   threads,
   url,
   userAgent,
-  addMp3Metadata: addMp3MetadataFlag,
+  embedMetadata,
+  addMp3Metadata,
   adjustBitrate: bitrate,
   season,
   trustExt,
 } = opts;
+
+const embedMetadataFlag = embedMetadata || addMp3Metadata;
 
 let { archive } = opts;
 
@@ -209,7 +213,7 @@ const main = async () => {
   const targetItems = getItemsToDownload({
     archive,
     archivePrefix,
-    addMp3MetadataFlag,
+    embedMetadataFlag,
     basePath,
     feed,
     limit,
@@ -239,12 +243,13 @@ const main = async () => {
   );
 
   const { numEpisodesDownloaded, hasErrors } = await downloadItemsAsync({
-    addMp3MetadataFlag,
     archive,
     archivePrefix,
     attempts,
+    audioFormat,
     basePath,
     bitrate,
+    embedMetadataFlag,
     episodeTemplate,
     episodeCustomTemplateOptions,
     episodeDigits,
