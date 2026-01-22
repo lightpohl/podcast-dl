@@ -25,8 +25,15 @@ import {
   getUrlFeed,
   logFeedInfo,
 } from "./util.js";
+import { hasFfmpeg } from "./validate.js";
 
 const opts = setupCommander(program);
+
+// Validate ffmpeg is available if any ffmpeg-dependent options are used
+const needsFfmpeg = opts.addMp3Metadata || opts.adjustBitrate || opts.mono;
+if (needsFfmpeg) {
+  hasFfmpeg();
+}
 
 const {
   after,

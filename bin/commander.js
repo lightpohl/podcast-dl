@@ -1,7 +1,7 @@
 import { ITEM_LIST_FORMATS } from "./items.js";
 import { logErrorAndExit } from "./logger.js";
 import { AUDIO_ORDER_TYPES, TRANSCRIPT_TYPES } from "./util.js";
-import { createParseNumber, hasFfmpeg } from "./validate.js";
+import { createParseNumber } from "./validate.js";
 
 export const setupCommander = (program) => {
   program
@@ -127,19 +127,13 @@ export const setupCommander = (program) => {
     )
     .option(
       "--add-mp3-metadata",
-      "attempts to add a base level of metadata to episode files using ffmpeg",
-      hasFfmpeg
+      "attempts to add a base level of metadata to episode files using ffmpeg"
     )
     .option(
       "--adjust-bitrate <string>",
-      "attempts to adjust bitrate of episode files using ffmpeg",
-      hasFfmpeg
+      "attempts to adjust bitrate of episode files using ffmpeg"
     )
-    .option(
-      "--mono",
-      "attempts to force episode files into mono using ffmpeg",
-      hasFfmpeg
-    )
+    .option("--mono", "attempts to force episode files into mono using ffmpeg")
     .option("--override", "override local files on collision")
     .option(
       "--always-postprocess",

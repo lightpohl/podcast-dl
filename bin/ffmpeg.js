@@ -1,5 +1,6 @@
 import dayjs from "dayjs";
 import fs from "fs";
+import path from "path";
 import { execWithPromise } from "./exec.js";
 import { LOG_LEVELS, logMessage } from "./logger.js";
 import { escapeArgForShell, isWin } from "./util.js";
@@ -61,7 +62,7 @@ export const runFfmpeg = async ({
     if (!isWin) {
       // Due to limited escape options, these metadata fields often break in Windows
       metaKeysToValues.comment = comment;
-      metaKeysToValues.subtitle = subtitle
+      metaKeysToValues.subtitle = subtitle;
     }
 
     const metadataString = Object.keys(metaKeysToValues)
@@ -77,7 +78,29 @@ export const runFfmpeg = async ({
       .filter((segment) => !!segment)
       .join(" ");
 
-    command += ` -map_metadata 0 ${metadataString} -codec copy`;
+    command += ` -map_metadata 0 ${metadataString}`;
+  }
+
+  // When adjusting bitrate, we need to re-encode. Determine codec based on extension.
+  const codecMap = {
+    ".mp3": "libmp3lame",
+    ".m4a": "aac",
+    ".aac": "aac",
+    ".ogg": "libvorbis",
+    ".opus": "libopus",
+    ".flac": "flac",
+    ".wav": "pcm_s16le",
+    ".mp4": "aac",
+    ".mov": "aac",
+    ".m4v": "aac",
+  };
+  const needsReencode = bitrate || mono;
+  const audioCodec = codecMap[ext?.toLowerCase()] || "libmp3lame";
+
+  if (addMp3Metadata && !needsReencode) {
+    command += ` -codec copy`;
+  } else if (needsReencode) {
+    command += ` -c:a ${audioCodec}`;
   }
 
   if (shouldEmbedImage) {
@@ -86,7 +109,9 @@ export const runFfmpeg = async ({
     command += ` -map 0`;
   }
 
-  const tmpMp3Path = `${outputPath}.tmp${ext}`;
+  // Insert .tmp before the extension (e.g., file.mp3 -> file.tmp.mp3)
+  const { dir, name, ext: fileExt } = path.parse(outputPath);
+  const tmpMp3Path = path.format({ dir, name: `${name}.tmp`, ext: fileExt });
   command += ` ${escapeArgForShell(tmpMp3Path)}`;
   logMessage("Running command: " + command, LOG_LEVELS.debug);
 
