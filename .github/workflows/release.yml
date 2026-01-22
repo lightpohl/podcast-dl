@@ -13,7 +13,7 @@ permissions:
   contents: write
   pull-requests: write
 
-name: release-please
+name: release
 
 jobs:
   release-please:
@@ -54,13 +54,6 @@ jobs:
 
       - name: Build binaries
         run: npm run build -- ${{ matrix.targets }}
-
-      - name: Sign macOS binaries
-        if: runner.os == 'macOS'
-        run: |
-          for file in ./binaries/*macos*; do
-            codesign --sign - "$file"
-          done
 
       - name: Upload release assets
         env:
