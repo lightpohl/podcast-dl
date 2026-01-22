@@ -1,5 +1,13 @@
 # Changelog
 
+## [11.5.1](https://github.com/lightpohl/podcast-dl/compare/v11.5.0...v11.5.1) (2026-01-22)
+
+
+### Bug Fixes
+
+* correctly grab 'feedUrl' from Atom feeds with multiple feed links ([e5fca28](https://github.com/lightpohl/podcast-dl/commit/e5fca28c2f17c517851383e939c8e0a5b7c5248f)), closes [#128](https://github.com/lightpohl/podcast-dl/issues/128)
+* ffmpeg options not correctly passed through ([3d68fae](https://github.com/lightpohl/podcast-dl/commit/3d68faef587a3d5b4777f4e90afc28da1440ad9a))
+
 ## [11.5.0](https://github.com/lightpohl/podcast-dl/compare/v11.4.1...v11.5.0) (2026-01-20)
 
 
