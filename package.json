@@ -33,7 +33,8 @@
     "url": "https://github.com/lightpohl/podcast-dl.git"
   },
   "files": [
-    "bin"
+    "bin",
+    "lib"
   ],
   "author": "Joshua Pohl",
   "license": "MIT",
