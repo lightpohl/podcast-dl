@@ -38,7 +38,12 @@ const MAX_LENGTH_FILENAME = process.env.MAX_LENGTH_FILENAME
   : 255;
 
 export const getSafeName = (name, maxLength = MAX_LENGTH_FILENAME) => {
-  return filenamify(name, {
+  // Replace periods with underscores BEFORE filenamify truncation.
+  // filenamify treats periods as extension delimiters and preserves content
+  // after the last period while truncating from the START, which destroys
+  // dates and other important prefix content in podcast titles.
+  const sanitized = name.replace(/\./g, INVALID_CHAR_REPLACE);
+  return filenamify(sanitized, {
     replacement: INVALID_CHAR_REPLACE,
     maxLength,
   });
@@ -101,14 +106,17 @@ export const getItemFilename = ({
 
   const replacementsMap = Object.fromEntries(templateReplacementsTuples);
   const templateSegments = template.trim().split(path.sep);
-  const nameSegments = templateSegments.map((segment) => {
+  const nameSegments = templateSegments.map((segment, index) => {
     const replaceRegex = /{{(\w+)(\|[^}]+)?}}/g;
     const name = segment.replace(replaceRegex, (match, varName, filterStr) => {
       const replacement = replacementsMap[varName] || "";
       return applyFilters(replacement, filterStr);
     });
 
-    return getSimpleFilename(name);
+    // Only truncate non-final segments here (they don't get an extension)
+    // Final segment is truncated below with the extension accounted for
+    const isLastSegment = index === templateSegments.length - 1;
+    return isLastSegment ? name : getSimpleFilename(name);
   });
 
   nameSegments[nameSegments.length - 1] = getSimpleFilename(
