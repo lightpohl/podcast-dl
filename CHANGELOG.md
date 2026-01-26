@@ -1,5 +1,12 @@
 # Changelog
 
+## [11.6.2](https://github.com/lightpohl/podcast-dl/compare/v11.6.1...v11.6.2) (2026-01-26)
+
+
+### Bug Fixes
+
+* filename truncation corrupting date prefixes in long titles ([8f7c712](https://github.com/lightpohl/podcast-dl/commit/8f7c7123961dc1b80e23c7771ffddd3fb4a7b5f8))
+
 ## [11.6.1](https://github.com/lightpohl/podcast-dl/compare/v11.6.0...v11.6.1) (2026-01-23)
 
 
