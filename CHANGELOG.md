@@ -1,5 +1,17 @@
 # Changelog
 
+## [11.7.0](https://github.com/lightpohl/podcast-dl/compare/v11.6.2...v11.7.0) (2026-01-29)
+
+
+### Features
+
+* save additional GUID-based archive keys if present ([9d5ca1c](https://github.com/lightpohl/podcast-dl/commit/9d5ca1ce3764c42e51db0562aedd2b08857820cf))
+
+
+### Bug Fixes
+
+* MIME correction should not affect archive keys ([9d5ca1c](https://github.com/lightpohl/podcast-dl/commit/9d5ca1ce3764c42e51db0562aedd2b08857820cf))
+
 ## [11.6.2](https://github.com/lightpohl/podcast-dl/compare/v11.6.1...v11.6.2) (2026-01-26)
 
 
