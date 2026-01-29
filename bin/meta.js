@@ -35,11 +35,15 @@ export const writeItemMeta = ({
   marker,
   outputPath,
   item,
-  key,
+  archiveKeys,
   archive,
   override,
 }) => {
-  if (key && archive && getIsInArchive({ key, archive })) {
+  if (
+    archive &&
+    archiveKeys?.length &&
+    getIsInArchive({ archiveKeys, archive })
+  ) {
     logMessage(`${marker} | Episode metadata exists in archive. Skipping...`);
     return;
   }
@@ -53,9 +57,13 @@ export const writeItemMeta = ({
       logMessage(`${marker} | Episode metadata exists locally. Skipping...`);
     }
 
-    if (key && archive && !getIsInArchive({ key, archive })) {
+    if (
+      archive &&
+      archiveKeys?.length &&
+      !getIsInArchive({ archiveKeys, archive })
+    ) {
       try {
-        writeToArchive({ key, archive });
+        writeToArchive({ archiveKeys, archive });
       } catch (error) {
         throw new Error("Error writing to archive", error);
       }

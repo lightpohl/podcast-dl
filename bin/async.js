@@ -7,7 +7,7 @@ import { throttle } from "throttle-debounce";
 import { promisify } from "util";
 import {
   getArchiveFilename,
-  getArchiveKey,
+  getArchiveKeys,
   getIsInArchive,
   writeToArchive,
 } from "./archive.js";
@@ -367,13 +367,14 @@ export const downloadItemsAsync = async ({
                 archive,
                 override,
                 item,
-                key: getArchiveKey({
+                archiveKeys: getArchiveKeys({
                   prefix: archivePrefix,
                   name: getArchiveFilename({
                     pubDate: item.pubDate,
                     name: item.title,
                     ext: episodeMetaExt,
                   }),
+                  guid: item.guid ? `${item.guid}-meta` : null,
                 }),
                 outputPath: outputEpisodeMetaPath,
               });
