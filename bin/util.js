@@ -242,7 +242,6 @@ const getMimeCategory = (mime) => {
 
 export const correctExtensionFromMime = ({
   outputPath,
-  key,
   contentType,
   onCorrect,
 }) => {
@@ -250,32 +249,28 @@ export const correctExtensionFromMime = ({
   const mimeExt = mimeType ? getExtFromMime(mimeType) : null;
 
   if (!mimeExt) {
-    return { outputPath, key };
+    return outputPath;
   }
 
   const currentExt = path.extname(outputPath);
   if (mimeExt === currentExt) {
-    return { outputPath, key };
+    return outputPath;
   }
 
   const currentCategory = getExtCategory(currentExt);
   const mimeCategory = getMimeCategory(mimeType);
 
   if (currentCategory && mimeCategory && currentCategory !== mimeCategory) {
-    return { outputPath, key };
+    return outputPath;
   }
 
   const basePath = currentExt
     ? outputPath.slice(0, -currentExt.length)
     : outputPath;
-  const baseKey = key && currentExt ? key.slice(0, -currentExt.length) : key;
 
   onCorrect?.(currentExt || "(none)", mimeExt);
 
-  return {
-    outputPath: basePath + mimeExt,
-    key: baseKey ? baseKey + mimeExt : null,
-  };
+  return basePath + mimeExt;
 };
 
 export const VALID_AUDIO_EXTS = [

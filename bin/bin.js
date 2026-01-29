@@ -164,10 +164,12 @@ const main = async () => {
           trustExt,
           userAgent,
           marker: podcastImageUrl,
-          key: getArchiveKey({
-            prefix: archivePrefix,
-            name: `${feed.title || "image"}${podcastImageFileExt}`,
-          }),
+          archiveKeys: [
+            getArchiveKey({
+              prefix: archivePrefix,
+              name: `${feed.title || "image"}${podcastImageFileExt}`,
+            }),
+          ],
           outputPath: outputImagePath,
           url: podcastImageUrl,
           maxAttempts: attempts,

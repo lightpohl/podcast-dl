@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
 import path from "path";
-import { getArchive, getArchiveFilename, getArchiveKey } from "./archive.js";
+import { getArchive, getArchiveFilename, getArchiveKeys } from "./archive.js";
 import { logErrorAndExit } from "./logger.js";
 import { getItemFilename } from "./naming.js";
 import {
@@ -48,7 +48,7 @@ export const getItemsToDownload = ({
   const savedArchive = archive ? getArchive(archive) : [];
 
   while (shouldGo(i)) {
-    const { title, pubDate, itunes } = feed.items[i];
+    const { title, pubDate, itunes, guid } = feed.items[i];
     const actualSeasonNum = itunes?.season ? parseInt(itunes.season) : null;
     const pubDateDay = dayjs(new Date(pubDate));
     let isValid = true;
@@ -94,16 +94,17 @@ export const getItemsToDownload = ({
     const { url: episodeAudioUrl, ext: audioFileExt } =
       getEpisodeAudioUrlAndExt(feed.items[i], episodeSourceOrder);
 
-    const key = getArchiveKey({
+    const archiveKeys = getArchiveKeys({
       prefix: archivePrefix,
       name: getArchiveFilename({
         pubDate,
         name: title,
         ext: audioFileExt,
       }),
+      guid,
     });
 
-    if (key && savedArchive.includes(key)) {
+    if (archiveKeys.some((archiveKey) => savedArchive.includes(archiveKey))) {
       isValid = false;
     }
 
@@ -111,19 +112,21 @@ export const getItemsToDownload = ({
       const item = feed.items[i];
       item._originalIndex = i;
       item.seasonNum = actualSeasonNum;
+      item._archiveKeys = archiveKeys;
 
       if (includeEpisodeImages || embedMetadataFlag) {
         const episodeImageUrl = getImageUrl(item);
 
         if (episodeImageUrl) {
           const episodeImageFileExt = getUrlExt(episodeImageUrl);
-          const episodeImageArchiveKey = getArchiveKey({
+          const episodeImageArchiveKeys = getArchiveKeys({
             prefix: archivePrefix,
             name: getArchiveFilename({
               pubDate,
               name: title,
               ext: episodeImageFileExt,
             }),
+            guid: guid ? `${guid}-image` : null,
           });
 
           const episodeImageName = getItemFilename({
@@ -141,7 +144,7 @@ export const getItemsToDownload = ({
           item._episodeImage = {
             url: episodeImageUrl,
             outputPath: outputImagePath,
-            key: episodeImageArchiveKey,
+            archiveKeys: episodeImageArchiveKeys,
           };
         }
       }
@@ -154,13 +157,14 @@ export const getItemsToDownload = ({
 
         if (episodeTranscriptUrl) {
           const episodeTranscriptFileExt = getUrlExt(episodeTranscriptUrl);
-          const episodeTranscriptArchiveKey = getArchiveKey({
+          const episodeTranscriptArchiveKeys = getArchiveKeys({
             prefix: archivePrefix,
             name: getArchiveFilename({
               pubDate,
               name: title,
               ext: episodeTranscriptFileExt,
             }),
+            guid: guid ? `${guid}-transcript` : null,
           });
 
           const episodeTranscriptName = getItemFilename({
@@ -181,7 +185,7 @@ export const getItemsToDownload = ({
           item._episodeTranscript = {
             url: episodeTranscriptUrl,
             outputPath: outputTranscriptPath,
-            key: episodeTranscriptArchiveKey,
+            archiveKeys: episodeTranscriptArchiveKeys,
           };
         }
       }

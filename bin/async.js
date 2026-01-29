@@ -39,7 +39,7 @@ export const download = async (options) => {
     marker,
     url,
     outputPath,
-    key,
+    archiveKeys = [],
     archive,
     override,
     alwaysPostprocess,
@@ -61,7 +61,11 @@ export const download = async (options) => {
     return outputPath;
   }
 
-  if (key && archive && getIsInArchive({ key, archive })) {
+  if (
+    archive &&
+    archiveKeys.length &&
+    getIsInArchive({ archiveKeys, archive })
+  ) {
     logMessage("Download exists in archive. Skipping...");
     return null;
   }
@@ -149,11 +153,10 @@ export const download = async (options) => {
     return null;
   }
 
-  const { outputPath: finalOutputPath, key: finalKey } = trustExt
-    ? { outputPath, key }
+  const finalOutputPath = trustExt
+    ? outputPath
     : correctExtensionFromMime({
         outputPath,
-        key,
         contentType: headResponse?.headers?.["content-type"],
         onCorrect: (from, to) =>
           logMessage(
@@ -170,9 +173,9 @@ export const download = async (options) => {
     await onAfterDownload(finalOutputPath);
   }
 
-  if (finalKey && archive) {
+  if (archive && archiveKeys.length) {
     try {
-      writeToArchive({ key: finalKey, archive });
+      writeToArchive({ archiveKeys, archive });
     } catch (error) {
       throw new Error(`Error writing to archive: ${error.toString()}`);
     }
@@ -245,14 +248,7 @@ export const downloadItemsAsync = async ({
         marker,
         trustExt,
         userAgent,
-        key: getArchiveKey({
-          prefix: archivePrefix,
-          name: getArchiveFilename({
-            name: item.title,
-            pubDate: item.pubDate,
-            ext: audioFileExt,
-          }),
-        }),
+        archiveKeys: item._archiveKeys || [],
         maxAttempts: attempts,
         outputPath: outputPodcastPath,
         url: episodeAudioUrl,
@@ -264,7 +260,7 @@ export const downloadItemsAsync = async ({
                 override,
                 trustExt,
                 userAgent,
-                key: item._episodeImage.key,
+                archiveKeys: item._episodeImage.archiveKeys || [],
                 marker: item._episodeImage.url,
                 maxAttempts: attempts,
                 outputPath: item._episodeImage.outputPath,
@@ -289,7 +285,7 @@ export const downloadItemsAsync = async ({
               const finalTranscriptPath = await download({
                 archive,
                 override,
-                key: item._episodeTranscript.key,
+                archiveKeys: item._episodeTranscript.archiveKeys || [],
                 marker: item._episodeTranscript.url,
                 maxAttempts: attempts,
                 outputPath: item._episodeTranscript.outputPath,
