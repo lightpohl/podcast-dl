@@ -1,5 +1,12 @@
 # Changelog
 
+## [11.7.1](https://github.com/lightpohl/podcast-dl/compare/v11.7.0...v11.7.1) (2026-01-29)
+
+
+### Bug Fixes
+
+* add GUID-based archive entry for meta files ([dfedddf](https://github.com/lightpohl/podcast-dl/commit/dfedddf6f31f3664b1023945c41245e74e051859))
+
 ## [11.7.0](https://github.com/lightpohl/podcast-dl/compare/v11.6.2...v11.7.0) (2026-01-29)
 
 
