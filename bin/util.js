@@ -14,6 +14,7 @@ export const AUDIO_FORMATS = {
 };
 
 export const isWin = process.platform === "win32";
+export const cwd = process.cwd();
 
 export const defaultRssParserConfig = {
   defaultRSS: 2.0,
@@ -72,7 +73,7 @@ export const getPublicObject = (object, exclude = []) => {
 };
 
 export const getFileString = (filePath) => {
-  const fullPath = path.resolve(process.cwd(), filePath);
+  const fullPath = path.resolve(cwd, filePath);
 
   if (!fs.existsSync(fullPath)) {
     return null;
@@ -88,7 +89,7 @@ export const getFileString = (filePath) => {
 };
 
 export const getJsonFile = (filePath) => {
-  const fullPath = path.resolve(process.cwd(), filePath);
+  const fullPath = path.resolve(cwd, filePath);
 
   if (!fs.existsSync(fullPath)) {
     return null;

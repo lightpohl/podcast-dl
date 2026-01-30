@@ -19,6 +19,7 @@ import {
 import { writeFeedMeta } from "./meta.js";
 import { getFolderName, getSimpleFilename } from "./naming.js";
 import {
+  cwd,
   getFileFeed,
   getImageUrl,
   getUrlExt,
@@ -99,7 +100,7 @@ const main = async () => {
   })();
 
   const basePath = _path.resolve(
-    process.cwd(),
+    cwd,
     getFolderName({ feed, template: outDir })
   );
 

@@ -1,7 +1,7 @@
 import dayjs from "dayjs";
 import fs from "fs";
 import path from "path";
-import { getJsonFile } from "./util.js";
+import { cwd, getJsonFile } from "./util.js";
 
 const archiveCache = new Map();
 
@@ -44,8 +44,10 @@ export const writeToArchive = ({ key, archiveKeys, archive }) => {
   });
 
   if (data.dirty) {
-    const archivePath = path.resolve(process.cwd(), archive);
-    fs.writeFileSync(archivePath, JSON.stringify([...data.entries], null, 4));
+    fs.writeFileSync(
+      path.resolve(cwd, archive),
+      JSON.stringify([...data.entries], null, 4)
+    );
     data.dirty = false;
   }
 };
