@@ -1,5 +1,12 @@
 # Changelog
 
+## [11.7.2](https://github.com/lightpohl/podcast-dl/compare/v11.7.1...v11.7.2) (2026-01-30)
+
+
+### Bug Fixes
+
+* improve archive read performance ([a65da6c](https://github.com/lightpohl/podcast-dl/commit/a65da6cfbd8efdf38e2a1e0d608169ef956fed23))
+
 ## [11.7.1](https://github.com/lightpohl/podcast-dl/compare/v11.7.0...v11.7.1) (2026-01-29)
 
 
