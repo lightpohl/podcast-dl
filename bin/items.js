@@ -46,6 +46,10 @@ export const getItemsToDownload = ({
   const items = [];
 
   const savedArchive = archive ? getArchive(archive) : [];
+  const includeRegex = episodeRegex ? new RegExp(episodeRegex) : null;
+  const excludeRegex = episodeRegexExclude
+    ? new RegExp(episodeRegexExclude)
+    : null;
 
   while (shouldGo(i)) {
     const { title, pubDate, itunes, guid } = feed.items[i];
@@ -53,18 +57,12 @@ export const getItemsToDownload = ({
     const pubDateDay = dayjs(new Date(pubDate));
     let isValid = true;
 
-    if (episodeRegex) {
-      const generatedEpisodeRegex = new RegExp(episodeRegex);
-      if (title && !generatedEpisodeRegex.test(title)) {
-        isValid = false;
-      }
+    if (includeRegex && title && !includeRegex.test(title)) {
+      isValid = false;
     }
 
-    if (episodeRegexExclude) {
-      const generatedEpisodeRegexExclude = new RegExp(episodeRegexExclude);
-      if (title && generatedEpisodeRegexExclude.test(title)) {
-        isValid = false;
-      }
+    if (excludeRegex && title && excludeRegex.test(title)) {
+      isValid = false;
     }
 
     if (before) {
