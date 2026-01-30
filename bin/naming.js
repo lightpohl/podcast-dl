@@ -33,6 +33,9 @@ const applyFilters = (value, filterStr) => {
   }, value);
 };
 
+const TEMPLATE_REGEX = /{{(\w+)(\|[^}]+)?}}/g;
+const customRegexCache = new Map();
+
 const MAX_LENGTH_FILENAME = process.env.MAX_LENGTH_FILENAME
   ? parseInt(process.env.MAX_LENGTH_FILENAME)
   : 255;
@@ -73,8 +76,10 @@ export const getItemFilename = ({
   const releaseDate = pubDateParsed?.format("YYYYMMDD") ?? null;
 
   const customReplacementTuples = customTemplateOptions.map((option, i) => {
-    const matchRegex = new RegExp(option);
-    const match = title.match(matchRegex);
+    if (!customRegexCache.has(option)) {
+      customRegexCache.set(option, new RegExp(option));
+    }
+    const match = title.match(customRegexCache.get(option));
 
     return match && match[0] ? [`custom_${i}`, match[0]] : [`custom_${i}`, ""];
   });
@@ -97,11 +102,13 @@ export const getItemFilename = ({
   const replacementsMap = Object.fromEntries(templateReplacementsTuples);
   const templateSegments = template.trim().split(path.sep);
   const nameSegments = templateSegments.map((segment, index) => {
-    const replaceRegex = /{{(\w+)(\|[^}]+)?}}/g;
-    const name = segment.replace(replaceRegex, (match, varName, filterStr) => {
-      const replacement = replacementsMap[varName] || "";
-      return applyFilters(replacement, filterStr);
-    });
+    const name = segment.replace(
+      TEMPLATE_REGEX,
+      (match, varName, filterStr) => {
+        const replacement = replacementsMap[varName] || "";
+        return applyFilters(replacement, filterStr);
+      }
+    );
 
     // Only truncate non-final segments here (they don't get an extension)
     // Final segment is truncated below with the extension accounted for
@@ -123,8 +130,7 @@ export const getFolderName = ({ feed, template }) => {
     podcast_link: feed.link || "",
   };
 
-  const replaceRegex = /{{(\w+)(\|[^}]+)?}}/g;
-  const name = template.replace(replaceRegex, (_, varName, filterStr) => {
+  const name = template.replace(TEMPLATE_REGEX, (_, varName, filterStr) => {
     const replacement = replacementsMap[varName] || "";
     const filtered = applyFilters(replacement, filterStr);
     return getSafeName(filtered);
