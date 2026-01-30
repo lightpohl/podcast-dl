@@ -32,8 +32,13 @@ export const createParseNumber = ({ min, max, name, required = true }) => {
   };
 };
 
+let ffmpegExists = null;
 export const hasFfmpeg = (value) => {
-  if (!commandExistsSync("ffmpeg")) {
+  if (ffmpegExists === null) {
+    ffmpegExists = commandExistsSync("ffmpeg");
+  }
+
+  if (!ffmpegExists) {
     logErrorAndExit('option specified requires "ffmpeg" be available');
   }
 
