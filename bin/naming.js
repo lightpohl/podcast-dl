@@ -66,21 +66,11 @@ export const getItemFilename = ({
   const episodeNum = feed.items.length - item._originalIndex + offset;
   const title = item.title || "";
 
-  const releaseYear = item.pubDate
-    ? dayjs(new Date(item.pubDate)).format("YYYY")
-    : null;
-
-  const releaseMonth = item.pubDate
-    ? dayjs(new Date(item.pubDate)).format("MM")
-    : null;
-
-  const releaseDay = item.pubDate
-    ? dayjs(new Date(item.pubDate)).format("DD")
-    : null;
-
-  const releaseDate = item.pubDate
-    ? dayjs(new Date(item.pubDate)).format("YYYYMMDD")
-    : null;
+  const pubDateParsed = item.pubDate ? dayjs(new Date(item.pubDate)) : null;
+  const releaseYear = pubDateParsed?.format("YYYY") ?? null;
+  const releaseMonth = pubDateParsed?.format("MM") ?? null;
+  const releaseDay = pubDateParsed?.format("DD") ?? null;
+  const releaseDate = pubDateParsed?.format("YYYYMMDD") ?? null;
 
   const customReplacementTuples = customTemplateOptions.map((option, i) => {
     const matchRegex = new RegExp(option);
