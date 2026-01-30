@@ -273,10 +273,6 @@ export const correctExtensionFromMime = ({
   return basePath + mimeExt;
 };
 
-export const VALID_AUDIO_EXTS = [
-  ...new Set(Object.values(AUDIO_TYPES_TO_EXTS)),
-];
-
 export const getIsAudioUrl = (url) => {
   let ext;
   try {
@@ -289,7 +285,7 @@ export const getIsAudioUrl = (url) => {
     return false;
   }
 
-  return VALID_AUDIO_EXTS.includes(ext);
+  return VALID_AUDIO_EXTS_SET.has(ext);
 };
 
 export const AUDIO_ORDER_TYPES = {
