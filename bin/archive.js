@@ -3,6 +3,20 @@ import fs from "fs";
 import path from "path";
 import { getJsonFile } from "./util.js";
 
+const archiveCache = new Map();
+
+const getArchiveData = (archivePath) => {
+  if (!archiveCache.has(archivePath)) {
+    const content = getJsonFile(archivePath);
+    archiveCache.set(archivePath, {
+      entries: new Set(content || []),
+      dirty: false,
+    });
+  }
+
+  return archiveCache.get(archivePath);
+};
+
 export const getArchiveKey = ({ prefix, name }) => {
   return `${prefix}-${name}`;
 };
@@ -14,30 +28,32 @@ export const getArchiveKeys = ({ prefix, name, guid }) => {
 };
 
 export const getArchive = (archive) => {
-  const archiveContent = getJsonFile(archive);
-  return archiveContent === null ? [] : archiveContent;
+  const { entries } = getArchiveData(archive);
+  return [...entries];
 };
 
 export const writeToArchive = ({ key, archiveKeys, archive }) => {
-  const archivePath = path.resolve(process.cwd(), archive);
-  const archiveResult = getArchive(archive);
-  const keys = Array.from(
-    new Set([key, ...(archiveKeys || [])].filter(Boolean))
-  );
+  const data = getArchiveData(archive);
+  const keys = [key, ...(archiveKeys || [])].filter(Boolean);
 
   keys.forEach((archiveKey) => {
-    if (!archiveResult.includes(archiveKey)) {
-      archiveResult.push(archiveKey);
+    if (!data.entries.has(archiveKey)) {
+      data.entries.add(archiveKey);
+      data.dirty = true;
     }
   });
 
-  fs.writeFileSync(archivePath, JSON.stringify(archiveResult, null, 4));
+  if (data.dirty) {
+    const archivePath = path.resolve(process.cwd(), archive);
+    fs.writeFileSync(archivePath, JSON.stringify([...data.entries], null, 4));
+    data.dirty = false;
+  }
 };
 
 export const getIsInArchive = ({ key, archiveKeys, archive }) => {
-  const archiveResult = getArchive(archive);
+  const { entries } = getArchiveData(archive);
   const keys = [key, ...(archiveKeys || [])].filter(Boolean);
-  return keys.some((archiveKey) => archiveResult.includes(archiveKey));
+  return keys.some((archiveKey) => entries.has(archiveKey));
 };
 
 export const getArchiveFilename = ({ pubDate, name, ext }) => {
