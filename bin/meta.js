@@ -4,7 +4,7 @@ import { logMessage } from "./logger.js";
 import { getPublicObject } from "./util.js";
 
 export const writeFeedMeta = ({ outputPath, feed, key, archive, override }) => {
-  if (key && archive && getIsInArchive({ key, archive })) {
+  if (key && archive && getIsInArchive({ archiveKeys: [key], archive })) {
     logMessage("Feed metadata exists in archive. Skipping...");
     return;
   }
@@ -17,9 +17,9 @@ export const writeFeedMeta = ({ outputPath, feed, key, archive, override }) => {
       logMessage("Feed metadata exists locally. Skipping...");
     }
 
-    if (key && archive && !getIsInArchive({ key, archive })) {
+    if (key && archive && !getIsInArchive({ archiveKeys: [key], archive })) {
       try {
-        writeToArchive({ key, archive });
+        writeToArchive({ archiveKeys: [key], archive });
       } catch (error) {
         throw new Error(`Error writing to archive: ${error.toString()}`);
       }

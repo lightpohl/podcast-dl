@@ -32,11 +32,10 @@ export const getArchive = (archive) => {
   return [...entries];
 };
 
-export const writeToArchive = ({ key, archiveKeys, archive }) => {
+export const writeToArchive = ({ archiveKeys, archive }) => {
   const data = getArchiveData(archive);
-  const keys = [key, ...(archiveKeys || [])].filter(Boolean);
 
-  keys.forEach((archiveKey) => {
+  archiveKeys.forEach((archiveKey) => {
     if (!data.entries.has(archiveKey)) {
       data.entries.add(archiveKey);
       data.dirty = true;
@@ -52,10 +51,9 @@ export const writeToArchive = ({ key, archiveKeys, archive }) => {
   }
 };
 
-export const getIsInArchive = ({ key, archiveKeys, archive }) => {
+export const getIsInArchive = ({ archiveKeys, archive }) => {
   const { entries } = getArchiveData(archive);
-  const keys = [key, ...(archiveKeys || [])].filter(Boolean);
-  return keys.some((archiveKey) => entries.has(archiveKey));
+  return archiveKeys.some((archiveKey) => entries.has(archiveKey));
 };
 
 export const getArchiveFilename = ({ pubDate, name, ext }) => {
