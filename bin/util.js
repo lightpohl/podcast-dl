@@ -141,6 +141,10 @@ export const getUrlExt = (url) => {
     return "";
   }
 
+  if (url.startsWith("//")) {
+    url = "https:" + url;
+  }
+
   const { pathname } = new URL(url);
 
   if (!pathname) {
