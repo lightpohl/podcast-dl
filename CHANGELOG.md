@@ -1,5 +1,12 @@
 # Changelog
 
+## [11.7.3](https://github.com/lightpohl/podcast-dl/compare/v11.7.2...v11.7.3) (2026-03-17)
+
+
+### Bug Fixes
+
+* normalize protocol-relative URLs to https ([62f916f](https://github.com/lightpohl/podcast-dl/commit/62f916f7e2edc9c8588476d36f2b6c25744ebd84))
+
 ## [11.7.2](https://github.com/lightpohl/podcast-dl/compare/v11.7.1...v11.7.2) (2026-01-30)
 
 
