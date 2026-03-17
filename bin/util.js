@@ -33,7 +33,7 @@ export const escapeArgForShell = (arg) => {
   let result = arg;
 
   if (/[^A-Za-z0-9_/:=-]/.test(result)) {
-    if (isWin) {
+    if (process.platform === "win32") {
       return `"${result}"`;
     } else {
       result = "'" + result.replace(/'/g, "'\\''") + "'";
