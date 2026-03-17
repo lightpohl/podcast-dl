@@ -25,6 +25,7 @@ import {
   getUrlExt,
   getUrlFeed,
   logFeedInfo,
+  normalizeUrl,
 } from "./util.js";
 
 const opts = setupCommander(program);
@@ -92,7 +93,8 @@ const main = async () => {
 
   const archivePrefix = (() => {
     if (feed.feedUrl || url) {
-      const { hostname, pathname } = new URL(feed.feedUrl || url);
+      const raw = feed.feedUrl || url;
+      const { hostname, pathname } = new URL(normalizeUrl(raw) ?? raw);
       return `${hostname}${pathname}`;
     }
 
@@ -148,7 +150,7 @@ const main = async () => {
   }
 
   if (includeMeta) {
-    const podcastImageUrl = getImageUrl(feed);
+    const podcastImageUrl = normalizeUrl(getImageUrl(feed));
 
     if (podcastImageUrl) {
       const podcastImageFileExt = getUrlExt(podcastImageUrl);

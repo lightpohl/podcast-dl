@@ -6,7 +6,9 @@
   "bin": "./bin/bin.js",
   "scripts": {
     "build": "rimraf ./binaries && rimraf ./dist && node build.cjs",
-    "lint": "eslint ./bin"
+    "lint": "eslint ./bin",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "lint-staged": {
     "*.{js,json,md}": [
@@ -47,6 +49,7 @@
     "lint-staged": "^10.1.7",
     "prettier": "2.3.2",
     "rimraf": "^3.0.2",
+    "vitest": "^3.2.4",
     "webpack": "^5.75.0"
   },
   "dependencies": {

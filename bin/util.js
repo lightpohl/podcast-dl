@@ -33,7 +33,7 @@ export const escapeArgForShell = (arg) => {
   let result = arg;
 
   if (/[^A-Za-z0-9_/:=-]/.test(result)) {
-    if (isWin) {
+    if (process.platform === "win32") {
       return `"${result}"`;
     } else {
       result = "'" + result.replace(/'/g, "'\\''") + "'";
@@ -136,10 +136,15 @@ export const logFeedInfo = (feed) => {
   logMessage();
 };
 
+export const normalizeUrl = (url) =>
+  url?.startsWith("//") ? "https:" + url : url;
+
 export const getUrlExt = (url) => {
   if (!url) {
     return "";
   }
+
+  url = normalizeUrl(url);
 
   const { pathname } = new URL(url);
 
@@ -300,16 +305,22 @@ export const getEpisodeAudioUrlAndExt = (
 ) => {
   for (const source of order) {
     if (source === AUDIO_ORDER_TYPES.link && link && getIsAudioUrl(link)) {
-      return { url: link, ext: getUrlExt(link) };
+      return { url: normalizeUrl(link), ext: getUrlExt(link) };
     }
 
     if (source === AUDIO_ORDER_TYPES.enclosure && enclosure) {
       if (getIsAudioUrl(enclosure.url)) {
-        return { url: enclosure.url, ext: getUrlExt(enclosure.url) };
+        return {
+          url: normalizeUrl(enclosure.url),
+          ext: getUrlExt(enclosure.url),
+        };
       }
 
       if (enclosure.url && AUDIO_TYPES_TO_EXTS[enclosure.type]) {
-        return { url: enclosure.url, ext: AUDIO_TYPES_TO_EXTS[enclosure.type] };
+        return {
+          url: normalizeUrl(enclosure.url),
+          ext: AUDIO_TYPES_TO_EXTS[enclosure.type],
+        };
       }
     }
   }
@@ -386,6 +397,8 @@ export const getFileFeed = async (filePath, parserConfig) => {
 };
 
 export const getUrlFeed = async (url, parserConfig) => {
+  url = normalizeUrl(url) ?? url;
+
   const config = parserConfig
     ? getJsonFile(parserConfig)
     : defaultRssParserConfig;

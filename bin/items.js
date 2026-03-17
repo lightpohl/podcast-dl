@@ -9,6 +9,7 @@ import {
   getLoopControls,
   getTranscriptUrl,
   getUrlExt,
+  normalizeUrl,
 } from "./util.js";
 
 export const ITEM_LIST_FORMATS = ["table", "json"];
@@ -113,7 +114,7 @@ export const getItemsToDownload = ({
       item._archiveKeys = archiveKeys;
 
       if (includeEpisodeImages || embedMetadataFlag) {
-        const episodeImageUrl = getImageUrl(item);
+        const episodeImageUrl = normalizeUrl(getImageUrl(item));
 
         if (episodeImageUrl) {
           const episodeImageFileExt = getUrlExt(episodeImageUrl);
@@ -148,9 +149,8 @@ export const getItemsToDownload = ({
       }
 
       if (includeEpisodeTranscripts) {
-        const episodeTranscriptUrl = getTranscriptUrl(
-          item,
-          episodeTranscriptTypes
+        const episodeTranscriptUrl = normalizeUrl(
+          getTranscriptUrl(item, episodeTranscriptTypes)
         );
 
         if (episodeTranscriptUrl) {
