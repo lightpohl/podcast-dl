@@ -58,14 +58,16 @@ export const setupCommander = (program) => {
       },
       [AUDIO_ORDER_TYPES.enclosure, AUDIO_ORDER_TYPES.link]
     )
-    .option("--include-meta", "write out podcast metadata to json")
+    .option("--include-meta", "write out podcast metadata to json", false)
     .option(
       "--include-episode-meta",
-      "write out individual episode metadata to json"
+      "write out individual episode metadata to json",
+      false
     )
     .option(
       "--include-episode-transcripts",
-      "download found episode transcripts"
+      "download found episode transcripts",
+      false
     )
     .option(
       "--episode-transcript-types <string>",
@@ -92,7 +94,7 @@ export const setupCommander = (program) => {
         TRANSCRIPT_TYPES["text/plain"],
       ]
     )
-    .option("--include-episode-images", "download found episode images")
+    .option("--include-episode-images", "download found episode images", false)
     .option(
       "--offset <number>",
       "offset episode to start downloading from (most recent = 0)",
@@ -102,7 +104,7 @@ export const setupCommander = (program) => {
     .option(
       "--limit <number>",
       "max amount of episodes to download",
-      createParseNumber({ min: 1, name: "--limit", require: false })
+      createParseNumber({ min: 1, name: "--limit", required: false })
     )
     .option(
       "--episode-regex <string>",
@@ -128,12 +130,14 @@ export const setupCommander = (program) => {
     .option(
       "--embed-metadata",
       "add metadata to episode files using ffmpeg",
-      hasFfmpeg
+      hasFfmpeg,
+      false
     )
     .option(
       "--add-mp3-metadata",
       "deprecated: use --embed-metadata instead",
-      hasFfmpeg
+      hasFfmpeg,
+      false
     )
     .option(
       "--audio-format <string>",
@@ -155,14 +159,24 @@ export const setupCommander = (program) => {
       "adjust bitrate of episode files using ffmpeg",
       hasFfmpeg
     )
-    .option("--mono", "force episode files into mono using ffmpeg", hasFfmpeg)
-    .option("--override", "override local files on collision")
+    .option(
+      "--mono",
+      "force episode files into mono using ffmpeg",
+      hasFfmpeg,
+      false
+    )
+    .option("--override", "override local files on collision", false)
     .option(
       "--always-postprocess",
-      "always run additional tasks on the file regardless of whether the file already exists"
+      "always run additional tasks on the file regardless of whether the file already exists",
+      false
     )
-    .option("--reverse", "download episodes in reverse order")
-    .option("--info", "print retrieved podcast info instead of downloading")
+    .option("--reverse", "download episodes in reverse order", false)
+    .option(
+      "--info",
+      "print retrieved podcast info instead of downloading",
+      false
+    )
     .option(
       "--list [table|json]",
       "print episode info instead of downloading",
@@ -206,9 +220,13 @@ export const setupCommander = (program) => {
       "--parser-config <string>",
       "path to JSON config to override RSS parser"
     )
-    .option("--proxy", "enable proxy support via global-agent")
+    .option("--proxy", "enable proxy support via global-agent", false)
     .option("--user-agent <string>", "specify custom user agent string")
-    .option("--trust-ext", "trust file extension, skip MIME-based correction");
+    .option(
+      "--trust-ext",
+      "trust file extension, skip MIME-based correction",
+      false
+    );
 
   program.parse();
 
