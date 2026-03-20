@@ -187,7 +187,7 @@ describe("correctExtensionFromMime", () => {
       correctExtensionFromMime({
         outputPath: "/out/episode.mp3",
         contentType: "audio/mpeg",
-      })
+      }),
     ).toBe("/out/episode.mp3");
   });
 
@@ -196,7 +196,7 @@ describe("correctExtensionFromMime", () => {
       correctExtensionFromMime({
         outputPath: "/out/episode.mp3",
         contentType: "audio/mp4",
-      })
+      }),
     ).toBe("/out/episode.m4a");
   });
 
@@ -215,7 +215,7 @@ describe("correctExtensionFromMime", () => {
       correctExtensionFromMime({
         outputPath: "/out/ep.mp3",
         contentType: "application/octet-stream",
-      })
+      }),
     ).toBe("/out/ep.mp3");
   });
 });
@@ -257,7 +257,7 @@ describe("getEpisodeAudioUrlAndExt", () => {
         enclosure: { url: "https://example.com/ep.mp3" },
         link: "https://example.com/alt.mp3",
       },
-      [AUDIO_ORDER_TYPES.link, AUDIO_ORDER_TYPES.enclosure]
+      [AUDIO_ORDER_TYPES.link, AUDIO_ORDER_TYPES.enclosure],
     );
     expect(result).toEqual({ url: "https://example.com/alt.mp3", ext: ".mp3" });
   });
@@ -269,7 +269,7 @@ describe("getImageUrl", () => {
       getImageUrl({
         image: { url: "https://a.com/img.jpg" },
         itunes: { image: "https://b.com/img.jpg" },
-      })
+      }),
     ).toBe("https://a.com/img.jpg");
   });
 
@@ -278,13 +278,13 @@ describe("getImageUrl", () => {
       getImageUrl({
         image: { link: "https://a.com/img.jpg" },
         itunes: { image: "https://b.com/img.jpg" },
-      })
+      }),
     ).toBe("https://a.com/img.jpg");
   });
 
   it("uses itunes.image when image url/link missing", () => {
     expect(getImageUrl({ itunes: { image: "https://b.com/img.jpg" } })).toBe(
-      "https://b.com/img.jpg"
+      "https://b.com/img.jpg",
     );
   });
 
@@ -308,18 +308,13 @@ describe("getTranscriptUrl", () => {
       ],
     };
     expect(
-      getTranscriptUrl(item, [
-        TRANSCRIPT_TYPES["text/vtt"],
-        TRANSCRIPT_TYPES["text/plain"],
-      ])
+      getTranscriptUrl(item, [TRANSCRIPT_TYPES["text/vtt"], TRANSCRIPT_TYPES["text/plain"]]),
     ).toBe("https://example.com/cc.vtt");
   });
 
   it("returns null when type does not match", () => {
     const item = {
-      podcastTranscripts: [
-        { $: { type: "text/plain", url: "https://example.com/plain.txt" } },
-      ],
+      podcastTranscripts: [{ $: { type: "text/plain", url: "https://example.com/plain.txt" } }],
     };
     expect(getTranscriptUrl(item, ["text/vtt"])).toBeNull();
   });

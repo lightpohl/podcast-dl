@@ -26,8 +26,7 @@ const loadCommander = async ({ ffmpegExists = true } = {}) => {
 const parseArgs = async (args, options) => {
   process.argv = ["node", "podcast-dl", ...args];
 
-  const { setupCommander, logErrorAndExit, commandExistsSync } =
-    await loadCommander(options);
+  const { setupCommander, logErrorAndExit, commandExistsSync } = await loadCommander(options);
   const program = new Command();
 
   try {
@@ -128,16 +127,11 @@ describe("setupCommander", () => {
   });
 
   it("fails on an invalid episode source order", async () => {
-    const { error, logErrorAndExit } = await parseArgs([
-      "--episode-source-order",
-      "link, bogus",
-    ]);
+    const { error, logErrorAndExit } = await parseArgs(["--episode-source-order", "link, bogus"]);
 
-    expect(error.message).toBe(
-      "Invalid type found in --episode-source-order: link, bogus\n"
-    );
+    expect(error.message).toBe("Invalid type found in --episode-source-order: link, bogus\n");
     expect(logErrorAndExit).toHaveBeenCalledWith(
-      "Invalid type found in --episode-source-order: link, bogus\n"
+      "Invalid type found in --episode-source-order: link, bogus\n",
     );
   });
 
@@ -147,19 +141,14 @@ describe("setupCommander", () => {
       "text/vtt, bogus",
     ]);
 
-    expect(error.message).toBe(
-      "Invalid type found in --transcript-types: text/vtt, bogus\n"
-    );
+    expect(error.message).toBe("Invalid type found in --transcript-types: text/vtt, bogus\n");
     expect(logErrorAndExit).toHaveBeenCalledWith(
-      "Invalid type found in --transcript-types: text/vtt, bogus\n"
+      "Invalid type found in --transcript-types: text/vtt, bogus\n",
     );
   });
 
   it("fails on an invalid audio format", async () => {
-    const { error, logErrorAndExit } = await parseArgs([
-      "--audio-format",
-      "wavv",
-    ]);
+    const { error, logErrorAndExit } = await parseArgs(["--audio-format", "wavv"]);
 
     expect(error.message).toContain("Invalid audio format: wavv");
     expect(error.message).toContain("Supported formats:");
@@ -172,10 +161,10 @@ describe("setupCommander", () => {
     const { error, logErrorAndExit } = await parseArgs(["--list", "xml"]);
 
     expect(error.message).toBe(
-      "xml is an invalid format for --list\nUse one of the following: table, json"
+      "xml is an invalid format for --list\nUse one of the following: table, json",
     );
     expect(logErrorAndExit).toHaveBeenCalledWith(
-      "xml is an invalid format for --list\nUse one of the following: table, json"
+      "xml is an invalid format for --list\nUse one of the following: table, json",
     );
   });
 });

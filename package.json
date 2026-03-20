@@ -6,13 +6,15 @@
   "bin": "./bin/bin.js",
   "scripts": {
     "build": "rimraf ./binaries && rimraf ./dist && node build.cjs",
-    "lint": "eslint ./bin",
+    "format": "oxfmt .",
+    "format:check": "oxfmt --check .",
+    "lint": "oxlint ./bin",
     "test": "vitest run",
     "test:watch": "vitest"
   },
   "lint-staged": {
     "*.{js,json,md}": [
-      "prettier --write"
+      "oxfmt"
     ]
   },
   "husky": {
@@ -41,13 +43,11 @@
   "author": "Joshua Pohl",
   "license": "MIT",
   "devDependencies": {
-    "@eslint/js": "^9.18.0",
     "@yao-pkg/pkg": "^6.6.0",
-    "eslint": "^9.18.0",
-    "globals": "^15.14.0",
     "husky": "^4.2.5",
     "lint-staged": "^10.1.7",
-    "prettier": "2.3.2",
+    "oxfmt": "^0.41.0",
+    "oxlint": "^1.56.0",
     "rimraf": "^3.0.2",
     "vitest": "^3.2.4",
     "webpack": "^5.75.0"
@@ -56,13 +56,13 @@
     "command-exists": "^1.2.9",
     "commander": "^12.1.0",
     "dayjs": "^1.8.25",
+    "entities": "^2.0.3",
     "filenamify": "^6.0.0",
     "global-agent": "^3.0.0",
     "got": "^11.0.2",
     "p-limit": "^4.0.0",
     "pluralize": "^8.0.0",
-    "entities": "^2.0.3",
-    "xml2js": "^0.5.0",
-    "throttle-debounce": "^3.0.1"
+    "throttle-debounce": "^3.0.1",
+    "xml2js": "^0.5.0"
   }
 }

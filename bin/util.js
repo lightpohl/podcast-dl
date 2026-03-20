@@ -136,8 +136,7 @@ export const logFeedInfo = (feed) => {
   logMessage();
 };
 
-export const normalizeUrl = (url) =>
-  url?.startsWith("//") ? "https:" + url : url;
+export const normalizeUrl = (url) => (url?.startsWith("//") ? "https:" + url : url);
 
 export const getUrlExt = (url) => {
   if (!url) {
@@ -211,9 +210,7 @@ const MEDIA_CATEGORIES = {
 
 const VALID_AUDIO_EXTS_SET = new Set(Object.values(AUDIO_TYPES_TO_EXTS));
 const VALID_IMAGE_EXTS_SET = new Set(Object.values(IMAGE_TYPES_TO_EXTS));
-const VALID_TRANSCRIPT_EXTS_SET = new Set(
-  Object.values(TRANSCRIPT_TYPES_TO_EXTS)
-);
+const VALID_TRANSCRIPT_EXTS_SET = new Set(Object.values(TRANSCRIPT_TYPES_TO_EXTS));
 
 const getExtCategory = (ext) => {
   if (VALID_AUDIO_EXTS_SET.has(ext)) {
@@ -246,11 +243,7 @@ const getMimeCategory = (mime) => {
   return null;
 };
 
-export const correctExtensionFromMime = ({
-  outputPath,
-  contentType,
-  onCorrect,
-}) => {
+export const correctExtensionFromMime = ({ outputPath, contentType, onCorrect }) => {
   const mimeType = contentType?.split(";")[0];
   const mimeExt = mimeType ? getExtFromMime(mimeType) : null;
 
@@ -270,9 +263,7 @@ export const correctExtensionFromMime = ({
     return outputPath;
   }
 
-  const basePath = currentExt
-    ? outputPath.slice(0, -currentExt.length)
-    : outputPath;
+  const basePath = currentExt ? outputPath.slice(0, -currentExt.length) : outputPath;
 
   onCorrect?.(currentExt || "(none)", mimeExt);
 
@@ -301,7 +292,7 @@ export const AUDIO_ORDER_TYPES = {
 
 export const getEpisodeAudioUrlAndExt = (
   { enclosure, link },
-  order = [AUDIO_ORDER_TYPES.enclosure, AUDIO_ORDER_TYPES.link]
+  order = [AUDIO_ORDER_TYPES.enclosure, AUDIO_ORDER_TYPES.link],
 ) => {
   for (const source of order) {
     if (source === AUDIO_ORDER_TYPES.link && link && getIsAudioUrl(link)) {
@@ -362,8 +353,7 @@ export const getTranscriptUrl = (item, transcriptTypes = []) => {
 
   for (const transcriptType of transcriptTypes) {
     const matchingTranscriptType = item.podcastTranscripts.find(
-      (transcript) =>
-        !!transcript?.["$"]?.url && transcript?.["$"]?.type === transcriptType
+      (transcript) => !!transcript?.["$"]?.url && transcript?.["$"]?.type === transcriptType,
     );
 
     if (matchingTranscriptType) {
@@ -375,9 +365,7 @@ export const getTranscriptUrl = (item, transcriptTypes = []) => {
 };
 
 export const getFileFeed = async (filePath, parserConfig) => {
-  const config = parserConfig
-    ? getJsonFile(parserConfig)
-    : defaultRssParserConfig;
+  const config = parserConfig ? getJsonFile(parserConfig) : defaultRssParserConfig;
   const rssString = getFileString(filePath);
 
   if (parserConfig && !config) {
@@ -399,9 +387,7 @@ export const getFileFeed = async (filePath, parserConfig) => {
 export const getUrlFeed = async (url, parserConfig) => {
   url = normalizeUrl(url) ?? url;
 
-  const config = parserConfig
-    ? getJsonFile(parserConfig)
-    : defaultRssParserConfig;
+  const config = parserConfig ? getJsonFile(parserConfig) : defaultRssParserConfig;
 
   if (parserConfig && !config) {
     logErrorAndExit(`Unable to load parser config: ${parserConfig}`);

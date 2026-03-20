@@ -43,10 +43,7 @@ export const writeToArchive = ({ archiveKeys, archive }) => {
   });
 
   if (data.dirty) {
-    fs.writeFileSync(
-      path.resolve(cwd, archive),
-      JSON.stringify([...data.entries], null, 4)
-    );
+    fs.writeFileSync(path.resolve(cwd, archive), JSON.stringify([...data.entries], null, 4));
     data.dirty = false;
   }
 };
@@ -57,9 +54,7 @@ export const getIsInArchive = ({ archiveKeys, archive }) => {
 };
 
 export const getArchiveFilename = ({ pubDate, name, ext }) => {
-  const formattedPubDate = pubDate
-    ? dayjs(new Date(pubDate)).format("YYYYMMDD")
-    : null;
+  const formattedPubDate = pubDate ? dayjs(new Date(pubDate)).format("YYYYMMDD") : null;
 
   const baseName = formattedPubDate ? `${formattedPubDate}-${name}` : name;
 

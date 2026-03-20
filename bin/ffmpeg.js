@@ -48,9 +48,7 @@ export const runFfmpeg = async ({
     const supportsAttachedPic = targetFormat
       ? targetFormat.attachedPic
       : Object.values(AUDIO_FORMATS).find((f) => f.ext === ext)?.attachedPic;
-    command += supportsAttachedPic
-      ? ` -c:v copy -disposition:v:0 attached_pic`
-      : ` -c:v copy`;
+    command += supportsAttachedPic ? ` -c:v copy -disposition:v:0 attached_pic` : ` -c:v copy`;
   }
 
   if (embedMetadata) {
@@ -62,9 +60,7 @@ export const runFfmpeg = async ({
     const disc = item.itunes?.season || "";
     const track = item.itunes?.episode || `${feed.items.length - itemIndex}`;
     const episodeType = item.itunes?.episodeType || "";
-    const date = item.pubDate
-      ? dayjs(new Date(item.pubDate)).format("YYYY-MM-DD")
-      : "";
+    const date = item.pubDate ? dayjs(new Date(item.pubDate)).format("YYYY-MM-DD") : "";
 
     const metaKeysToValues = {
       album,
@@ -129,9 +125,7 @@ export const runFfmpeg = async ({
     }
 
     const hasExt = /\.[^.]+$/.test(outputPath);
-    return hasExt
-      ? outputPath.replace(/\.[^.]+$/, outputExt)
-      : outputPath + outputExt;
+    return hasExt ? outputPath.replace(/\.[^.]+$/, outputExt) : outputPath + outputExt;
   })();
 
   fs.renameSync(tmpPath, finalOutputPath);

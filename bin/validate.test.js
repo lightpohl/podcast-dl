@@ -85,9 +85,7 @@ describe("createParseNumber", () => {
 
     parseNumber(`${Number.MAX_SAFE_INTEGER + 1}`);
 
-    expect(logErrorAndExit).toHaveBeenCalledWith(
-      "count must be <= Number.MAX_SAFE_INTEGER"
-    );
+    expect(logErrorAndExit).toHaveBeenCalledWith("count must be <= Number.MAX_SAFE_INTEGER");
   });
 
   it("logs a generic parse failure when parsing throws", async () => {
@@ -102,10 +100,9 @@ describe("createParseNumber", () => {
 
 describe("hasFfmpeg", () => {
   it("returns the original value when ffmpeg exists", async () => {
-    const { hasFfmpeg, commandExistsSync, logErrorAndExit } =
-      await loadValidate({
-        commandExists: true,
-      });
+    const { hasFfmpeg, commandExistsSync, logErrorAndExit } = await loadValidate({
+      commandExists: true,
+    });
 
     expect(hasFfmpeg("copy")).toBe("copy");
     expect(commandExistsSync).toHaveBeenCalledWith("ffmpeg");
@@ -129,8 +126,6 @@ describe("hasFfmpeg", () => {
 
     hasFfmpeg("copy");
 
-    expect(logErrorAndExit).toHaveBeenCalledWith(
-      'option specified requires "ffmpeg" be available'
-    );
+    expect(logErrorAndExit).toHaveBeenCalledWith('option specified requires "ffmpeg" be available');
   });
 });

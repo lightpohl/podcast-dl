@@ -1,4 +1,4 @@
-/* eslint-disable no-console */
+/* oxlint-disable no-console */
 
 export const ERROR_STATUSES = {
   general: 1,
@@ -42,10 +42,7 @@ export const logMessage = (message = "", logLevel = 1) => {
     return;
   }
 
-  if (
-    process.env.LOG_LEVEL === LOG_LEVEL_TYPES.quiet &&
-    logLevel > LOG_LEVELS.info
-  ) {
+  if (process.env.LOG_LEVEL === LOG_LEVEL_TYPES.quiet && logLevel > LOG_LEVELS.info) {
     console.log(message);
     return;
   }

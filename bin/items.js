@@ -48,9 +48,7 @@ export const getItemsToDownload = ({
 
   const savedArchive = archive ? getArchive(archive) : [];
   const includeRegex = episodeRegex ? new RegExp(episodeRegex) : null;
-  const excludeRegex = episodeRegexExclude
-    ? new RegExp(episodeRegexExclude)
-    : null;
+  const excludeRegex = episodeRegexExclude ? new RegExp(episodeRegexExclude) : null;
 
   while (shouldGo(i)) {
     const { title, pubDate, itunes, guid } = feed.items[i];
@@ -68,20 +66,14 @@ export const getItemsToDownload = ({
 
     if (before) {
       const beforeDateDay = dayjs(new Date(before));
-      if (
-        !pubDateDay.isSame(beforeDateDay, "day") &&
-        !pubDateDay.isBefore(beforeDateDay, "day")
-      ) {
+      if (!pubDateDay.isSame(beforeDateDay, "day") && !pubDateDay.isBefore(beforeDateDay, "day")) {
         isValid = false;
       }
     }
 
     if (after) {
       const afterDateDay = dayjs(new Date(after));
-      if (
-        !pubDateDay.isSame(afterDateDay, "day") &&
-        !pubDateDay.isAfter(afterDateDay, "day")
-      ) {
+      if (!pubDateDay.isSame(afterDateDay, "day") && !pubDateDay.isAfter(afterDateDay, "day")) {
         isValid = false;
       }
     }
@@ -90,8 +82,10 @@ export const getItemsToDownload = ({
       isValid = false;
     }
 
-    const { url: episodeAudioUrl, ext: audioFileExt } =
-      getEpisodeAudioUrlAndExt(feed.items[i], episodeSourceOrder);
+    const { url: episodeAudioUrl, ext: audioFileExt } = getEpisodeAudioUrlAndExt(
+      feed.items[i],
+      episodeSourceOrder,
+    );
 
     const archiveKeys = getArchiveKeys({
       prefix: archivePrefix,
@@ -149,9 +143,7 @@ export const getItemsToDownload = ({
       }
 
       if (includeEpisodeTranscripts) {
-        const episodeTranscriptUrl = normalizeUrl(
-          getTranscriptUrl(item, episodeTranscriptTypes)
-        );
+        const episodeTranscriptUrl = normalizeUrl(getTranscriptUrl(item, episodeTranscriptTypes));
 
         if (episodeTranscriptUrl) {
           const episodeTranscriptFileExt = getUrlExt(episodeTranscriptUrl);
@@ -175,10 +167,7 @@ export const getItemsToDownload = ({
             offset: episodeNumOffset,
           });
 
-          const outputTranscriptPath = path.resolve(
-            basePath,
-            episodeTranscriptName
-          );
+          const outputTranscriptPath = path.resolve(basePath, episodeTranscriptName);
 
           item._episodeTranscript = {
             url: episodeTranscriptUrl,
@@ -239,11 +228,11 @@ export const logItemsList = ({
   });
 
   if (isJson) {
-    // eslint-disable-next-line no-console
+    // oxlint-disable-next-line no-console
     console.log(JSON.stringify(output));
     return;
   }
 
-  // eslint-disable-next-line no-console
+  // oxlint-disable-next-line no-console
   console.table(output);
 };

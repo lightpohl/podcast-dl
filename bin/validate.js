@@ -19,9 +19,7 @@ export const createParseNumber = ({ min, max, name, required = true }) => {
 
       if (max !== undefined && number > max) {
         logErrorAndExit(
-          `${name} must be <= ${
-            max === Number.MAX_SAFE_INTEGER ? "Number.MAX_SAFE_INTEGER" : max
-          }`
+          `${name} must be <= ${max === Number.MAX_SAFE_INTEGER ? "Number.MAX_SAFE_INTEGER" : max}`,
         );
       }
 

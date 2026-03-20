@@ -30,9 +30,7 @@ describe("getSafeName", () => {
   it("replaces periods before sanitizing the filename", async () => {
     const { getSafeName } = await loadNaming();
 
-    expect(getSafeName("2024.01.02.Episode.mp3")).toBe(
-      "2024_01_02_Episode_mp3"
-    );
+    expect(getSafeName("2024.01.02.Episode.mp3")).toBe("2024_01_02_Episode_mp3");
   });
 });
 
@@ -69,9 +67,7 @@ describe("getItemFilename", () => {
       customTemplateOptions: ["S\\d+E\\d+"],
     });
 
-    expect(result).toBe(
-      path.join("My-Podcast", "20240102-013-Great_Episode_S01E02-S01E02.mp3")
-    );
+    expect(result).toBe(path.join("My-Podcast", "20240102-013-Great_Episode_S01E02-S01E02.mp3"));
   });
 
   it("truncates directory and file segments independently", async () => {
@@ -104,7 +100,7 @@ describe("getFolderName", () => {
       getFolderName({
         feed: { title: "  My/Podcast.Name  " },
         template: "{{podcast_title|trim|underscore}}",
-      })
+      }),
     ).toBe("My_Podcast_Name");
   });
 });

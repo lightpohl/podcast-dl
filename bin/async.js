@@ -5,12 +5,7 @@ import _path from "path";
 import stream from "stream";
 import { throttle } from "throttle-debounce";
 import { promisify } from "util";
-import {
-  getArchiveFilename,
-  getArchiveKeys,
-  getIsInArchive,
-  writeToArchive,
-} from "./archive.js";
+import { getArchiveFilename, getArchiveKeys, getIsInArchive, writeToArchive } from "./archive.js";
 import { runExec } from "./exec.js";
 import { runFfmpeg } from "./ffmpeg.js";
 import {
@@ -61,11 +56,7 @@ export const download = async (options) => {
     return outputPath;
   }
 
-  if (
-    archive &&
-    archiveKeys.length &&
-    getIsInArchive({ archiveKeys, archive })
-  ) {
+  if (archive && archiveKeys.length && getIsInArchive({ archiveKeys, archive })) {
     logMessage("Download exists in archive. Skipping...");
     return null;
   }
@@ -98,23 +89,17 @@ export const download = async (options) => {
 
   logMessage(
     `Starting download${
-      expectedSize
-        ? ` of ${(expectedSize / BYTES_IN_MB).toFixed(2)} MB...`
-        : "..."
-    }`
+      expectedSize ? ` of ${(expectedSize / BYTES_IN_MB).toFixed(2)} MB...` : "..."
+    }`,
   );
 
   try {
     const onDownloadProgress = throttle(3000, (progress) => {
-      if (
-        getShouldOutputProgressIndicator() &&
-        progress.transferred > 0 &&
-        progress.percent < 1
-      ) {
+      if (getShouldOutputProgressIndicator() && progress.transferred > 0 && progress.percent < 1) {
         logMessage(
-          `${(progress.percent * 100).toFixed(0)}% of ${(
-            progress.total / BYTES_IN_MB
-          ).toFixed(2)} MB...`
+          `${(progress.percent * 100).toFixed(0)}% of ${(progress.total / BYTES_IN_MB).toFixed(
+            2,
+          )} MB...`,
         );
       }
     });
@@ -123,7 +108,7 @@ export const download = async (options) => {
       got
         .stream(url, { headers: { "user-agent": userAgent } })
         .on("downloadProgress", onDownloadProgress),
-      fs.createWriteStream(tempOutputPath)
+      fs.createWriteStream(tempOutputPath),
     );
   } catch (error) {
     removeFile();
@@ -145,10 +130,7 @@ export const download = async (options) => {
   if (fileSize === 0) {
     removeFile();
 
-    logMessage(
-      "Unable to write to file. Suggestion: verify permissions",
-      LOG_LEVELS.important
-    );
+    logMessage("Unable to write to file. Suggestion: verify permissions", LOG_LEVELS.important);
 
     return null;
   }
@@ -159,10 +141,7 @@ export const download = async (options) => {
         outputPath,
         contentType: headResponse?.headers?.["content-type"],
         onCorrect: (from, to) =>
-          logMessage(
-            `Correcting extension: ${from} --> ${to}`,
-            LOG_LEVELS.important
-          ),
+          logMessage(`Correcting extension: ${from} --> ${to}`, LOG_LEVELS.important),
       });
 
   fs.renameSync(tempOutputPath, finalOutputPath);
@@ -217,8 +196,10 @@ export const downloadItemsAsync = async ({
     const threadIndex = index % threads;
     const marker = threads > 1 ? `[${threadIndex}] ${item.title}` : item.title;
     const logMessage = getLogMessageWithMarker(marker);
-    const { url: episodeAudioUrl, ext: audioFileExt } =
-      getEpisodeAudioUrlAndExt(item, episodeSourceOrder);
+    const { url: episodeAudioUrl, ext: audioFileExt } = getEpisodeAudioUrlAndExt(
+      item,
+      episodeSourceOrder,
+    );
 
     if (!episodeAudioUrl) {
       hasErrors = true;
@@ -273,9 +254,7 @@ export const downloadItemsAsync = async ({
             } catch (error) {
               hasErrors = true;
               logError(
-                `${marker} | Error downloading ${
-                  item._episodeImage.url
-                }: ${error.toString()}`
+                `${marker} | Error downloading ${item._episodeImage.url}: ${error.toString()}`,
               );
             }
           }
@@ -300,9 +279,7 @@ export const downloadItemsAsync = async ({
             } catch (error) {
               hasErrors = true;
               logError(
-                `${marker} | Error downloading ${
-                  item._episodeTranscript.url
-                }: ${error.toString()}`
+                `${marker} | Error downloading ${item._episodeTranscript.url}: ${error.toString()}`,
               );
             }
           }
@@ -316,9 +293,7 @@ export const downloadItemsAsync = async ({
               audioFormat,
               bitrate,
               embedMetadata: embedMetadataFlag,
-              episodeImageOutputPath: hasEpisodeImage
-                ? item._episodeImage.outputPath
-                : undefined,
+              episodeImageOutputPath: hasEpisodeImage ? item._episodeImage.outputPath : undefined,
               ext: audioFileExt,
               feed,
               item,
@@ -355,10 +330,7 @@ export const downloadItemsAsync = async ({
               width: episodeDigits,
               offset: episodeNumOffset,
             });
-            const outputEpisodeMetaPath = _path.resolve(
-              basePath,
-              episodeMetaName
-            );
+            const outputEpisodeMetaPath = _path.resolve(basePath, episodeMetaName);
 
             try {
               logMessage("Saving episode metadata...");
@@ -393,9 +365,7 @@ export const downloadItemsAsync = async ({
     }
   };
 
-  const itemPromises = targetItems.map((item, index) =>
-    limit(() => downloadItem(item, index))
-  );
+  const itemPromises = targetItems.map((item, index) => limit(() => downloadItem(item, index)));
 
   await Promise.all(itemPromises);
 

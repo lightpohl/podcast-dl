@@ -1,4 +1,4 @@
-/* eslint-disable no-console */
+/* oxlint-disable no-console */
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   ERROR_STATUSES,
@@ -140,9 +140,7 @@ describe("logError", () => {
 
 describe("logErrorAndExit", () => {
   it("logs and exits with the general error status", () => {
-    expect(() => logErrorAndExit("failed", new Error("boom"))).toThrow(
-      "process.exit"
-    );
+    expect(() => logErrorAndExit("failed", new Error("boom"))).toThrow("process.exit");
 
     expect(console.error).toHaveBeenNthCalledWith(1, "failed");
     expect(console.error).toHaveBeenNthCalledWith(2, "boom");

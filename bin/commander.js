@@ -7,29 +7,22 @@ export const setupCommander = (program) => {
   program
     .option("--url <string>", "url to podcast rss feed")
     .option("--file <path>", "local path to podcast rss feed")
-    .option(
-      "--out-dir <path>",
-      "specify output directory",
-      "./{{podcast_title}}"
-    )
-    .option(
-      "--archive [path]",
-      "download or write only items not listed in archive file"
-    )
+    .option("--out-dir <path>", "specify output directory", "./{{podcast_title}}")
+    .option("--archive [path]", "download or write only items not listed in archive file")
     .option(
       "--episode-template <string>",
       "template for generating episode related filenames",
-      "{{release_date}}-{{title}}"
+      "{{release_date}}-{{title}}",
     )
     .option(
       "--episode-custom-template-options <patterns...>",
-      "create custom options for the episode template"
+      "create custom options for the episode template",
     )
     .option(
       "--episode-digits <number>",
       "minimum number of digits to use for episode numbering (leading zeros)",
       createParseNumber({ min: 0, name: "--episode-digits" }),
-      1
+      1,
     )
     .option(
       "--episode-num-offset <number>",
@@ -39,7 +32,7 @@ export const setupCommander = (program) => {
         max: Number.MAX_SAFE_INTEGER,
         name: "--episode-num-offset",
       }),
-      0
+      0,
     )
     .option(
       "--episode-source-order <string>",
@@ -49,26 +42,16 @@ export const setupCommander = (program) => {
         const isValid = parsed.every((type) => !!AUDIO_ORDER_TYPES[type]);
 
         if (!isValid) {
-          logErrorAndExit(
-            `Invalid type found in --episode-source-order: ${value}\n`
-          );
+          logErrorAndExit(`Invalid type found in --episode-source-order: ${value}\n`);
         }
 
         return parsed;
       },
-      [AUDIO_ORDER_TYPES.enclosure, AUDIO_ORDER_TYPES.link]
+      [AUDIO_ORDER_TYPES.enclosure, AUDIO_ORDER_TYPES.link],
     )
     .option("--include-meta", "write out podcast metadata to json", false)
-    .option(
-      "--include-episode-meta",
-      "write out individual episode metadata to json",
-      false
-    )
-    .option(
-      "--include-episode-transcripts",
-      "download found episode transcripts",
-      false
-    )
+    .option("--include-episode-meta", "write out individual episode metadata to json", false)
+    .option("--include-episode-transcripts", "download found episode transcripts", false)
     .option(
       "--episode-transcript-types <string>",
       "list of allowed transcript types in preferred order",
@@ -77,9 +60,7 @@ export const setupCommander = (program) => {
         const isValid = parsed.every((type) => !!TRANSCRIPT_TYPES[type]);
 
         if (!isValid) {
-          logErrorAndExit(
-            `Invalid type found in --transcript-types: ${value}\n`
-          );
+          logErrorAndExit(`Invalid type found in --transcript-types: ${value}\n`);
         }
 
         return parsed;
@@ -92,110 +73,68 @@ export const setupCommander = (program) => {
         TRANSCRIPT_TYPES["text/vtt"],
         TRANSCRIPT_TYPES["text/html"],
         TRANSCRIPT_TYPES["text/plain"],
-      ]
+      ],
     )
     .option("--include-episode-images", "download found episode images", false)
     .option(
       "--offset <number>",
       "offset episode to start downloading from (most recent = 0)",
       createParseNumber({ min: 0, name: "--offset" }),
-      0
+      0,
     )
     .option(
       "--limit <number>",
       "max amount of episodes to download",
-      createParseNumber({ min: 1, name: "--limit", required: false })
+      createParseNumber({ min: 1, name: "--limit", required: false }),
     )
-    .option(
-      "--episode-regex <string>",
-      "match episode title against regex before downloading"
-    )
-    .option(
-      "--episode-regex-exclude <string>",
-      "episode titles matching regex will be excluded"
-    )
+    .option("--episode-regex <string>", "match episode title against regex before downloading")
+    .option("--episode-regex-exclude <string>", "episode titles matching regex will be excluded")
     .option(
       "--season <number>",
       "download only episodes from this season",
-      createParseNumber({ min: 0, name: "--season" })
+      createParseNumber({ min: 0, name: "--season" }),
     )
-    .option(
-      "--after <string>",
-      "download episodes only after this date (inclusive)"
-    )
-    .option(
-      "--before <string>",
-      "download episodes only before this date (inclusive)"
-    )
-    .option(
-      "--embed-metadata",
-      "add metadata to episode files using ffmpeg",
-      hasFfmpeg,
-      false
-    )
-    .option(
-      "--add-mp3-metadata",
-      "deprecated: use --embed-metadata instead",
-      hasFfmpeg,
-      false
-    )
+    .option("--after <string>", "download episodes only after this date (inclusive)")
+    .option("--before <string>", "download episodes only before this date (inclusive)")
+    .option("--embed-metadata", "add metadata to episode files using ffmpeg", hasFfmpeg, false)
+    .option("--add-mp3-metadata", "deprecated: use --embed-metadata instead", hasFfmpeg, false)
     .option(
       "--audio-format <string>",
       "convert audio to format (mp3, m4a, aac, opus, ogg, flac, wav)",
       (value) => {
         if (!AUDIO_FORMATS[value]) {
           logErrorAndExit(
-            `Invalid audio format: ${value}\nSupported formats: ${Object.keys(
-              AUDIO_FORMATS
-            ).join(", ")}`
+            `Invalid audio format: ${value}\nSupported formats: ${Object.keys(AUDIO_FORMATS).join(
+              ", ",
+            )}`,
           );
         }
 
         return hasFfmpeg(value);
-      }
+      },
     )
-    .option(
-      "--adjust-bitrate <string>",
-      "adjust bitrate of episode files using ffmpeg",
-      hasFfmpeg
-    )
-    .option(
-      "--mono",
-      "force episode files into mono using ffmpeg",
-      hasFfmpeg,
-      false
-    )
+    .option("--adjust-bitrate <string>", "adjust bitrate of episode files using ffmpeg", hasFfmpeg)
+    .option("--mono", "force episode files into mono using ffmpeg", hasFfmpeg, false)
     .option("--override", "override local files on collision", false)
     .option(
       "--always-postprocess",
       "always run additional tasks on the file regardless of whether the file already exists",
-      false
+      false,
     )
     .option("--reverse", "download episodes in reverse order", false)
-    .option(
-      "--info",
-      "print retrieved podcast info instead of downloading",
-      false
-    )
-    .option(
-      "--list [table|json]",
-      "print episode info instead of downloading",
-      (value) => {
-        if (!ITEM_LIST_FORMATS.includes(value)) {
-          logErrorAndExit(
-            `${value} is an invalid format for --list\nUse one of the following: ${ITEM_LIST_FORMATS.join(
-              ", "
-            )}`
-          );
-        }
-
-        return value;
+    .option("--info", "print retrieved podcast info instead of downloading", false)
+    .option("--list [table|json]", "print episode info instead of downloading", (value) => {
+      if (!ITEM_LIST_FORMATS.includes(value)) {
+        logErrorAndExit(
+          `${value} is an invalid format for --list\nUse one of the following: ${ITEM_LIST_FORMATS.join(
+            ", ",
+          )}`,
+        );
       }
-    )
-    .option(
-      "--exec <string>",
-      "execute a command after each episode is downloaded"
-    )
+
+      return value;
+    })
+    .option("--exec <string>", "execute a command after each episode is downloaded")
     .option(
       "--threads <number>",
       "the number of downloads that can happen concurrently",
@@ -204,7 +143,7 @@ export const setupCommander = (program) => {
         max: Number.MAX_SAFE_INTEGER,
         name: "threads",
       }),
-      1
+      1,
     )
     .option(
       "--attempts <number>",
@@ -214,19 +153,12 @@ export const setupCommander = (program) => {
         max: Number.MAX_SAFE_INTEGER,
         name: "attempts",
       }),
-      3
+      3,
     )
-    .option(
-      "--parser-config <string>",
-      "path to JSON config to override RSS parser"
-    )
+    .option("--parser-config <string>", "path to JSON config to override RSS parser")
     .option("--proxy", "enable proxy support via global-agent", false)
     .option("--user-agent <string>", "specify custom user agent string")
-    .option(
-      "--trust-ext",
-      "trust file extension, skip MIME-based correction",
-      false
-    );
+    .option("--trust-ext", "trust file extension, skip MIME-based correction", false);
 
   program.parse();
 

@@ -12,9 +12,7 @@ const FILTER_FUNCTIONS = {
   camelcase: (val) =>
     val
       .split(/\s+/)
-      .map((w) =>
-        w ? w.charAt(0).toUpperCase() + w.slice(1).toLowerCase() : ""
-      )
+      .map((w) => (w ? w.charAt(0).toUpperCase() + w.slice(1).toLowerCase() : ""))
       .join(""),
   lowercase: (val) => val.toLowerCase(),
   uppercase: (val) => val.toUpperCase(),
@@ -102,13 +100,10 @@ export const getItemFilename = ({
   const replacementsMap = Object.fromEntries(templateReplacementsTuples);
   const templateSegments = template.trim().split(path.sep);
   const nameSegments = templateSegments.map((segment, index) => {
-    const name = segment.replace(
-      TEMPLATE_REGEX,
-      (match, varName, filterStr) => {
-        const replacement = replacementsMap[varName] || "";
-        return applyFilters(replacement, filterStr);
-      }
-    );
+    const name = segment.replace(TEMPLATE_REGEX, (match, varName, filterStr) => {
+      const replacement = replacementsMap[varName] || "";
+      return applyFilters(replacement, filterStr);
+    });
 
     // Only truncate non-final segments here (they don't get an extension)
     // Final segment is truncated below with the extension accounted for
@@ -118,7 +113,7 @@ export const getItemFilename = ({
 
   nameSegments[nameSegments.length - 1] = getSimpleFilename(
     nameSegments[nameSegments.length - 1],
-    ext
+    ext,
   );
 
   return nameSegments.join(path.sep);

@@ -25,25 +25,12 @@ export const writeFeedMeta = ({ outputPath, feed, key, archive, override }) => {
       }
     }
   } catch (error) {
-    throw new Error(
-      `Unable to save metadata file for feed: ${error.toString()}`
-    );
+    throw new Error(`Unable to save metadata file for feed: ${error.toString()}`);
   }
 };
 
-export const writeItemMeta = ({
-  marker,
-  outputPath,
-  item,
-  archiveKeys,
-  archive,
-  override,
-}) => {
-  if (
-    archive &&
-    archiveKeys?.length &&
-    getIsInArchive({ archiveKeys, archive })
-  ) {
+export const writeItemMeta = ({ marker, outputPath, item, archiveKeys, archive, override }) => {
+  if (archive && archiveKeys?.length && getIsInArchive({ archiveKeys, archive })) {
     logMessage(`${marker} | Episode metadata exists in archive. Skipping...`);
     return;
   }
@@ -57,11 +44,7 @@ export const writeItemMeta = ({
       logMessage(`${marker} | Episode metadata exists locally. Skipping...`);
     }
 
-    if (
-      archive &&
-      archiveKeys?.length &&
-      !getIsInArchive({ archiveKeys, archive })
-    ) {
+    if (archive && archiveKeys?.length && !getIsInArchive({ archiveKeys, archive })) {
       try {
         writeToArchive({ archiveKeys, archive });
       } catch (error) {

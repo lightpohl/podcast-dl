@@ -9,13 +9,7 @@ import { getArchiveKey } from "./archive.js";
 import { download, downloadItemsAsync } from "./async.js";
 import { setupCommander } from "./commander.js";
 import { getItemsToDownload, logItemsList } from "./items.js";
-import {
-  ERROR_STATUSES,
-  LOG_LEVELS,
-  logError,
-  logErrorAndExit,
-  logMessage,
-} from "./logger.js";
+import { ERROR_STATUSES, LOG_LEVELS, logError, logErrorAndExit, logMessage } from "./logger.js";
 import { writeFeedMeta } from "./meta.js";
 import { getFolderName, getSimpleFilename } from "./naming.js";
 import {
@@ -87,9 +81,7 @@ const main = async () => {
     bootstrapProxy();
   }
 
-  const feed = url
-    ? await getUrlFeed(url, parserConfig)
-    : await getFileFeed(file, parserConfig);
+  const feed = url ? await getUrlFeed(url, parserConfig) : await getFileFeed(file, parserConfig);
 
   const archivePrefix = (() => {
     if (feed.feedUrl || url) {
@@ -101,10 +93,7 @@ const main = async () => {
     return feed.title || file;
   })();
 
-  const basePath = _path.resolve(
-    cwd,
-    getFolderName({ feed, template: outDir })
-  );
+  const basePath = _path.resolve(cwd, getFolderName({ feed, template: outDir }));
 
   if (info) {
     logFeedInfo(feed);
@@ -142,10 +131,7 @@ const main = async () => {
   }
 
   if (archive) {
-    archive =
-      typeof archive === "boolean"
-        ? "./{{podcast_title}}/archive.json"
-        : archive;
+    archive = typeof archive === "boolean" ? "./{{podcast_title}}/archive.json" : archive;
     archive = getFolderName({ feed, template: archive });
   }
 
@@ -156,7 +142,7 @@ const main = async () => {
       const podcastImageFileExt = getUrlExt(podcastImageUrl);
       const outputImagePath = _path.resolve(
         basePath,
-        getSimpleFilename(feed.title || "image", podcastImageFileExt)
+        getSimpleFilename(feed.title || "image", podcastImageFileExt),
       );
 
       try {
@@ -184,10 +170,7 @@ const main = async () => {
 
     const outputMetaPath = _path.resolve(
       basePath,
-      getSimpleFilename(
-        feed.title ? feed.title : "meta",
-        feed.title ? ".meta.json" : ".json"
-      )
+      getSimpleFilename(feed.title ? feed.title : "meta", feed.title ? ".meta.json" : ".json"),
     );
 
     try {
@@ -243,9 +226,7 @@ const main = async () => {
     logErrorAndExit("No episodes found with provided criteria to download");
   }
 
-  logMessage(
-    `\nStarting download of ${pluralize("episode", targetItems.length, true)}\n`
-  );
+  logMessage(`\nStarting download of ${pluralize("episode", targetItems.length, true)}\n`);
 
   const { numEpisodesDownloaded, hasErrors } = await downloadItemsAsync({
     archive,
@@ -278,17 +259,11 @@ const main = async () => {
       `\n${numEpisodesDownloaded} of ${pluralize(
         "episode",
         targetItems.length,
-        true
-      )} downloaded\n`
+        true,
+      )} downloaded\n`,
     );
   } else if (numEpisodesDownloaded > 0) {
-    logMessage(
-      `\nSuccessfully downloaded ${pluralize(
-        "episode",
-        numEpisodesDownloaded,
-        true
-      )}\n`
-    );
+    logMessage(`\nSuccessfully downloaded ${pluralize("episode", numEpisodesDownloaded, true)}\n`);
   }
 
   if (numEpisodesDownloaded === 0) {

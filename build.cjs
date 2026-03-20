@@ -71,7 +71,7 @@ const main = async () => {
       }
 
       await buildBinaries();
-    }
+    },
   );
 };
 
