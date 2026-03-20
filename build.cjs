@@ -1,6 +1,6 @@
+const fs = require("fs");
 const path = require("path");
 const { exec } = require("@yao-pkg/pkg");
-const webpack = require("webpack");
 
 const { version } = require("./package.json");
 
@@ -35,7 +35,7 @@ const buildBinaries = async () => {
   const targets = parseTargets();
   for (const targetMapping of targets) {
     await exec([
-      `./dist/podcast-dl-${version}.js`,
+      `./dist/podcast-dl-${version}.cjs`,
       "--target",
       targetMapping.target,
       "--output",
@@ -45,34 +45,25 @@ const buildBinaries = async () => {
 };
 
 const main = async () => {
-  webpack(
-    {
-      mode: "production",
-      target: "node",
-      entry: {
-        main: path.resolve(__dirname, "./bin/bin.js"),
-      },
+  const { build } = await import("rolldown");
+  const outFile = path.resolve(__dirname, "dist", `podcast-dl-${version}.cjs`);
+  fs.mkdirSync(path.dirname(outFile), { recursive: true });
+
+  try {
+    await build({
+      input: path.resolve(__dirname, "./bin/bin.js"),
+      platform: "node",
       output: {
-        path: path.resolve(__dirname, "./dist"),
-        filename: `podcast-dl-${version}.js`,
+        file: outFile,
+        format: "cjs",
       },
-    },
-    async (error, stats) => {
-      if (error) {
-        console.error("Fatal Webpack error:", error);
-        process.exit(1);
-      }
+    });
+  } catch (error) {
+    console.error("Rolldown build error:", error);
+    process.exit(1);
+  }
 
-      const info = stats.toJson();
-
-      if (stats.hasErrors()) {
-        console.error("Build errors:", info.errors);
-        process.exit(1);
-      }
-
-      await buildBinaries();
-    },
-  );
+  await buildBinaries();
 };
 
 main();

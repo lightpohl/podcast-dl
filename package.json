@@ -14,7 +14,7 @@
   },
   "lint-staged": {
     "*.{js,json,md}": [
-      "oxfmt"
+      "oxfmt --no-error-on-unmatched-pattern"
     ]
   },
   "husky": {
@@ -49,8 +49,8 @@
     "oxfmt": "^0.41.0",
     "oxlint": "^1.56.0",
     "rimraf": "^3.0.2",
-    "vitest": "^3.2.4",
-    "webpack": "^5.75.0"
+    "rolldown": "^1.0.0-rc.10",
+    "vitest": "^3.2.4"
   },
   "dependencies": {
     "command-exists": "^1.2.9",
