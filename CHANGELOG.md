@@ -1,5 +1,12 @@
 # Changelog
 
+## [11.7.4](https://github.com/lightpohl/podcast-dl/compare/v11.7.3...v11.7.4) (2026-04-16)
+
+
+### Bug Fixes
+
+* avoid re-encoding cover images when possible ([#152](https://github.com/lightpohl/podcast-dl/issues/152)) ([a708b05](https://github.com/lightpohl/podcast-dl/commit/a708b0569dedce6e2d6a588e777511675bb6b45c)), closes [#151](https://github.com/lightpohl/podcast-dl/issues/151)
+
 ## [11.7.3](https://github.com/lightpohl/podcast-dl/compare/v11.7.2...v11.7.3) (2026-03-17)
 
 
