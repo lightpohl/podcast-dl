@@ -22,7 +22,12 @@ export const runFfmpeg = async ({
 
   const shouldEmbedImage = embedMetadata && episodeImageOutputPath;
   const targetFormat = audioFormat ? AUDIO_FORMATS[audioFormat] : null;
+  const sourceFormat = Object.values(AUDIO_FORMATS).find((format) => format.ext === ext);
   const outputExt = targetFormat ? targetFormat.ext : ext;
+  const usedFullStreamCopy = embedMetadata && !bitrate && !mono && !targetFormat;
+  const supportsAttachedPic = (targetFormat || sourceFormat)?.attachedPic;
+  const shouldCopyVideo = shouldEmbedImage || (embedMetadata && (bitrate || mono) && !targetFormat);
+  const shouldMarkAttachedPic = shouldEmbedImage && supportsAttachedPic;
 
   let command = `ffmpeg -loglevel quiet -i ${escapeArgForShell(outputPath)}`;
 
@@ -40,15 +45,16 @@ export const runFfmpeg = async ({
 
   if (targetFormat) {
     command += ` -c:a ${targetFormat.codec}`;
-  } else if (embedMetadata && !bitrate && !mono) {
-    command += ` -c:a copy`;
+  } else if (usedFullStreamCopy) {
+    command += ` -c copy`;
   }
 
-  if (shouldEmbedImage) {
-    const supportsAttachedPic = targetFormat
-      ? targetFormat.attachedPic
-      : Object.values(AUDIO_FORMATS).find((f) => f.ext === ext)?.attachedPic;
-    command += supportsAttachedPic ? ` -c:v copy -disposition:v:0 attached_pic` : ` -c:v copy`;
+  if (shouldCopyVideo && !usedFullStreamCopy) {
+    command += ` -c:v copy`;
+  }
+
+  if (shouldMarkAttachedPic) {
+    command += ` -disposition:v:0 attached_pic`;
   }
 
   if (embedMetadata) {
