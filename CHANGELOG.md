@@ -1,5 +1,12 @@
 # Changelog
 
+## [11.7.5](https://github.com/lightpohl/podcast-dl/compare/v11.7.4...v11.7.5) (2026-05-05)
+
+
+### Bug Fixes
+
+* filenamify should use NFC normalization ([36336f3](https://github.com/lightpohl/podcast-dl/commit/36336f3bcd15ffaeafcf5da82566ee0b1337102d)), closes [#154](https://github.com/lightpohl/podcast-dl/issues/154)
+
 ## [11.7.4](https://github.com/lightpohl/podcast-dl/compare/v11.7.3...v11.7.4) (2026-04-16)
 
 
