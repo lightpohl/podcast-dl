@@ -44,10 +44,12 @@ export const getSafeName = (name, maxLength = MAX_LENGTH_FILENAME) => {
   // after the last period while truncating from the START, which destroys
   // dates and other important prefix content in podcast titles.
   const sanitized = name.replace(/\./g, INVALID_CHAR_REPLACE);
+  // filenamify v6 normalizes to NFD internally. filenamify v7 switches back
+  // to NFC, but requires a newer Node baseline, so mirror that fix here.
   return filenamify(sanitized, {
     replacement: INVALID_CHAR_REPLACE,
     maxLength,
-  });
+  }).normalize("NFC");
 };
 
 export const getSimpleFilename = (name, ext = "") => {

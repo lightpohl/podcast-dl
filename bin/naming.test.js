@@ -32,6 +32,12 @@ describe("getSafeName", () => {
 
     expect(getSafeName("2024.01.02.Episode.mp3")).toBe("2024_01_02_Episode_mp3");
   });
+
+  it("keeps accented characters in composed Unicode form", async () => {
+    const { getSafeName } = await loadNaming();
+
+    expect(getSafeName("á é í ó ö ú ü")).toBe("á é í ó ö ú ü");
+  });
 });
 
 describe("getSimpleFilename", () => {
