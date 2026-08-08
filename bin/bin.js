@@ -100,23 +100,19 @@ const main = async () => {
   }
 
   if (list) {
-    if (feed?.items?.length) {
-      const listFormat = typeof list === "boolean" ? "table" : list;
-      logItemsList({
-        type: listFormat,
-        feed,
-        limit,
-        offset,
-        reverse,
-        after,
-        before,
-        episodeRegex,
-        episodeRegexExclude,
-        season,
-      });
-    } else {
-      logErrorAndExit("No episodes found to list");
-    }
+    const listFormat = typeof list === "boolean" ? "table" : list;
+    logItemsList({
+      type: listFormat,
+      feed,
+      limit,
+      offset,
+      reverse,
+      after,
+      before,
+      episodeRegex,
+      episodeRegexExclude,
+      season,
+    });
   }
 
   if (info || list) {
@@ -191,11 +187,13 @@ const main = async () => {
   }
 
   if (!feed.items || feed.items.length === 0) {
-    logErrorAndExit("No episodes found to download");
+    logMessage("No episodes found to download");
+    return;
   }
 
   if (offset >= feed.items.length) {
-    logErrorAndExit("--offset too large. No episodes to download.");
+    logMessage("--offset too large. No episodes to download.");
+    return;
   }
 
   const targetItems = getItemsToDownload({
@@ -223,7 +221,8 @@ const main = async () => {
   });
 
   if (!targetItems.length) {
-    logErrorAndExit("No episodes found with provided criteria to download");
+    logMessage("No episodes found with provided criteria to download");
+    return;
   }
 
   logMessage(`\nStarting download of ${pluralize("episode", targetItems.length, true)}\n`);
@@ -264,10 +263,6 @@ const main = async () => {
     );
   } else if (numEpisodesDownloaded > 0) {
     logMessage(`\nSuccessfully downloaded ${pluralize("episode", numEpisodesDownloaded, true)}\n`);
-  }
-
-  if (numEpisodesDownloaded === 0) {
-    process.exit(ERROR_STATUSES.nothingDownloaded);
   }
 
   if (hasErrors) {

@@ -1,7 +1,6 @@
 import dayjs from "dayjs";
 import path from "path";
 import { getArchive, getArchiveFilename, getArchiveKeys } from "./archive.js";
-import { logErrorAndExit } from "./logger.js";
 import { getItemFilename } from "./naming.js";
 import {
   getEpisodeAudioUrlAndExt,
@@ -198,23 +197,20 @@ export const logItemsList = ({
   episodeRegexExclude,
   season,
 }) => {
-  const items = getItemsToDownload({
-    feed,
-    limit,
-    offset,
-    reverse,
-    before,
-    after,
-    episodeRegex,
-    episodeRegexExclude,
-    season,
-  });
-
-  if (!items.length) {
-    logErrorAndExit("No episodes found with provided criteria to list");
-  }
-
   const isJson = type === "json";
+  const items = feed?.items?.length
+    ? getItemsToDownload({
+        feed,
+        limit,
+        offset,
+        reverse,
+        before,
+        after,
+        episodeRegex,
+        episodeRegexExclude,
+        season,
+      })
+    : [];
 
   const output = items.map((item) => {
     const data = {

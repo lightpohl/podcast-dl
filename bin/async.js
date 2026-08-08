@@ -129,10 +129,7 @@ export const download = async (options) => {
 
   if (fileSize === 0) {
     removeFile();
-
-    logMessage("Unable to write to file. Suggestion: verify permissions", LOG_LEVELS.important);
-
-    return null;
+    throw new Error("Downloaded file is empty");
   }
 
   const finalOutputPath = trustExt

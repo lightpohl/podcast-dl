@@ -2,7 +2,6 @@
 
 export const ERROR_STATUSES = {
   general: 1,
-  nothingDownloaded: 2,
   completedWithErrors: 3,
 };
 
