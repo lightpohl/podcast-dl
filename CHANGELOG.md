@@ -1,5 +1,16 @@
 # Changelog
 
+## [12.0.0](https://github.com/lightpohl/podcast-dl/compare/v11.7.5...v12.0.0) (2026-08-08)
+
+
+### ⚠ BREAKING CHANGES
+
+* return success when no episodes match the download criteria
+
+### Bug Fixes
+
+* return success when no episodes match the download criteria ([cf72fb7](https://github.com/lightpohl/podcast-dl/commit/cf72fb7417e0788229d7fe8450b846da38e0e86d)), closes [#156](https://github.com/lightpohl/podcast-dl/issues/156)
+
 ## [11.7.5](https://github.com/lightpohl/podcast-dl/compare/v11.7.4...v11.7.5) (2026-05-05)
 
 
