@@ -120,7 +120,7 @@ export const download = async (options) => {
   } catch (error) {
     removeFile();
 
-    if (attempt <= maxAttempts) {
+    if (attempt < maxAttempts) {
       logMessage(`Download attempt #${attempt} failed. Retrying...`);
 
       return await download({

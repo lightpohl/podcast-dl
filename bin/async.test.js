@@ -150,6 +150,30 @@ describe("download", () => {
     expect(fs.readFileSync(outputPath, "utf8")).toBe("complete audio");
     expect(fs.existsSync(`${outputPath}.tmp`)).toBe(false);
   });
+
+  it("limits the total number of download attempts", async () => {
+    const { download, got } = await loadDownload();
+    const outputPath = path.join(testDirectory, "episode.mp3");
+    got.stream.mockImplementation(
+      () =>
+        new Readable({
+          read() {
+            this.destroy(new Error("connection lost"));
+          },
+        }),
+    );
+
+    await expect(
+      download({
+        url: "https://example.com/episode.mp3",
+        outputPath,
+        maxAttempts: 2,
+      }),
+    ).rejects.toThrow("connection lost");
+
+    expect(got.stream).toHaveBeenCalledTimes(2);
+    expect(fs.existsSync(`${outputPath}.tmp`)).toBe(false);
+  });
 });
 
 describe("downloadItemsAsync", () => {
