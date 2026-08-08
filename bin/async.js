@@ -17,6 +17,7 @@ import {
 import { writeItemMeta } from "./meta.js";
 import { getItemFilename } from "./naming.js";
 import {
+  AUDIO_FORMATS,
   correctExtensionFromMime,
   getEpisodeAudioUrlAndExt,
   getTempPath,
@@ -34,6 +35,7 @@ export const download = async (options) => {
     marker,
     url,
     outputPath,
+    existingOutputPath,
     archiveKeys = [],
     archive,
     override,
@@ -46,14 +48,19 @@ export const download = async (options) => {
   } = options;
 
   const logMessage = getLogMessageWithMarker(marker);
-  if (!override && fs.existsSync(outputPath)) {
+  const localOutputPath =
+    !override && existingOutputPath && fs.existsSync(existingOutputPath)
+      ? existingOutputPath
+      : outputPath;
+
+  if (!override && fs.existsSync(localOutputPath)) {
     logMessage("Download exists locally. Skipping...");
 
     if (onAfterDownload && alwaysPostprocess) {
-      await onAfterDownload();
+      return (await onAfterDownload(localOutputPath)) || localOutputPath;
     }
 
-    return outputPath;
+    return localOutputPath;
   }
 
   if (archive && archiveKeys.length && getIsInArchive({ archiveKeys, archive })) {
@@ -145,9 +152,9 @@ export const download = async (options) => {
 
   logMessage("Download complete!");
 
-  if (onAfterDownload) {
-    await onAfterDownload(finalOutputPath);
-  }
+  const processedOutputPath = onAfterDownload
+    ? (await onAfterDownload(finalOutputPath)) || finalOutputPath
+    : finalOutputPath;
 
   if (archive && archiveKeys.length) {
     try {
@@ -157,7 +164,12 @@ export const download = async (options) => {
     }
   }
 
-  return finalOutputPath;
+  return processedOutputPath;
+};
+
+const replaceExtension = (outputPath, ext) => {
+  const currentExt = _path.extname(outputPath);
+  return currentExt ? outputPath.slice(0, -currentExt.length) + ext : outputPath + ext;
 };
 
 export const downloadItemsAsync = async ({
@@ -215,6 +227,9 @@ export const downloadItemsAsync = async ({
       offset: episodeNumOffset,
     });
     const outputPodcastPath = _path.resolve(basePath, episodeFilename);
+    const expectedOutputPath = audioFormat
+      ? replaceExtension(outputPodcastPath, AUDIO_FORMATS[audioFormat].ext)
+      : outputPodcastPath;
 
     prepareOutputPath(outputPodcastPath);
 
@@ -229,8 +244,11 @@ export const downloadItemsAsync = async ({
         archiveKeys: item._archiveKeys || [],
         maxAttempts: attempts,
         outputPath: outputPodcastPath,
+        existingOutputPath: expectedOutputPath,
         url: episodeAudioUrl,
         onAfterDownload: async (finalEpisodePath) => {
+          let processedEpisodePath = finalEpisodePath;
+
           if (item._episodeImage) {
             try {
               const finalImagePath = await download({
@@ -286,18 +304,19 @@ export const downloadItemsAsync = async ({
 
           if (embedMetadataFlag || bitrate || mono || audioFormat) {
             logMessage("Running ffmpeg...");
-            await runFfmpeg({
-              audioFormat,
-              bitrate,
-              embedMetadata: embedMetadataFlag,
-              episodeImageOutputPath: hasEpisodeImage ? item._episodeImage.outputPath : undefined,
-              ext: audioFileExt,
-              feed,
-              item,
-              itemIndex: item._originalIndex,
-              mono,
-              outputPath: finalEpisodePath,
-            });
+            processedEpisodePath =
+              (await runFfmpeg({
+                audioFormat,
+                bitrate,
+                embedMetadata: embedMetadataFlag,
+                episodeImageOutputPath: hasEpisodeImage ? item._episodeImage.outputPath : undefined,
+                ext: audioFileExt,
+                feed,
+                item,
+                itemIndex: item._originalIndex,
+                mono,
+                outputPath: processedEpisodePath,
+              })) || processedEpisodePath;
           }
 
           if (!includeEpisodeImages && hasEpisodeImage) {
@@ -306,11 +325,12 @@ export const downloadItemsAsync = async ({
 
           if (exec) {
             logMessage("Running exec...");
+            const processedEpisodeFilename = _path.relative(basePath, processedEpisodePath);
             await runExec({
               exec,
               basePath,
-              outputPodcastPath: finalEpisodePath,
-              episodeFilename,
+              outputPodcastPath: processedEpisodePath,
+              episodeFilename: processedEpisodeFilename,
               episodeAudioUrl,
             });
           }
@@ -354,6 +374,7 @@ export const downloadItemsAsync = async ({
           }
 
           numEpisodesDownloaded += 1;
+          return processedEpisodePath;
         },
       });
     } catch (error) {

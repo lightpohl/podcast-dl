@@ -17,7 +17,7 @@ export const runFfmpeg = async ({
   outputPath,
 }) => {
   if (!fs.existsSync(outputPath)) {
-    return;
+    return outputPath;
   }
 
   const shouldEmbedImage = embedMetadata && episodeImageOutputPath;
@@ -135,4 +135,5 @@ export const runFfmpeg = async ({
   })();
 
   fs.renameSync(tmpPath, finalOutputPath);
+  return finalOutputPath;
 };

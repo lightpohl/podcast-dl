@@ -23,6 +23,32 @@ const loadDownload = async ({ content = "episode audio", contentType = "audio/mp
   return { download, got };
 };
 
+const loadDownloadItems = async () => {
+  vi.resetModules();
+
+  const got = vi.fn(async () => ({
+    headers: {
+      "content-length": "13",
+      "content-type": "audio/wav",
+    },
+  }));
+  got.stream = vi.fn(() => Readable.from(["episode audio"]));
+
+  const runFfmpeg = vi.fn(async ({ outputPath }) => {
+    const finalOutputPath = outputPath.replace(/\.wav$/, ".mp3");
+    fs.renameSync(outputPath, finalOutputPath);
+    return finalOutputPath;
+  });
+  const runExec = vi.fn();
+
+  vi.doMock("got", () => ({ default: got }));
+  vi.doMock("./ffmpeg.js", () => ({ runFfmpeg }));
+  vi.doMock("./exec.js", () => ({ runExec }));
+
+  const { downloadItemsAsync } = await import("./async.js");
+  return { downloadItemsAsync, got, runExec, runFfmpeg };
+};
+
 beforeEach(() => {
   testDirectory = fs.mkdtempSync(path.join(os.tmpdir(), "podcast-dl-async-"));
 });
@@ -96,7 +122,7 @@ describe("download", () => {
     });
 
     expect(onAfterDownload).toHaveBeenCalledOnce();
-    expect(onAfterDownload).toHaveBeenCalledWith();
+    expect(onAfterDownload).toHaveBeenCalledWith(outputPath);
     expect(got).not.toHaveBeenCalled();
     expect(got.stream).not.toHaveBeenCalled();
   });
@@ -123,5 +149,56 @@ describe("download", () => {
     expect(got.stream).toHaveBeenCalledTimes(2);
     expect(fs.readFileSync(outputPath, "utf8")).toBe("complete audio");
     expect(fs.existsSync(`${outputPath}.tmp`)).toBe(false);
+  });
+});
+
+describe("downloadItemsAsync", () => {
+  it("uses the converted path for exec and recognizes it on a later run", async () => {
+    const { downloadItemsAsync, got, runExec, runFfmpeg } = await loadDownloadItems();
+    const item = {
+      _archiveKeys: [],
+      _originalIndex: 0,
+      enclosure: {
+        type: "audio/wav",
+        url: "https://example.com/episode.wav",
+      },
+      title: "An Episode",
+    };
+    const feed = {
+      items: [item],
+      title: "Example Podcast",
+    };
+    const options = {
+      audioFormat: "mp3",
+      basePath: testDirectory,
+      episodeCustomTemplateOptions: [],
+      episodeDigits: 1,
+      episodeNumOffset: 0,
+      episodeSourceOrder: ["enclosure", "link"],
+      episodeTemplate: "{{title}}",
+      exec: "process {{episode_path}}",
+      feed,
+      targetItems: [item],
+    };
+    const sourcePath = path.join(testDirectory, "An Episode.wav");
+    const convertedPath = path.join(testDirectory, "An Episode.mp3");
+
+    await downloadItemsAsync(options);
+
+    expect(runFfmpeg).toHaveBeenCalledOnce();
+    expect(runExec).toHaveBeenCalledWith(
+      expect.objectContaining({
+        episodeFilename: "An Episode.mp3",
+        outputPodcastPath: convertedPath,
+      }),
+    );
+    expect(fs.existsSync(sourcePath)).toBe(false);
+    expect(fs.existsSync(convertedPath)).toBe(true);
+
+    await downloadItemsAsync(options);
+
+    expect(got.stream).toHaveBeenCalledOnce();
+    expect(runFfmpeg).toHaveBeenCalledOnce();
+    expect(runExec).toHaveBeenCalledOnce();
   });
 });

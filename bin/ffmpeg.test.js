@@ -54,7 +54,7 @@ describe("runFfmpeg", () => {
     const { feed, item } = createFeedAndItem();
     const { runFfmpeg, execWithPromise } = await loadRunFfmpeg();
 
-    await runFfmpeg({
+    const result = await runFfmpeg({
       audioFormat: "mp3",
       ext: ".wav",
       feed,
@@ -69,6 +69,7 @@ describe("runFfmpeg", () => {
     expect(fs.existsSync(sourcePath)).toBe(false);
     expect(fs.readFileSync(finalPath, "utf8")).toBe("converted audio");
     expect(fs.existsSync(ffmpegOutputPath)).toBe(false);
+    expect(result).toBe(finalPath);
   });
 
   it("includes metadata and attached artwork in the ffmpeg command", async () => {
