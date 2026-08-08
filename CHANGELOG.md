@@ -1,5 +1,13 @@
 # Changelog
 
+## [12.0.1](https://github.com/lightpohl/podcast-dl/compare/v12.0.0...v12.0.1) (2026-08-08)
+
+
+### Bug Fixes
+
+* honor download attempt limit ([d0a8f3d](https://github.com/lightpohl/podcast-dl/commit/d0a8f3d0d6dff08afed97773fb2e3e752c809608))
+* propagate converted episode path ([c22a561](https://github.com/lightpohl/podcast-dl/commit/c22a56166c2b120e3c08fb5c2fb03cc5a93f9d58))
+
 ## [12.0.0](https://github.com/lightpohl/podcast-dl/compare/v11.7.5...v12.0.0) (2026-08-08)
 
 
