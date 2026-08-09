@@ -1,5 +1,12 @@
 # Changelog
 
+## [12.0.2](https://github.com/lightpohl/podcast-dl/compare/v12.0.1...v12.0.2) (2026-08-09)
+
+
+### Bug Fixes
+
+* spawn ffmpeg without a shell ([ef964dc](https://github.com/lightpohl/podcast-dl/commit/ef964dcd8c4fc0f2b122992ecc5e49860b17a14a))
+
 ## [12.0.1](https://github.com/lightpohl/podcast-dl/compare/v12.0.0...v12.0.1) (2026-08-08)
 
 
