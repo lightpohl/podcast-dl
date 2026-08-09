@@ -1,5 +1,12 @@
 # Changelog
 
+## [12.0.3](https://github.com/lightpohl/podcast-dl/compare/v12.0.2...v12.0.3) (2026-08-09)
+
+
+### Bug Fixes
+
+* preserve source when ffmpeg finalization fails ([f7e7652](https://github.com/lightpohl/podcast-dl/commit/f7e7652fbc1ae2ac175fe48d3c44b8b33938e823))
+
 ## [12.0.2](https://github.com/lightpohl/podcast-dl/compare/v12.0.1...v12.0.2) (2026-08-09)
 
 
