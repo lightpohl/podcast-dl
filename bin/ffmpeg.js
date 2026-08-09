@@ -1,8 +1,8 @@
 import dayjs from "dayjs";
 import fs from "fs";
-import { execWithPromise } from "./exec.js";
 import { LOG_LEVELS, logMessage } from "./logger.js";
-import { AUDIO_FORMATS, escapeArgForShell, isWin } from "./util.js";
+import { spawnWithPromise } from "./spawn.js";
+import { AUDIO_FORMATS, escapeArgForShell } from "./util.js";
 
 export const runFfmpeg = async ({
   audioFormat,
@@ -29,32 +29,32 @@ export const runFfmpeg = async ({
   const shouldCopyVideo = shouldEmbedImage || (embedMetadata && (bitrate || mono) && !targetFormat);
   const shouldMarkAttachedPic = shouldEmbedImage && supportsAttachedPic;
 
-  let command = `ffmpeg -loglevel quiet -i ${escapeArgForShell(outputPath)}`;
+  const args = ["-nostdin", "-y", "-loglevel", "quiet", "-i", outputPath];
 
   if (shouldEmbedImage) {
-    command += ` -i ${escapeArgForShell(episodeImageOutputPath)}`;
+    args.push("-i", episodeImageOutputPath);
   }
 
   if (bitrate) {
-    command += ` -b:a ${bitrate}`;
+    args.push("-b:a", bitrate);
   }
 
   if (mono) {
-    command += " -ac 1";
+    args.push("-ac", "1");
   }
 
   if (targetFormat) {
-    command += ` -c:a ${targetFormat.codec}`;
+    args.push("-c:a", targetFormat.codec);
   } else if (usedFullStreamCopy) {
-    command += ` -c copy`;
+    args.push("-c", "copy");
   }
 
   if (shouldCopyVideo && !usedFullStreamCopy) {
-    command += ` -c:v copy`;
+    args.push("-c:v", "copy");
   }
 
   if (shouldMarkAttachedPic) {
-    command += ` -disposition:v:0 attached_pic`;
+    args.push("-disposition:v:0", "attached_pic");
   }
 
   if (embedMetadata) {
@@ -73,48 +73,39 @@ export const runFfmpeg = async ({
       artist,
       album_artist: artist,
       title,
+      subtitle,
+      comment,
       disc,
       track,
       "episode-type": episodeType,
       date,
     };
 
-    if (!isWin) {
-      // Due to limited escape options, these metadata fields often break in Windows
-      metaKeysToValues.comment = comment;
-      metaKeysToValues.subtitle = subtitle;
-    }
+    args.push("-map_metadata", "0");
 
-    const metadataString = Object.keys(metaKeysToValues)
-      .map((key) => {
-        if (!metaKeysToValues[key]) {
-          return null;
-        }
-
-        const argValue = escapeArgForShell(metaKeysToValues[key]);
-
-        return argValue ? `-metadata ${key}=${argValue}` : null;
-      })
-      .filter((segment) => !!segment)
-      .join(" ");
-
-    command += ` -map_metadata 0 ${metadataString}`;
+    Object.keys(metaKeysToValues).forEach((key) => {
+      const value = metaKeysToValues[key];
+      if (value) {
+        args.push("-metadata", `${key}=${value}`);
+      }
+    });
   }
 
   if (shouldEmbedImage) {
-    command += ` -map 0:a -map 1`;
+    args.push("-map", "0:a", "-map", "1");
   } else if (targetFormat) {
-    command += ` -map 0:a`;
+    args.push("-map", "0:a");
   } else {
-    command += ` -map 0`;
+    args.push("-map", "0");
   }
 
   const tmpPath = `${outputPath}.tmp${outputExt}`;
-  command += ` ${escapeArgForShell(tmpPath)}`;
-  logMessage("Running command: " + command, LOG_LEVELS.debug);
+  args.push(tmpPath);
+  const commandForLogging = ["ffmpeg", ...args].map(escapeArgForShell).join(" ");
+  logMessage("Running command: " + commandForLogging, LOG_LEVELS.debug);
 
   try {
-    await execWithPromise(command, { stdio: "ignore" });
+    await spawnWithPromise("ffmpeg", args, { stdio: "ignore" });
   } catch (error) {
     if (fs.existsSync(tmpPath)) {
       fs.unlinkSync(tmpPath);

@@ -9,17 +9,17 @@ let ffmpegOutputPath;
 const loadRunFfmpeg = async ({ reject = false } = {}) => {
   vi.resetModules();
 
-  const execWithPromise = vi.fn(async () => {
+  const spawnWithPromise = vi.fn(async () => {
     fs.writeFileSync(ffmpegOutputPath, "converted audio");
     if (reject) {
       throw new Error("ffmpeg failed");
     }
   });
 
-  vi.doMock("./exec.js", () => ({ execWithPromise }));
+  vi.doMock("./spawn.js", () => ({ spawnWithPromise }));
 
   const { runFfmpeg } = await import("./ffmpeg.js");
-  return { runFfmpeg, execWithPromise };
+  return { runFfmpeg, spawnWithPromise };
 };
 
 const createFeedAndItem = () => ({
@@ -52,7 +52,7 @@ describe("runFfmpeg", () => {
     ffmpegOutputPath = `${sourcePath}.tmp.mp3`;
     fs.writeFileSync(sourcePath, "source audio");
     const { feed, item } = createFeedAndItem();
-    const { runFfmpeg, execWithPromise } = await loadRunFfmpeg();
+    const { runFfmpeg, spawnWithPromise } = await loadRunFfmpeg();
 
     const result = await runFfmpeg({
       audioFormat: "mp3",
@@ -63,9 +63,24 @@ describe("runFfmpeg", () => {
       outputPath: sourcePath,
     });
 
-    expect(execWithPromise).toHaveBeenCalledOnce();
-    expect(execWithPromise.mock.calls[0][0]).toContain("-c:a libmp3lame");
-    expect(execWithPromise.mock.calls[0][0]).toContain("-map 0:a");
+    expect(spawnWithPromise).toHaveBeenCalledOnce();
+    expect(spawnWithPromise).toHaveBeenCalledWith(
+      "ffmpeg",
+      [
+        "-nostdin",
+        "-y",
+        "-loglevel",
+        "quiet",
+        "-i",
+        sourcePath,
+        "-c:a",
+        "libmp3lame",
+        "-map",
+        "0:a",
+        ffmpegOutputPath,
+      ],
+      { stdio: "ignore" },
+    );
     expect(fs.existsSync(sourcePath)).toBe(false);
     expect(fs.readFileSync(finalPath, "utf8")).toBe("converted audio");
     expect(fs.existsSync(ffmpegOutputPath)).toBe(false);
@@ -79,7 +94,9 @@ describe("runFfmpeg", () => {
     fs.writeFileSync(sourcePath, "source audio");
     fs.writeFileSync(imagePath, "image");
     const { feed, item } = createFeedAndItem();
-    const { runFfmpeg, execWithPromise } = await loadRunFfmpeg();
+    item.contentSnippet = "It's $5 & worth it";
+    item.itunes = { subtitle: "A subtitle (with punctuation)" };
+    const { runFfmpeg, spawnWithPromise } = await loadRunFfmpeg();
 
     await runFfmpeg({
       embedMetadata: true,
@@ -91,13 +108,15 @@ describe("runFfmpeg", () => {
       outputPath: sourcePath,
     });
 
-    const command = execWithPromise.mock.calls[0][0];
-    expect(command).toContain(`-i '${imagePath}'`);
-    expect(command).toContain("-c copy");
-    expect(command).toContain("-disposition:v:0 attached_pic");
-    expect(command).toContain("-metadata album='Example Podcast'");
-    expect(command).toContain("-metadata title='An Episode'");
-    expect(command).toContain("-map 0:a -map 1");
+    const args = spawnWithPromise.mock.calls[0][1];
+    expect(args).toContain(imagePath);
+    expect(args).toContain("copy");
+    expect(args).toContain("attached_pic");
+    expect(args).toContain("album=Example Podcast");
+    expect(args).toContain("title=An Episode");
+    expect(args).toContain("comment=It's $5 & worth it");
+    expect(args).toContain("subtitle=A subtitle (with punctuation)");
+    expect(args.slice(-5)).toEqual(["-map", "0:a", "-map", "1", ffmpegOutputPath]);
   });
 
   it("keeps the source and removes temporary output when ffmpeg fails", async () => {
