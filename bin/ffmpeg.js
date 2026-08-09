@@ -114,8 +114,6 @@ export const runFfmpeg = async ({
     throw error;
   }
 
-  fs.unlinkSync(outputPath);
-
   const finalOutputPath = (() => {
     if (!targetFormat) {
       return outputPath;
@@ -125,6 +123,19 @@ export const runFfmpeg = async ({
     return hasExt ? outputPath.replace(/\.[^.]+$/, outputExt) : outputPath + outputExt;
   })();
 
-  fs.renameSync(tmpPath, finalOutputPath);
+  try {
+    fs.renameSync(tmpPath, finalOutputPath);
+  } catch (error) {
+    if (fs.existsSync(tmpPath)) {
+      fs.unlinkSync(tmpPath);
+    }
+
+    throw error;
+  }
+
+  if (finalOutputPath !== outputPath) {
+    fs.unlinkSync(outputPath);
+  }
+
   return finalOutputPath;
 };

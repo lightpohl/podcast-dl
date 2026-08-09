@@ -140,4 +140,29 @@ describe("runFfmpeg", () => {
     expect(fs.readFileSync(sourcePath, "utf8")).toBe("source audio");
     expect(fs.existsSync(ffmpegOutputPath)).toBe(false);
   });
+
+  it("keeps the source and removes temporary output when finalizing fails", async () => {
+    const sourcePath = path.join(testDirectory, "episode.wav");
+    ffmpegOutputPath = `${sourcePath}.tmp.mp3`;
+    fs.writeFileSync(sourcePath, "source audio");
+    const { feed, item } = createFeedAndItem();
+    const { runFfmpeg } = await loadRunFfmpeg();
+    vi.spyOn(fs, "renameSync").mockImplementationOnce(() => {
+      throw new Error("rename failed");
+    });
+
+    await expect(
+      runFfmpeg({
+        audioFormat: "mp3",
+        ext: ".wav",
+        feed,
+        item,
+        itemIndex: 0,
+        outputPath: sourcePath,
+      }),
+    ).rejects.toThrow("rename failed");
+
+    expect(fs.readFileSync(sourcePath, "utf8")).toBe("source audio");
+    expect(fs.existsSync(ffmpegOutputPath)).toBe(false);
+  });
 });
