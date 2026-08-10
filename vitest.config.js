@@ -1,1 +1,1 @@
-export default { test: { environment: "node" } };
+export default { test: { environment: "node", env: { TZ: "UTC" } } };

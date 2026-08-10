@@ -90,6 +90,10 @@ Options that support templates allow users to specify a template for the generat
 - `release_year`: The release year (`YYYY`) of the episode.
 - `release_month`: The release month (`MM`) of the episode.
 - `release_day`: The release day (`DD`) of the episode.
+- `release_time`: The release time of the episode in `HHmmss` format.
+- `release_hour`: The release hour (`HH`) of the episode.
+- `release_minute`: The release minute (`mm`) of the episode.
+- `release_second`: The release second (`ss`) of the episode.
 - `episode_num`: The position number of where the episode appears in the feed.
 - `url`: URL of episode audio file.
 - `duration`: Provided `mm:ss` duration (if found).

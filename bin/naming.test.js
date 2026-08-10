@@ -68,12 +68,12 @@ describe("getItemFilename", () => {
         items: new Array(15).fill(null),
       },
       template:
-        "{{podcast_title|trim|dash}}/{{release_date}}-{{episode_num}}-{{title|trim|strip_special|underscore}}-{{custom_0|uppercase}}",
+        "{{podcast_title|trim|dash}}/{{release_date}}-{{release_time}}-{{episode_num}}-{{title|trim|strip_special|underscore}}-{{custom_0|uppercase}}",
       width: 3,
       customTemplateOptions: ["S\\d+E\\d+"],
     });
 
-    expect(result).toBe(path.join("My-Podcast", "20240102-013-Great_Episode_S01E02-S01E02.mp3"));
+    expect(result).toBe(path.join("My-Podcast", "20240102-120000-013-Great_Episode_S01E02-S01E02.mp3"));
   });
 
   it("truncates directory and file segments independently", async () => {
