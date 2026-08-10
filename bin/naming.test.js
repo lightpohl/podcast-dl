@@ -73,7 +73,9 @@ describe("getItemFilename", () => {
       customTemplateOptions: ["S\\d+E\\d+"],
     });
 
-    expect(result).toBe(path.join("My-Podcast", "20240102-120000-013-Great_Episode_S01E02-S01E02.mp3"));
+    expect(result).toBe(
+      path.join("My-Podcast", "20240102-120000-013-Great_Episode_S01E02-S01E02.mp3"),
+    );
   });
 
   it("truncates directory and file segments independently", async () => {
