@@ -74,6 +74,10 @@ export const getItemFilename = ({
   const releaseMonth = pubDateParsed?.format("MM") ?? null;
   const releaseDay = pubDateParsed?.format("DD") ?? null;
   const releaseDate = pubDateParsed?.format("YYYYMMDD") ?? null;
+  const releaseTime = pubDateParsed?.format("HHmmss") ?? null;
+  const releaseHour = pubDateParsed?.format("HH") ?? null;
+  const releaseMinute = pubDateParsed?.format("mm") ?? null;
+  const releaseSecond = pubDateParsed?.format("ss") ?? null;
 
   const customReplacementTuples = customTemplateOptions.map((option, i) => {
     if (!customRegexCache.has(option)) {
@@ -90,6 +94,10 @@ export const getItemFilename = ({
     ["release_year", releaseYear || ""],
     ["release_month", releaseMonth || ""],
     ["release_day", releaseDay || ""],
+    ["release_time", releaseTime || ""],
+    ["release_hour", releaseHour || ""],
+    ["release_minute", releaseMinute || ""],
+    ["release_second", releaseSecond || ""],
     ["episode_num", `${episodeNum}`.padStart(width, "0")],
     ["url", url],
     ["podcast_title", feed.title || ""],
