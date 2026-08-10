@@ -1,5 +1,12 @@
 # Changelog
 
+## [12.1.0](https://github.com/lightpohl/podcast-dl/compare/v12.0.3...v12.1.0) (2026-08-10)
+
+
+### Features
+
+* add release_{time,hour,minute,second} template variables ([#161](https://github.com/lightpohl/podcast-dl/issues/161)) ([3f85403](https://github.com/lightpohl/podcast-dl/commit/3f854036565da51d0cd8a6b7ebdf0d887d90bacc))
+
 ## [12.0.3](https://github.com/lightpohl/podcast-dl/compare/v12.0.2...v12.0.3) (2026-08-09)
 
 
