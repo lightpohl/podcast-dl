@@ -13,8 +13,6 @@ export const AUDIO_FORMATS = {
   wav: { codec: "pcm_s16le", ext: ".wav" },
 };
 
-export const VIDEO_EXTS = new Set([".mp4", ".mov", ".m4v"]);
-
 export const isWin = process.platform === "win32";
 export const cwd = process.cwd();
 
@@ -169,10 +167,15 @@ export const AUDIO_TYPES_TO_EXTS = {
   "audio/wav": ".wav",
   "audio/x-m4a": ".m4a",
   "audio/x-wav": ".wav",
+};
+
+export const VIDEO_TYPES_TO_EXTS = {
   "video/mp4": ".mp4",
   "video/quicktime": ".mov",
   "video/x-m4v": ".m4v",
 };
+
+export const VIDEO_EXTS = new Set(Object.values(VIDEO_TYPES_TO_EXTS));
 
 export const IMAGE_TYPES_TO_EXTS = {
   "image/jpeg": ".jpg",
@@ -198,6 +201,7 @@ export const TRANSCRIPT_TYPES_TO_EXTS = {
 
 export const MIME_TO_EXT = {
   ...AUDIO_TYPES_TO_EXTS,
+  ...VIDEO_TYPES_TO_EXTS,
   ...IMAGE_TYPES_TO_EXTS,
   ...TRANSCRIPT_TYPES_TO_EXTS,
 };

@@ -14,6 +14,8 @@ import {
   getImageUrl,
   getTranscriptUrl,
   TRANSCRIPT_TYPES,
+  VIDEO_EXTS,
+  VIDEO_TYPES_TO_EXTS,
 } from "./util.js";
 
 describe("escapeArgForShell", () => {
@@ -221,6 +223,10 @@ describe("correctExtensionFromMime", () => {
 });
 
 describe("getEpisodeAudioUrlAndExt", () => {
+  it("keeps video MIME extensions aligned with recognized video extensions", () => {
+    expect(VIDEO_EXTS).toEqual(new Set(Object.values(VIDEO_TYPES_TO_EXTS)));
+  });
+
   it("prefers enclosure URL when present and audio", () => {
     const result = getEpisodeAudioUrlAndExt({
       enclosure: { url: "https://example.com/ep.mp3" },
