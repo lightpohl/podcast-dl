@@ -119,6 +119,86 @@ describe("runFfmpeg", () => {
     expect(args.slice(-5)).toEqual(["-map", "0:a", "-map", "1", ffmpegOutputPath]);
   });
 
+  it("preserves the video stream when embedding metadata and artwork into a video file", async () => {
+    const sourcePath = path.join(testDirectory, "episode.mp4");
+    const imagePath = path.join(testDirectory, "cover.jpg");
+    ffmpegOutputPath = `${sourcePath}.tmp.mp4`;
+    fs.writeFileSync(sourcePath, "source video");
+    fs.writeFileSync(imagePath, "image");
+    const { feed, item } = createFeedAndItem();
+    const { runFfmpeg, spawnWithPromise } = await loadRunFfmpeg();
+
+    await runFfmpeg({
+      embedMetadata: true,
+      episodeImageOutputPath: imagePath,
+      ext: ".mp4",
+      feed,
+      item,
+      itemIndex: 0,
+      outputPath: sourcePath,
+    });
+
+    const args = spawnWithPromise.mock.calls[0][1];
+    expect(args).toContain(imagePath);
+    expect(args).toContain("copy");
+    expect(args).toContain("-disposition:v:1");
+    expect(args).toContain("attached_pic");
+    expect(args).not.toContain("0:a");
+    expect(args.slice(-5)).toEqual(["-map", "0", "-map", "1", ffmpegOutputPath]);
+  });
+
+  it("still embeds artwork as the first video stream for audio files", async () => {
+    const sourcePath = path.join(testDirectory, "episode.mp3");
+    const imagePath = path.join(testDirectory, "cover.jpg");
+    ffmpegOutputPath = `${sourcePath}.tmp.mp3`;
+    fs.writeFileSync(sourcePath, "source audio");
+    fs.writeFileSync(imagePath, "image");
+    const { feed, item } = createFeedAndItem();
+    const { runFfmpeg, spawnWithPromise } = await loadRunFfmpeg();
+
+    await runFfmpeg({
+      embedMetadata: true,
+      episodeImageOutputPath: imagePath,
+      ext: ".mp3",
+      feed,
+      item,
+      itemIndex: 0,
+      outputPath: sourcePath,
+    });
+
+    const args = spawnWithPromise.mock.calls[0][1];
+    expect(args).toContain("-disposition:v:0");
+    expect(args).toContain("attached_pic");
+    expect(args.slice(-5)).toEqual(["-map", "0:a", "-map", "1", ffmpegOutputPath]);
+  });
+
+  it("extracts only the audio when converting a video file to an audio format", async () => {
+    const sourcePath = path.join(testDirectory, "episode.mp4");
+    const imagePath = path.join(testDirectory, "cover.jpg");
+    ffmpegOutputPath = `${sourcePath}.tmp.mp3`;
+    fs.writeFileSync(sourcePath, "source video");
+    fs.writeFileSync(imagePath, "image");
+    const { feed, item } = createFeedAndItem();
+    const { runFfmpeg, spawnWithPromise } = await loadRunFfmpeg();
+
+    await runFfmpeg({
+      audioFormat: "mp3",
+      embedMetadata: true,
+      episodeImageOutputPath: imagePath,
+      ext: ".mp4",
+      feed,
+      item,
+      itemIndex: 0,
+      outputPath: sourcePath,
+    });
+
+    const args = spawnWithPromise.mock.calls[0][1];
+    expect(args).toContain("libmp3lame");
+    expect(args).toContain("-disposition:v:0");
+    expect(args).toContain("attached_pic");
+    expect(args.slice(-5)).toEqual(["-map", "0:a", "-map", "1", ffmpegOutputPath]);
+  });
+
   it("keeps the source and removes temporary output when ffmpeg fails", async () => {
     const sourcePath = path.join(testDirectory, "episode.mp3");
     ffmpegOutputPath = `${sourcePath}.tmp.mp3`;

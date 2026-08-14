@@ -13,6 +13,8 @@ export const AUDIO_FORMATS = {
   wav: { codec: "pcm_s16le", ext: ".wav" },
 };
 
+export const VIDEO_EXTS = new Set([".mp4", ".mov", ".m4v"]);
+
 export const isWin = process.platform === "win32";
 export const cwd = process.cwd();
 
