@@ -2,7 +2,7 @@ import dayjs from "dayjs";
 import fs from "fs";
 import { LOG_LEVELS, logMessage } from "./logger.js";
 import { spawnWithPromise } from "./spawn.js";
-import { AUDIO_FORMATS, escapeArgForShell } from "./util.js";
+import { AUDIO_FORMATS, VIDEO_EXTS, escapeArgForShell } from "./util.js";
 
 export const runFfmpeg = async ({
   audioFormat,
@@ -25,7 +25,8 @@ export const runFfmpeg = async ({
   const sourceFormat = Object.values(AUDIO_FORMATS).find((format) => format.ext === ext);
   const outputExt = targetFormat ? targetFormat.ext : ext;
   const usedFullStreamCopy = embedMetadata && !bitrate && !mono && !targetFormat;
-  const supportsAttachedPic = (targetFormat || sourceFormat)?.attachedPic;
+  const keepVideo = !targetFormat && VIDEO_EXTS.has(ext);
+  const supportsAttachedPic = keepVideo || (targetFormat || sourceFormat)?.attachedPic;
   const shouldCopyVideo = shouldEmbedImage || (embedMetadata && (bitrate || mono) && !targetFormat);
   const shouldMarkAttachedPic = shouldEmbedImage && supportsAttachedPic;
 
@@ -54,7 +55,7 @@ export const runFfmpeg = async ({
   }
 
   if (shouldMarkAttachedPic) {
-    args.push("-disposition:v:0", "attached_pic");
+    args.push(`-disposition:v:${keepVideo ? 1 : 0}`, "attached_pic");
   }
 
   if (embedMetadata) {
@@ -92,7 +93,7 @@ export const runFfmpeg = async ({
   }
 
   if (shouldEmbedImage) {
-    args.push("-map", "0:a", "-map", "1");
+    args.push("-map", keepVideo ? "0" : "0:a", "-map", "1");
   } else if (targetFormat) {
     args.push("-map", "0:a");
   } else {
