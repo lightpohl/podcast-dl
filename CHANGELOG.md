@@ -1,5 +1,12 @@
 # Changelog
 
+## [12.1.1](https://github.com/lightpohl/podcast-dl/compare/v12.1.0...v12.1.1) (2026-08-14)
+
+
+### Bug Fixes
+
+* preserve video stream when embedding metadata ([#164](https://github.com/lightpohl/podcast-dl/issues/164)) ([40ab325](https://github.com/lightpohl/podcast-dl/commit/40ab3254c5403f6f54f6904e0ef8bcee71d17c01))
+
 ## [12.1.0](https://github.com/lightpohl/podcast-dl/compare/v12.0.3...v12.1.0) (2026-08-10)
 
 
