@@ -208,6 +208,33 @@ describe("correctExtensionFromMime", () => {
     ).toBe("/out/episode.m4a");
   });
 
+  it("replaces a video extension with another video extension", () => {
+    expect(
+      correctExtensionFromMime({
+        outputPath: "/out/episode.mov",
+        contentType: "video/mp4",
+      }),
+    ).toBe("/out/episode.mp4");
+  });
+
+  it("does not replace a video extension with an audio extension", () => {
+    expect(
+      correctExtensionFromMime({
+        outputPath: "/out/episode.mp4",
+        contentType: "audio/mpeg",
+      }),
+    ).toBe("/out/episode.mp4");
+  });
+
+  it("does not replace an audio extension with a video extension", () => {
+    expect(
+      correctExtensionFromMime({
+        outputPath: "/out/episode.mp3",
+        contentType: "video/mp4",
+      }),
+    ).toBe("/out/episode.mp3");
+  });
+
   it("calls onCorrect when extension is corrected", () => {
     const onCorrect = vi.fn();
     correctExtensionFromMime({

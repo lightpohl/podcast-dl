@@ -216,6 +216,7 @@ const MEDIA_CATEGORIES = {
   audio: "audio",
   image: "image",
   transcript: "transcript",
+  video: "video",
 };
 
 const VALID_AUDIO_EXTS_SET = new Set(Object.values(AUDIO_TYPES_TO_EXTS));
@@ -225,6 +226,10 @@ const VALID_TRANSCRIPT_EXTS_SET = new Set(Object.values(TRANSCRIPT_TYPES_TO_EXTS
 const getExtCategory = (ext) => {
   if (VALID_AUDIO_EXTS_SET.has(ext)) {
     return MEDIA_CATEGORIES.audio;
+  }
+
+  if (VIDEO_EXTS.has(ext)) {
+    return MEDIA_CATEGORIES.video;
   }
 
   if (VALID_IMAGE_EXTS_SET.has(ext)) {
@@ -240,6 +245,10 @@ const getExtCategory = (ext) => {
 const getMimeCategory = (mime) => {
   if (AUDIO_TYPES_TO_EXTS[mime]) {
     return MEDIA_CATEGORIES.audio;
+  }
+
+  if (VIDEO_TYPES_TO_EXTS[mime]) {
+    return MEDIA_CATEGORIES.video;
   }
 
   if (IMAGE_TYPES_TO_EXTS[mime]) {

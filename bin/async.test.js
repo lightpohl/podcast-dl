@@ -101,6 +101,23 @@ describe("download", () => {
     expect(onAfterDownload).toHaveBeenCalledWith(correctedPath);
   });
 
+  it("keeps a video extension when the response incorrectly reports an audio MIME type", async () => {
+    const { download } = await loadDownload({
+      content: "episode video",
+      contentType: "audio/mpeg",
+    });
+    const outputPath = path.join(testDirectory, "episode.mp4");
+
+    const result = await download({
+      url: "https://example.com/episode.mp4",
+      outputPath,
+    });
+
+    expect(result).toBe(outputPath);
+    expect(fs.readFileSync(outputPath, "utf8")).toBe("episode video");
+    expect(fs.existsSync(path.join(testDirectory, "episode.mp3"))).toBe(false);
+  });
+
   it("skips an existing file and only post-processes it when requested", async () => {
     const { download, got } = await loadDownload();
     const outputPath = path.join(testDirectory, "episode.mp3");
