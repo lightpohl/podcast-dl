@@ -1,6 +1,6 @@
 import { ITEM_LIST_FORMATS } from "./items.js";
 import { logErrorAndExit } from "./logger.js";
-import { AUDIO_FORMATS, AUDIO_ORDER_TYPES, TRANSCRIPT_TYPES } from "./util.js";
+import { AUDIO_FORMATS, EPISODE_SOURCE_TYPES, TRANSCRIPT_TYPES } from "./util.js";
 import { createParseNumber, hasFfmpeg } from "./validate.js";
 
 export const setupCommander = (program) => {
@@ -36,10 +36,10 @@ export const setupCommander = (program) => {
     )
     .option(
       "--episode-source-order <string>",
-      "attempted order to extract episode audio URL from rss feed",
+      "attempted order to extract episode media URL from rss feed",
       (value) => {
         const parsed = value.split(",").map((type) => type.trim());
-        const isValid = parsed.every((type) => !!AUDIO_ORDER_TYPES[type]);
+        const isValid = parsed.every((type) => !!EPISODE_SOURCE_TYPES[type]);
 
         if (!isValid) {
           logErrorAndExit(`Invalid type found in --episode-source-order: ${value}\n`);
@@ -47,7 +47,7 @@ export const setupCommander = (program) => {
 
         return parsed;
       },
-      [AUDIO_ORDER_TYPES.enclosure, AUDIO_ORDER_TYPES.link],
+      [EPISODE_SOURCE_TYPES.enclosure, EPISODE_SOURCE_TYPES.link],
     )
     .option("--include-meta", "write out podcast metadata to json", false)
     .option("--include-episode-meta", "write out individual episode metadata to json", false)

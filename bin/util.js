@@ -289,7 +289,7 @@ export const correctExtensionFromMime = ({ outputPath, contentType, onCorrect })
   return basePath + mimeExt;
 };
 
-export const getIsAudioUrl = (url) => {
+export const isEpisodeMediaUrl = (url) => {
   let ext;
   try {
     ext = getUrlExt(url);
@@ -304,22 +304,22 @@ export const getIsAudioUrl = (url) => {
   return VALID_AUDIO_EXTS_SET.has(ext) || VIDEO_EXTS.has(ext);
 };
 
-export const AUDIO_ORDER_TYPES = {
+export const EPISODE_SOURCE_TYPES = {
   enclosure: "enclosure",
   link: "link",
 };
 
-export const getEpisodeAudioUrlAndExt = (
+export const resolveEpisodeMedia = (
   { enclosure, link },
-  order = [AUDIO_ORDER_TYPES.enclosure, AUDIO_ORDER_TYPES.link],
+  order = [EPISODE_SOURCE_TYPES.enclosure, EPISODE_SOURCE_TYPES.link],
 ) => {
   for (const source of order) {
-    if (source === AUDIO_ORDER_TYPES.link && link && getIsAudioUrl(link)) {
+    if (source === EPISODE_SOURCE_TYPES.link && link && isEpisodeMediaUrl(link)) {
       return { url: normalizeUrl(link), ext: getUrlExt(link) };
     }
 
-    if (source === AUDIO_ORDER_TYPES.enclosure && enclosure) {
-      if (getIsAudioUrl(enclosure.url)) {
+    if (source === EPISODE_SOURCE_TYPES.enclosure && enclosure) {
+      if (isEpisodeMediaUrl(enclosure.url)) {
         return {
           url: normalizeUrl(enclosure.url),
           ext: getUrlExt(enclosure.url),

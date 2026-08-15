@@ -9,7 +9,7 @@ export const runExec = async ({
   basePath,
   outputPodcastPath,
   episodeFilename,
-  episodeAudioUrl,
+  episodeMediaUrl,
 }) => {
   const episodeFilenameBase = episodeFilename.substring(0, episodeFilename.lastIndexOf("."));
 
@@ -18,7 +18,7 @@ export const runExec = async ({
     .replace(/{{episode_path_base}}/g, escapeArgForShell(basePath))
     .replace(/{{episode_filename}}/g, escapeArgForShell(episodeFilename))
     .replace(/{{episode_filename_base}}/g, escapeArgForShell(episodeFilenameBase))
-    .replace(/{{url}}/g, escapeArgForShell(episodeAudioUrl));
+    .replace(/{{url}}/g, escapeArgForShell(episodeMediaUrl));
 
   await execWithPromise(execCmd, { stdio: "ignore" });
 };

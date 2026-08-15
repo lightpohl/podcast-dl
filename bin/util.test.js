@@ -8,9 +8,9 @@ import {
   getUrlExt,
   getExtFromMime,
   correctExtensionFromMime,
-  getIsAudioUrl,
-  AUDIO_ORDER_TYPES,
-  getEpisodeAudioUrlAndExt,
+  isEpisodeMediaUrl,
+  EPISODE_SOURCE_TYPES,
+  resolveEpisodeMedia,
   getImageUrl,
   getTranscriptUrl,
   TRANSCRIPT_TYPES,
@@ -167,25 +167,25 @@ describe("getExtFromMime", () => {
   });
 });
 
-describe("getIsAudioUrl", () => {
+describe("isEpisodeMediaUrl", () => {
   it("returns true for URL with audio extension", () => {
-    expect(getIsAudioUrl("https://example.com/ep.mp3")).toBe(true);
-    expect(getIsAudioUrl("https://example.com/ep.m4a")).toBe(true);
+    expect(isEpisodeMediaUrl("https://example.com/ep.mp3")).toBe(true);
+    expect(isEpisodeMediaUrl("https://example.com/ep.m4a")).toBe(true);
   });
 
   it("returns true for URL with video extension", () => {
-    expect(getIsAudioUrl("https://example.com/ep.mp4")).toBe(true);
-    expect(getIsAudioUrl("https://example.com/ep.mov")).toBe(true);
-    expect(getIsAudioUrl("https://example.com/ep.m4v")).toBe(true);
+    expect(isEpisodeMediaUrl("https://example.com/ep.mp4")).toBe(true);
+    expect(isEpisodeMediaUrl("https://example.com/ep.mov")).toBe(true);
+    expect(isEpisodeMediaUrl("https://example.com/ep.m4v")).toBe(true);
   });
 
-  it("returns false for URL without audio extension", () => {
-    expect(getIsAudioUrl("https://example.com/page.html")).toBe(false);
-    expect(getIsAudioUrl("https://example.com/")).toBe(false);
+  it("returns false for URL without a media extension", () => {
+    expect(isEpisodeMediaUrl("https://example.com/page.html")).toBe(false);
+    expect(isEpisodeMediaUrl("https://example.com/")).toBe(false);
   });
 
   it("returns false for invalid URL", () => {
-    expect(getIsAudioUrl("not-a-url")).toBe(false);
+    expect(isEpisodeMediaUrl("not-a-url")).toBe(false);
   });
 });
 
@@ -255,69 +255,69 @@ describe("correctExtensionFromMime", () => {
   });
 });
 
-describe("getEpisodeAudioUrlAndExt", () => {
+describe("resolveEpisodeMedia", () => {
   it("keeps video MIME extensions aligned with recognized video extensions", () => {
     expect(VIDEO_EXTS).toEqual(new Set(Object.values(VIDEO_TYPES_TO_EXTS)));
   });
 
-  it("prefers enclosure URL when present and audio", () => {
-    const result = getEpisodeAudioUrlAndExt({
+  it("prefers enclosure URL when it points to episode media", () => {
+    const result = resolveEpisodeMedia({
       enclosure: { url: "https://example.com/ep.mp3" },
       link: "https://example.com/other.mp3",
     });
     expect(result).toEqual({ url: "https://example.com/ep.mp3", ext: ".mp3" });
   });
 
-  it("uses enclosure type when URL has no audio ext", () => {
-    const result = getEpisodeAudioUrlAndExt({
+  it("uses enclosure type when URL has no media extension", () => {
+    const result = resolveEpisodeMedia({
       enclosure: { url: "https://example.com/ep", type: "audio/mpeg" },
     });
     expect(result).toEqual({ url: "https://example.com/ep", ext: ".mp3" });
   });
 
   it("resolves a video enclosure URL (mp4)", () => {
-    const result = getEpisodeAudioUrlAndExt({
+    const result = resolveEpisodeMedia({
       enclosure: { url: "https://example.com/ep.mp4", type: "video/mp4" },
     });
     expect(result).toEqual({ url: "https://example.com/ep.mp4", ext: ".mp4" });
   });
 
   it("resolves a video enclosure URL (mov)", () => {
-    const result = getEpisodeAudioUrlAndExt({
+    const result = resolveEpisodeMedia({
       enclosure: { url: "https://example.com/ep.mov", type: "video/quicktime" },
     });
     expect(result).toEqual({ url: "https://example.com/ep.mov", ext: ".mov" });
   });
 
   it("uses enclosure type when URL has no video ext", () => {
-    const result = getEpisodeAudioUrlAndExt({
+    const result = resolveEpisodeMedia({
       enclosure: { url: "https://example.com/ep", type: "video/mp4" },
     });
     expect(result).toEqual({ url: "https://example.com/ep", ext: ".mp4" });
   });
 
-  it("falls back to link when enclosure not audio", () => {
-    const result = getEpisodeAudioUrlAndExt({
+  it("falls back to link when enclosure is not episode media", () => {
+    const result = resolveEpisodeMedia({
       enclosure: { url: "https://example.com/page.html" },
       link: "https://example.com/ep.mp3",
     });
     expect(result).toEqual({ url: "https://example.com/ep.mp3", ext: ".mp3" });
   });
 
-  it("returns null url/ext when no audio source", () => {
-    const result = getEpisodeAudioUrlAndExt({
+  it("returns null url/ext when there is no media source", () => {
+    const result = resolveEpisodeMedia({
       enclosure: { url: "https://example.com/page.html" },
     });
     expect(result).toEqual({ url: null, ext: null });
   });
 
   it("respects order option", () => {
-    const result = getEpisodeAudioUrlAndExt(
+    const result = resolveEpisodeMedia(
       {
         enclosure: { url: "https://example.com/ep.mp3" },
         link: "https://example.com/alt.mp3",
       },
-      [AUDIO_ORDER_TYPES.link, AUDIO_ORDER_TYPES.enclosure],
+      [EPISODE_SOURCE_TYPES.link, EPISODE_SOURCE_TYPES.enclosure],
     );
     expect(result).toEqual({ url: "https://example.com/alt.mp3", ext: ".mp3" });
   });

@@ -19,7 +19,7 @@ import { getItemFilename } from "./naming.js";
 import {
   AUDIO_FORMATS,
   correctExtensionFromMime,
-  getEpisodeAudioUrlAndExt,
+  resolveEpisodeMedia,
   getTempPath,
   prepareOutputPath,
 } from "./util.js";
@@ -205,12 +205,12 @@ export const downloadItemsAsync = async ({
     const threadIndex = index % threads;
     const marker = threads > 1 ? `[${threadIndex}] ${item.title}` : item.title;
     const logMessage = getLogMessageWithMarker(marker);
-    const { url: episodeAudioUrl, ext: audioFileExt } = getEpisodeAudioUrlAndExt(
+    const { url: episodeMediaUrl, ext: mediaFileExt } = resolveEpisodeMedia(
       item,
       episodeSourceOrder,
     );
 
-    if (!episodeAudioUrl) {
+    if (!episodeMediaUrl) {
       hasErrors = true;
       logError(`${marker} | Unable to find episode download URL`);
       return;
@@ -219,8 +219,8 @@ export const downloadItemsAsync = async ({
     const episodeFilename = getItemFilename({
       item,
       feed,
-      url: episodeAudioUrl,
-      ext: audioFileExt,
+      url: episodeMediaUrl,
+      ext: mediaFileExt,
       template: episodeTemplate,
       customTemplateOptions: episodeCustomTemplateOptions,
       width: episodeDigits,
@@ -245,7 +245,7 @@ export const downloadItemsAsync = async ({
         maxAttempts: attempts,
         outputPath: outputPodcastPath,
         existingOutputPath: expectedOutputPath,
-        url: episodeAudioUrl,
+        url: episodeMediaUrl,
         onAfterDownload: async (finalEpisodePath) => {
           let processedEpisodePath = finalEpisodePath;
 
@@ -310,7 +310,7 @@ export const downloadItemsAsync = async ({
                 bitrate,
                 embedMetadata: embedMetadataFlag,
                 episodeImageOutputPath: hasEpisodeImage ? item._episodeImage.outputPath : undefined,
-                ext: audioFileExt,
+                ext: mediaFileExt,
                 feed,
                 item,
                 itemIndex: item._originalIndex,
@@ -331,7 +331,7 @@ export const downloadItemsAsync = async ({
               basePath,
               outputPodcastPath: processedEpisodePath,
               episodeFilename: processedEpisodeFilename,
-              episodeAudioUrl,
+              episodeMediaUrl,
             });
           }
 
@@ -340,7 +340,7 @@ export const downloadItemsAsync = async ({
             const episodeMetaName = getItemFilename({
               item,
               feed,
-              url: episodeAudioUrl,
+              url: episodeMediaUrl,
               ext: episodeMetaExt,
               template: episodeTemplate,
               customTemplateOptions: episodeCustomTemplateOptions,

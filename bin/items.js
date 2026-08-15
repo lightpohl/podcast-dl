@@ -3,7 +3,7 @@ import path from "path";
 import { getArchive, getArchiveFilename, getArchiveKeys } from "./archive.js";
 import { getItemFilename } from "./naming.js";
 import {
-  getEpisodeAudioUrlAndExt,
+  resolveEpisodeMedia,
   getImageUrl,
   getLoopControls,
   getTranscriptUrl,
@@ -81,7 +81,7 @@ export const getItemsToDownload = ({
       isValid = false;
     }
 
-    const { url: episodeAudioUrl, ext: audioFileExt } = getEpisodeAudioUrlAndExt(
+    const { url: episodeMediaUrl, ext: mediaFileExt } = resolveEpisodeMedia(
       feed.items[i],
       episodeSourceOrder,
     );
@@ -91,7 +91,7 @@ export const getItemsToDownload = ({
       name: getArchiveFilename({
         pubDate,
         name: title,
-        ext: audioFileExt,
+        ext: mediaFileExt,
       }),
       guid,
     });
@@ -124,7 +124,7 @@ export const getItemsToDownload = ({
           const episodeImageName = getItemFilename({
             item,
             feed,
-            url: episodeAudioUrl,
+            url: episodeMediaUrl,
             ext: episodeImageFileExt,
             template: episodeTemplate,
             customTemplateOptions: episodeCustomTemplateOptions,
@@ -159,7 +159,7 @@ export const getItemsToDownload = ({
           const episodeTranscriptName = getItemFilename({
             item,
             feed,
-            url: episodeAudioUrl,
+            url: episodeMediaUrl,
             ext: episodeTranscriptFileExt,
             template: episodeTemplate,
             width: episodeDigits,

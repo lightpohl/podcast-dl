@@ -46,7 +46,7 @@ Type values surrounded in square brackets (`[]`) can be used as boolean options 
 | --episode-regex-exclude           | String              | false    | Episode titles matching provided regex will be excluded.                                                                                                                                                                      |
 | --episode-digits                  | Number              | false    | Minimum number of digits to use for episode numbering (e.g. 3 would generate "001" instead of "1"). Default is `1`.                                                                                                           |
 | --episode-num-offset              | Number              | false    | Offset the acquired episode number. Default is `0`.                                                                                                                                                                           |
-| --episode-source-order            | String              | false    | Attempted order to extract episode audio URL from RSS feed. Default is `"enclosure,link"`.                                                                                                                                    |
+| --episode-source-order            | String              | false    | Attempted order to extract episode media URL from RSS feed. Default is `"enclosure,link"`.                                                                                                                                    |
 | --episode-transcript-types        | String              | false    | List of allowed transcript types in preferred order. Default is "application/json,application/x-subrip,application/srr,application/srt,text/vtt,text/html,text/plain".                                                        |
 | --season                          | Number              | false    | Only download episodes from specified season. Note: this will only work if the RSS feed includes the `itunes:season` tag on episodes.                                                                                         |
 | --embed-metadata                  |                     | false    | Add metadata to episode files. Video streams are preserved; use `--audio-format` to extract audio. (**ffmpeg required**)                                                                                                      |
@@ -95,7 +95,7 @@ Options that support templates allow users to specify a template for the generat
 - `release_minute`: The release minute (`mm`) of the episode.
 - `release_second`: The release second (`ss`) of the episode.
 - `episode_num`: The position number of where the episode appears in the feed.
-- `url`: URL of episode audio file.
+- `url`: URL of episode media file.
 - `duration`: Provided `mm:ss` duration (if found).
 - `podcast_title`: Title of the podcast feed.
 - `podcast_link`: `link` value provided for the podcast feed. Typically the homepage URL.
@@ -113,7 +113,7 @@ If no match is found, the `custom_<n>` keyword will be replaced with an empty st
 - `episode_path_base`: The path to the folder of the downloaded episode.
 - `episode_filename`: The filename of the episode.
 - `episode_filename_base`: The filename of the episode without its extension.
-- `url`: URL of episode audio file.
+- `url`: URL of episode media file.
 
 ### Template Filters
 
