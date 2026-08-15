@@ -1,5 +1,13 @@
 # Changelog
 
+## [12.1.2](https://github.com/lightpohl/podcast-dl/compare/v12.1.1...v12.1.2) (2026-08-15)
+
+
+### Bug Fixes
+
+* categorize video MIME types ([41a62ff](https://github.com/lightpohl/podcast-dl/commit/41a62ffcb46cde849e739b7dbdd1a14d1a167a8a))
+* resolve video enclosure URLs after MIME map refactor ([#166](https://github.com/lightpohl/podcast-dl/issues/166)) ([590575e](https://github.com/lightpohl/podcast-dl/commit/590575ec8d7b86176a791b413584b4deee6af348))
+
 ## [12.1.1](https://github.com/lightpohl/podcast-dl/compare/v12.1.0...v12.1.1) (2026-08-14)
 
 
