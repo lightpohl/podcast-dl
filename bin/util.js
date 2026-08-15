@@ -199,9 +199,13 @@ export const TRANSCRIPT_TYPES_TO_EXTS = {
   "text/vtt": ".vtt",
 };
 
-export const MIME_TO_EXT = {
+export const MEDIA_TYPES_TO_EXTS = {
   ...AUDIO_TYPES_TO_EXTS,
   ...VIDEO_TYPES_TO_EXTS,
+};
+
+export const MIME_TO_EXT = {
+  ...MEDIA_TYPES_TO_EXTS,
   ...IMAGE_TYPES_TO_EXTS,
   ...TRANSCRIPT_TYPES_TO_EXTS,
 };
@@ -288,7 +292,7 @@ export const getIsAudioUrl = (url) => {
     return false;
   }
 
-  return VALID_AUDIO_EXTS_SET.has(ext);
+  return VALID_AUDIO_EXTS_SET.has(ext) || VIDEO_EXTS.has(ext);
 };
 
 export const AUDIO_ORDER_TYPES = {
@@ -313,10 +317,10 @@ export const getEpisodeAudioUrlAndExt = (
         };
       }
 
-      if (enclosure.url && AUDIO_TYPES_TO_EXTS[enclosure.type]) {
+      if (enclosure.url && MEDIA_TYPES_TO_EXTS[enclosure.type]) {
         return {
           url: normalizeUrl(enclosure.url),
-          ext: AUDIO_TYPES_TO_EXTS[enclosure.type],
+          ext: MEDIA_TYPES_TO_EXTS[enclosure.type],
         };
       }
     }

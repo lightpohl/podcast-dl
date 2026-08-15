@@ -173,6 +173,12 @@ describe("getIsAudioUrl", () => {
     expect(getIsAudioUrl("https://example.com/ep.m4a")).toBe(true);
   });
 
+  it("returns true for URL with video extension", () => {
+    expect(getIsAudioUrl("https://example.com/ep.mp4")).toBe(true);
+    expect(getIsAudioUrl("https://example.com/ep.mov")).toBe(true);
+    expect(getIsAudioUrl("https://example.com/ep.m4v")).toBe(true);
+  });
+
   it("returns false for URL without audio extension", () => {
     expect(getIsAudioUrl("https://example.com/page.html")).toBe(false);
     expect(getIsAudioUrl("https://example.com/")).toBe(false);
@@ -240,6 +246,27 @@ describe("getEpisodeAudioUrlAndExt", () => {
       enclosure: { url: "https://example.com/ep", type: "audio/mpeg" },
     });
     expect(result).toEqual({ url: "https://example.com/ep", ext: ".mp3" });
+  });
+
+  it("resolves a video enclosure URL (mp4)", () => {
+    const result = getEpisodeAudioUrlAndExt({
+      enclosure: { url: "https://example.com/ep.mp4", type: "video/mp4" },
+    });
+    expect(result).toEqual({ url: "https://example.com/ep.mp4", ext: ".mp4" });
+  });
+
+  it("resolves a video enclosure URL (mov)", () => {
+    const result = getEpisodeAudioUrlAndExt({
+      enclosure: { url: "https://example.com/ep.mov", type: "video/quicktime" },
+    });
+    expect(result).toEqual({ url: "https://example.com/ep.mov", ext: ".mov" });
+  });
+
+  it("uses enclosure type when URL has no video ext", () => {
+    const result = getEpisodeAudioUrlAndExt({
+      enclosure: { url: "https://example.com/ep", type: "video/mp4" },
+    });
+    expect(result).toEqual({ url: "https://example.com/ep", ext: ".mp4" });
   });
 
   it("falls back to link when enclosure not audio", () => {
