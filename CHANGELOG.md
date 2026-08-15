@@ -1,5 +1,12 @@
 # Changelog
 
+## [12.1.3](https://github.com/lightpohl/podcast-dl/compare/v12.1.2...v12.1.3) (2026-08-15)
+
+
+### Bug Fixes
+
+* improve video format handling ([534ee76](https://github.com/lightpohl/podcast-dl/commit/534ee76858e0343ceb5f83d15aa6e978781874a0))
+
 ## [12.1.2](https://github.com/lightpohl/podcast-dl/compare/v12.1.1...v12.1.2) (2026-08-15)
 
 
