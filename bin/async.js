@@ -48,12 +48,7 @@ export const download = async (options) => {
   } = options;
 
   const logMessage = getLogMessageWithMarker(marker);
-  const localOutputPath =
-    !override && existingOutputPath && fs.existsSync(existingOutputPath)
-      ? existingOutputPath
-      : outputPath;
-
-  if (!override && fs.existsSync(localOutputPath)) {
+  const finishExistingDownload = async (localOutputPath) => {
     logMessage("Download exists locally. Skipping...");
 
     if (onAfterDownload && alwaysPostprocess) {
@@ -61,6 +56,15 @@ export const download = async (options) => {
     }
 
     return localOutputPath;
+  };
+
+  const localOutputPath =
+    !override && existingOutputPath && fs.existsSync(existingOutputPath)
+      ? existingOutputPath
+      : outputPath;
+
+  if (!override && fs.existsSync(localOutputPath)) {
+    return finishExistingDownload(localOutputPath);
   }
 
   if (archive && archiveKeys.length && getIsInArchive({ archiveKeys, archive })) {
@@ -81,6 +85,17 @@ export const download = async (options) => {
     });
   } catch {
     // unable to retrieve head response
+  }
+
+  const correctedOutputPath = trustExt
+    ? outputPath
+    : correctExtensionFromMime({
+        outputPath,
+        contentType: headResponse?.headers?.["content-type"],
+      });
+
+  if (!override && correctedOutputPath !== outputPath && fs.existsSync(correctedOutputPath)) {
+    return finishExistingDownload(correctedOutputPath);
   }
 
   const tempOutputPath = getTempPath(outputPath);
@@ -310,7 +325,6 @@ export const downloadItemsAsync = async ({
                 bitrate,
                 embedMetadata: embedMetadataFlag,
                 episodeImageOutputPath: hasEpisodeImage ? item._episodeImage.outputPath : undefined,
-                ext: mediaFileExt,
                 feed,
                 item,
                 itemIndex: item._originalIndex,

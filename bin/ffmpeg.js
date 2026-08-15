@@ -1,15 +1,17 @@
 import dayjs from "dayjs";
 import fs from "fs";
+import path from "path";
 import { LOG_LEVELS, logMessage } from "./logger.js";
 import { spawnWithPromise } from "./spawn.js";
 import { AUDIO_FORMATS, VIDEO_EXTS, escapeArgForShell } from "./util.js";
+
+const VIDEO_ATTACHED_PIC_EXTS = new Set([".mov", ".mp4"]);
 
 export const runFfmpeg = async ({
   audioFormat,
   bitrate,
   embedMetadata,
   episodeImageOutputPath,
-  ext,
   feed,
   item,
   itemIndex,
@@ -20,13 +22,16 @@ export const runFfmpeg = async ({
     return outputPath;
   }
 
-  const shouldEmbedImage = embedMetadata && episodeImageOutputPath;
+  const sourceExt = path.extname(outputPath).toLowerCase();
   const targetFormat = audioFormat ? AUDIO_FORMATS[audioFormat] : null;
-  const sourceFormat = Object.values(AUDIO_FORMATS).find((format) => format.ext === ext);
-  const outputExt = targetFormat ? targetFormat.ext : ext;
+  const sourceFormat = Object.values(AUDIO_FORMATS).find((format) => format.ext === sourceExt);
+  const outputExt = targetFormat ? targetFormat.ext : sourceExt;
   const usedFullStreamCopy = embedMetadata && !bitrate && !mono && !targetFormat;
-  const keepVideo = !targetFormat && VIDEO_EXTS.has(ext);
-  const supportsAttachedPic = keepVideo || (targetFormat || sourceFormat)?.attachedPic;
+  const keepVideo = !targetFormat && VIDEO_EXTS.has(sourceExt);
+  const supportsAttachedPic = keepVideo
+    ? VIDEO_ATTACHED_PIC_EXTS.has(sourceExt)
+    : (targetFormat || sourceFormat)?.attachedPic;
+  const shouldEmbedImage = embedMetadata && episodeImageOutputPath && supportsAttachedPic;
   const shouldCopyVideo = shouldEmbedImage || (embedMetadata && (bitrate || mono) && !targetFormat);
   const shouldMarkAttachedPic = shouldEmbedImage && supportsAttachedPic;
 

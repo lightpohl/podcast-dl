@@ -101,6 +101,7 @@ describe("getUrlExt", () => {
   it("returns extension from pathname", () => {
     expect(getUrlExt("https://example.com/episode.mp3")).toBe(".mp3");
     expect(getUrlExt("https://example.com/path/file.m4a?q=1")).toBe(".m4a");
+    expect(getUrlExt("https://example.com/episode.WEBM")).toBe(".webm");
   });
 
   it("returns empty string for no url", () => {
@@ -159,6 +160,8 @@ describe("getExtFromMime", () => {
   it("returns extension for known MIME", () => {
     expect(getExtFromMime("audio/mpeg")).toBe(".mp3");
     expect(getExtFromMime("text/vtt")).toBe(".vtt");
+    expect(getExtFromMime("video/webm")).toBe(".webm");
+    expect(getExtFromMime("Video/Matroska; codecs=av1")).toBe(".mkv");
   });
 
   it("returns null for unknown MIME", () => {
@@ -177,6 +180,8 @@ describe("isEpisodeMediaUrl", () => {
     expect(isEpisodeMediaUrl("https://example.com/ep.mp4")).toBe(true);
     expect(isEpisodeMediaUrl("https://example.com/ep.mov")).toBe(true);
     expect(isEpisodeMediaUrl("https://example.com/ep.m4v")).toBe(true);
+    expect(isEpisodeMediaUrl("https://example.com/ep.webm")).toBe(true);
+    expect(isEpisodeMediaUrl("https://example.com/ep.mkv")).toBe(true);
   });
 
   it("returns false for URL without a media extension", () => {
@@ -256,6 +261,25 @@ describe("correctExtensionFromMime", () => {
 });
 
 describe("resolveEpisodeMedia", () => {
+  it("supports common video MIME types", () => {
+    expect(VIDEO_TYPES_TO_EXTS).toEqual({
+      "video/3gpp": ".3gp",
+      "video/3gpp2": ".3g2",
+      "video/matroska": ".mkv",
+      "video/mp4": ".mp4",
+      "video/mp2t": ".ts",
+      "video/mpeg": ".mpeg",
+      "video/ogg": ".ogv",
+      "video/quicktime": ".mov",
+      "video/webm": ".webm",
+      "video/x-flv": ".flv",
+      "video/x-m4v": ".m4v",
+      "video/x-matroska": ".mkv",
+      "video/x-ms-wmv": ".wmv",
+      "video/x-msvideo": ".avi",
+    });
+  });
+
   it("keeps video MIME extensions aligned with recognized video extensions", () => {
     expect(VIDEO_EXTS).toEqual(new Set(Object.values(VIDEO_TYPES_TO_EXTS)));
   });
@@ -296,6 +320,13 @@ describe("resolveEpisodeMedia", () => {
     expect(result).toEqual({ url: "https://example.com/ep", ext: ".mp4" });
   });
 
+  it("normalizes a video enclosure MIME type", () => {
+    const result = resolveEpisodeMedia({
+      enclosure: { url: "https://example.com/ep", type: "Video/WebM; codecs=vp9" },
+    });
+    expect(result).toEqual({ url: "https://example.com/ep", ext: ".webm" });
+  });
+
   it("falls back to link when enclosure is not episode media", () => {
     const result = resolveEpisodeMedia({
       enclosure: { url: "https://example.com/page.html" },
@@ -307,6 +338,13 @@ describe("resolveEpisodeMedia", () => {
   it("returns null url/ext when there is no media source", () => {
     const result = resolveEpisodeMedia({
       enclosure: { url: "https://example.com/page.html" },
+    });
+    expect(result).toEqual({ url: null, ext: null });
+  });
+
+  it("does not treat a non-media enclosure MIME as episode media", () => {
+    const result = resolveEpisodeMedia({
+      enclosure: { url: "https://example.com/cover", type: "image/jpeg" },
     });
     expect(result).toEqual({ url: null, ext: null });
   });

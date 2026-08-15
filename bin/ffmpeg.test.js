@@ -56,7 +56,6 @@ describe("runFfmpeg", () => {
 
     const result = await runFfmpeg({
       audioFormat: "mp3",
-      ext: ".wav",
       feed,
       item,
       itemIndex: 0,
@@ -101,7 +100,6 @@ describe("runFfmpeg", () => {
     await runFfmpeg({
       embedMetadata: true,
       episodeImageOutputPath: imagePath,
-      ext: ".mp3",
       feed,
       item,
       itemIndex: 0,
@@ -119,6 +117,24 @@ describe("runFfmpeg", () => {
     expect(args.slice(-5)).toEqual(["-map", "0:a", "-map", "1", ffmpegOutputPath]);
   });
 
+  it("derives the temporary container from the downloaded file path", async () => {
+    const sourcePath = path.join(testDirectory, "episode.m4a");
+    ffmpegOutputPath = `${sourcePath}.tmp.m4a`;
+    fs.writeFileSync(sourcePath, "source audio");
+    const { feed, item } = createFeedAndItem();
+    const { runFfmpeg, spawnWithPromise } = await loadRunFfmpeg();
+
+    await runFfmpeg({
+      embedMetadata: true,
+      feed,
+      item,
+      itemIndex: 0,
+      outputPath: sourcePath,
+    });
+
+    expect(spawnWithPromise.mock.calls[0][1].at(-1)).toBe(ffmpegOutputPath);
+  });
+
   it("preserves the video stream when embedding metadata and artwork into a video file", async () => {
     const sourcePath = path.join(testDirectory, "episode.mp4");
     const imagePath = path.join(testDirectory, "cover.jpg");
@@ -131,7 +147,6 @@ describe("runFfmpeg", () => {
     await runFfmpeg({
       embedMetadata: true,
       episodeImageOutputPath: imagePath,
-      ext: ".mp4",
       feed,
       item,
       itemIndex: 0,
@@ -147,6 +162,30 @@ describe("runFfmpeg", () => {
     expect(args.slice(-5)).toEqual(["-map", "0", "-map", "1", ffmpegOutputPath]);
   });
 
+  it("preserves video containers that do not support attached artwork", async () => {
+    const sourcePath = path.join(testDirectory, "episode.webm");
+    const imagePath = path.join(testDirectory, "cover.jpg");
+    ffmpegOutputPath = `${sourcePath}.tmp.webm`;
+    fs.writeFileSync(sourcePath, "source video");
+    fs.writeFileSync(imagePath, "image");
+    const { feed, item } = createFeedAndItem();
+    const { runFfmpeg, spawnWithPromise } = await loadRunFfmpeg();
+
+    await runFfmpeg({
+      embedMetadata: true,
+      episodeImageOutputPath: imagePath,
+      feed,
+      item,
+      itemIndex: 0,
+      outputPath: sourcePath,
+    });
+
+    const args = spawnWithPromise.mock.calls[0][1];
+    expect(args).not.toContain(imagePath);
+    expect(args).not.toContain("attached_pic");
+    expect(args.slice(-3)).toEqual(["-map", "0", ffmpegOutputPath]);
+  });
+
   it("still embeds artwork as the first video stream for audio files", async () => {
     const sourcePath = path.join(testDirectory, "episode.mp3");
     const imagePath = path.join(testDirectory, "cover.jpg");
@@ -159,7 +198,6 @@ describe("runFfmpeg", () => {
     await runFfmpeg({
       embedMetadata: true,
       episodeImageOutputPath: imagePath,
-      ext: ".mp3",
       feed,
       item,
       itemIndex: 0,
@@ -185,7 +223,6 @@ describe("runFfmpeg", () => {
       audioFormat: "mp3",
       embedMetadata: true,
       episodeImageOutputPath: imagePath,
-      ext: ".mp4",
       feed,
       item,
       itemIndex: 0,
@@ -209,7 +246,6 @@ describe("runFfmpeg", () => {
     await expect(
       runFfmpeg({
         bitrate: "128k",
-        ext: ".mp3",
         feed,
         item,
         itemIndex: 0,
@@ -234,7 +270,6 @@ describe("runFfmpeg", () => {
     await expect(
       runFfmpeg({
         audioFormat: "mp3",
-        ext: ".wav",
         feed,
         item,
         itemIndex: 0,

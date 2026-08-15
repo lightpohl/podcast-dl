@@ -101,6 +101,30 @@ describe("download", () => {
     expect(onAfterDownload).toHaveBeenCalledWith(correctedPath);
   });
 
+  it.each([
+    { contentType: "audio/mp4", requestedExt: ".mp3", correctedExt: ".m4a" },
+    { contentType: "video/mp4", requestedExt: ".mov", correctedExt: ".mp4" },
+  ])(
+    "recognizes an existing $correctedExt file after MIME correction",
+    async ({ contentType, requestedExt, correctedExt }) => {
+      const { download, got } = await loadDownload({ contentType });
+      const requestedPath = path.join(testDirectory, `episode${requestedExt}`);
+      const correctedPath = path.join(testDirectory, `episode${correctedExt}`);
+      const options = {
+        url: `https://example.com/episode${requestedExt}`,
+        outputPath: requestedPath,
+      };
+
+      expect(await download(options)).toBe(correctedPath);
+      expect(await download(options)).toBe(correctedPath);
+
+      expect(got).toHaveBeenCalledTimes(2);
+      expect(got.stream).toHaveBeenCalledOnce();
+      expect(fs.existsSync(requestedPath)).toBe(false);
+      expect(fs.existsSync(correctedPath)).toBe(true);
+    },
+  );
+
   it("keeps a video extension when the response incorrectly reports an audio MIME type", async () => {
     const { download } = await loadDownload({
       content: "episode video",

@@ -151,7 +151,7 @@ export const getUrlExt = (url) => {
     return "";
   }
 
-  const ext = path.extname(pathname);
+  const ext = path.extname(pathname).toLowerCase();
   return ext;
 };
 
@@ -170,9 +170,20 @@ export const AUDIO_TYPES_TO_EXTS = {
 };
 
 export const VIDEO_TYPES_TO_EXTS = {
+  "video/3gpp": ".3gp",
+  "video/3gpp2": ".3g2",
+  "video/matroska": ".mkv",
   "video/mp4": ".mp4",
+  "video/mp2t": ".ts",
+  "video/mpeg": ".mpeg",
+  "video/ogg": ".ogv",
   "video/quicktime": ".mov",
+  "video/webm": ".webm",
+  "video/x-flv": ".flv",
   "video/x-m4v": ".m4v",
+  "video/x-matroska": ".mkv",
+  "video/x-ms-wmv": ".wmv",
+  "video/x-msvideo": ".avi",
 };
 
 export const VIDEO_EXTS = new Set(Object.values(VIDEO_TYPES_TO_EXTS));
@@ -210,7 +221,9 @@ export const MIME_TO_EXT = {
   ...TRANSCRIPT_TYPES_TO_EXTS,
 };
 
-export const getExtFromMime = (mime) => MIME_TO_EXT[mime] || null;
+const normalizeMimeType = (mime) => mime?.split(";")[0].trim().toLowerCase() || null;
+
+export const getExtFromMime = (mime) => MIME_TO_EXT[normalizeMimeType(mime)] || null;
 
 const MEDIA_CATEGORIES = {
   audio: "audio",
@@ -263,7 +276,7 @@ const getMimeCategory = (mime) => {
 };
 
 export const correctExtensionFromMime = ({ outputPath, contentType, onCorrect }) => {
-  const mimeType = contentType?.split(";")[0];
+  const mimeType = normalizeMimeType(contentType);
   const mimeExt = mimeType ? getExtFromMime(mimeType) : null;
 
   if (!mimeExt) {
@@ -326,10 +339,11 @@ export const resolveEpisodeMedia = (
         };
       }
 
-      if (enclosure.url && MEDIA_TYPES_TO_EXTS[enclosure.type]) {
+      const enclosureExt = MEDIA_TYPES_TO_EXTS[normalizeMimeType(enclosure.type)];
+      if (enclosure.url && enclosureExt) {
         return {
           url: normalizeUrl(enclosure.url),
-          ext: MEDIA_TYPES_TO_EXTS[enclosure.type],
+          ext: enclosureExt,
         };
       }
     }
