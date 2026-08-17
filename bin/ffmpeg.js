@@ -1,9 +1,16 @@
 import dayjs from "dayjs";
 import fs from "fs";
 import path from "path";
+import { randomUUID } from "crypto";
 import { LOG_LEVELS, logMessage } from "./logger.js";
 import { spawnWithPromise } from "./spawn.js";
-import { AUDIO_FORMATS, VIDEO_EXTS, escapeArgForShell } from "./util.js";
+import {
+  AUDIO_FORMATS,
+  VIDEO_EXTS,
+  escapeArgForShell,
+  getTempPath,
+  publishTempFile,
+} from "./util.js";
 
 const VIDEO_ATTACHED_PIC_EXTS = new Set([".mov", ".mp4"]);
 
@@ -17,6 +24,7 @@ export const runFfmpeg = async ({
   itemIndex,
   mono,
   outputPath,
+  override,
 }) => {
   if (!fs.existsSync(outputPath)) {
     return outputPath;
@@ -105,7 +113,18 @@ export const runFfmpeg = async ({
     args.push("-map", "0");
   }
 
-  const tmpPath = `${outputPath}.tmp${outputExt}`;
+  const tmpPath = getTempPath({
+    outputPath,
+    id: randomUUID(),
+    type: "ffmpeg",
+    ext: outputExt,
+  });
+  const removeTempOutput = () => {
+    if (fs.existsSync(tmpPath)) {
+      fs.unlinkSync(tmpPath);
+    }
+  };
+
   args.push(tmpPath);
   const commandForLogging = ["ffmpeg", ...args].map(escapeArgForShell).join(" ");
   logMessage("Running command: " + commandForLogging, LOG_LEVELS.debug);
@@ -113,10 +132,7 @@ export const runFfmpeg = async ({
   try {
     await spawnWithPromise("ffmpeg", args, { stdio: "ignore" });
   } catch (error) {
-    if (fs.existsSync(tmpPath)) {
-      fs.unlinkSync(tmpPath);
-    }
-
+    removeTempOutput();
     throw error;
   }
 
@@ -130,12 +146,13 @@ export const runFfmpeg = async ({
   })();
 
   try {
-    fs.renameSync(tmpPath, finalOutputPath);
+    publishTempFile({
+      tempPath: tmpPath,
+      outputPath: finalOutputPath,
+      override: override || finalOutputPath === outputPath,
+    });
   } catch (error) {
-    if (fs.existsSync(tmpPath)) {
-      fs.unlinkSync(tmpPath);
-    }
-
+    removeTempOutput();
     throw error;
   }
 

@@ -15,7 +15,6 @@ export const AUDIO_FORMATS = {
 
 export const isWin = process.platform === "win32";
 export const cwd = process.cwd();
-
 export const defaultRssParserConfig = {
   defaultRSS: 2.0,
   headers: {
@@ -46,8 +45,18 @@ export const escapeArgForShell = (arg) => {
   return result;
 };
 
-export const getTempPath = (path) => {
-  return `${path}.tmp`;
+export const getTempPath = ({ outputPath, id, type, ext = ".tmp" }) => {
+  return path.join(path.dirname(outputPath), `.podcast-dl-${id}.${type}${ext}`);
+};
+
+export const publishTempFile = ({ tempPath, outputPath, override = false }) => {
+  if (override) {
+    fs.renameSync(tempPath, outputPath);
+    return;
+  }
+
+  fs.linkSync(tempPath, outputPath);
+  fs.unlinkSync(tempPath);
 };
 
 export const prepareOutputPath = (outputPath) => {

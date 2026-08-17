@@ -9,7 +9,8 @@ let ffmpegOutputPath;
 const loadRunFfmpeg = async ({ reject = false } = {}) => {
   vi.resetModules();
 
-  const spawnWithPromise = vi.fn(async () => {
+  const spawnWithPromise = vi.fn(async (_command, args) => {
+    ffmpegOutputPath = args.at(-1);
     fs.writeFileSync(ffmpegOutputPath, "converted audio");
     if (reject) {
       throw new Error("ffmpeg failed");
@@ -49,7 +50,6 @@ describe("runFfmpeg", () => {
   it("converts to the requested format using a temporary output", async () => {
     const sourcePath = path.join(testDirectory, "episode.wav");
     const finalPath = path.join(testDirectory, "episode.mp3");
-    ffmpegOutputPath = `${sourcePath}.tmp.mp3`;
     fs.writeFileSync(sourcePath, "source audio");
     const { feed, item } = createFeedAndItem();
     const { runFfmpeg, spawnWithPromise } = await loadRunFfmpeg();
@@ -62,6 +62,8 @@ describe("runFfmpeg", () => {
       outputPath: sourcePath,
     });
 
+    expect(path.dirname(ffmpegOutputPath)).toBe(testDirectory);
+    expect(path.basename(ffmpegOutputPath)).toMatch(/^\.podcast-dl-[\da-f-]+\.ffmpeg\.mp3$/);
     expect(spawnWithPromise).toHaveBeenCalledOnce();
     expect(spawnWithPromise).toHaveBeenCalledWith(
       "ffmpeg",
@@ -89,7 +91,6 @@ describe("runFfmpeg", () => {
   it("includes metadata and attached artwork in the ffmpeg command", async () => {
     const sourcePath = path.join(testDirectory, "episode.mp3");
     const imagePath = path.join(testDirectory, "cover.jpg");
-    ffmpegOutputPath = `${sourcePath}.tmp.mp3`;
     fs.writeFileSync(sourcePath, "source audio");
     fs.writeFileSync(imagePath, "image");
     const { feed, item } = createFeedAndItem();
@@ -119,7 +120,6 @@ describe("runFfmpeg", () => {
 
   it("derives the temporary container from the downloaded file path", async () => {
     const sourcePath = path.join(testDirectory, "episode.m4a");
-    ffmpegOutputPath = `${sourcePath}.tmp.m4a`;
     fs.writeFileSync(sourcePath, "source audio");
     const { feed, item } = createFeedAndItem();
     const { runFfmpeg, spawnWithPromise } = await loadRunFfmpeg();
@@ -138,7 +138,6 @@ describe("runFfmpeg", () => {
   it("preserves the video stream when embedding metadata and artwork into a video file", async () => {
     const sourcePath = path.join(testDirectory, "episode.mp4");
     const imagePath = path.join(testDirectory, "cover.jpg");
-    ffmpegOutputPath = `${sourcePath}.tmp.mp4`;
     fs.writeFileSync(sourcePath, "source video");
     fs.writeFileSync(imagePath, "image");
     const { feed, item } = createFeedAndItem();
@@ -165,7 +164,6 @@ describe("runFfmpeg", () => {
   it("preserves video containers that do not support attached artwork", async () => {
     const sourcePath = path.join(testDirectory, "episode.webm");
     const imagePath = path.join(testDirectory, "cover.jpg");
-    ffmpegOutputPath = `${sourcePath}.tmp.webm`;
     fs.writeFileSync(sourcePath, "source video");
     fs.writeFileSync(imagePath, "image");
     const { feed, item } = createFeedAndItem();
@@ -189,7 +187,6 @@ describe("runFfmpeg", () => {
   it("still embeds artwork as the first video stream for audio files", async () => {
     const sourcePath = path.join(testDirectory, "episode.mp3");
     const imagePath = path.join(testDirectory, "cover.jpg");
-    ffmpegOutputPath = `${sourcePath}.tmp.mp3`;
     fs.writeFileSync(sourcePath, "source audio");
     fs.writeFileSync(imagePath, "image");
     const { feed, item } = createFeedAndItem();
@@ -213,7 +210,6 @@ describe("runFfmpeg", () => {
   it("extracts only the audio when converting a video file to an audio format", async () => {
     const sourcePath = path.join(testDirectory, "episode.mp4");
     const imagePath = path.join(testDirectory, "cover.jpg");
-    ffmpegOutputPath = `${sourcePath}.tmp.mp3`;
     fs.writeFileSync(sourcePath, "source video");
     fs.writeFileSync(imagePath, "image");
     const { feed, item } = createFeedAndItem();
@@ -238,7 +234,6 @@ describe("runFfmpeg", () => {
 
   it("keeps the source and removes temporary output when ffmpeg fails", async () => {
     const sourcePath = path.join(testDirectory, "episode.mp3");
-    ffmpegOutputPath = `${sourcePath}.tmp.mp3`;
     fs.writeFileSync(sourcePath, "source audio");
     const { feed, item } = createFeedAndItem();
     const { runFfmpeg } = await loadRunFfmpeg({ reject: true });
@@ -255,16 +250,41 @@ describe("runFfmpeg", () => {
 
     expect(fs.readFileSync(sourcePath, "utf8")).toBe("source audio");
     expect(fs.existsSync(ffmpegOutputPath)).toBe(false);
+    expect(fs.readdirSync(testDirectory).some((name) => name.startsWith(".podcast-dl-"))).toBe(
+      false,
+    );
+  });
+
+  it("does not replace a converted output created by another process", async () => {
+    const sourcePath = path.join(testDirectory, "episode.wav");
+    const finalPath = path.join(testDirectory, "episode.mp3");
+    fs.writeFileSync(sourcePath, "source audio");
+    fs.writeFileSync(finalPath, "existing conversion");
+    const { feed, item } = createFeedAndItem();
+    const { runFfmpeg } = await loadRunFfmpeg();
+
+    await expect(
+      runFfmpeg({
+        audioFormat: "mp3",
+        feed,
+        item,
+        itemIndex: 0,
+        outputPath: sourcePath,
+      }),
+    ).rejects.toMatchObject({ code: "EEXIST" });
+
+    expect(fs.readFileSync(sourcePath, "utf8")).toBe("source audio");
+    expect(fs.readFileSync(finalPath, "utf8")).toBe("existing conversion");
+    expect(fs.existsSync(ffmpegOutputPath)).toBe(false);
   });
 
   it("keeps the source and removes temporary output when finalizing fails", async () => {
     const sourcePath = path.join(testDirectory, "episode.wav");
-    ffmpegOutputPath = `${sourcePath}.tmp.mp3`;
     fs.writeFileSync(sourcePath, "source audio");
     const { feed, item } = createFeedAndItem();
     const { runFfmpeg } = await loadRunFfmpeg();
-    vi.spyOn(fs, "renameSync").mockImplementationOnce(() => {
-      throw new Error("rename failed");
+    vi.spyOn(fs, "linkSync").mockImplementationOnce(() => {
+      throw new Error("publish failed");
     });
 
     await expect(
@@ -275,9 +295,12 @@ describe("runFfmpeg", () => {
         itemIndex: 0,
         outputPath: sourcePath,
       }),
-    ).rejects.toThrow("rename failed");
+    ).rejects.toThrow("publish failed");
 
     expect(fs.readFileSync(sourcePath, "utf8")).toBe("source audio");
     expect(fs.existsSync(ffmpegOutputPath)).toBe(false);
+    expect(fs.readdirSync(testDirectory).some((name) => name.startsWith(".podcast-dl-"))).toBe(
+      false,
+    );
   });
 });

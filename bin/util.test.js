@@ -1,3 +1,6 @@
+import path from "path";
+import fs from "fs";
+import os from "os";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import {
   escapeArgForShell,
@@ -16,6 +19,7 @@ import {
   TRANSCRIPT_TYPES,
   VIDEO_EXTS,
   VIDEO_TYPES_TO_EXTS,
+  publishTempFile,
 } from "./util.js";
 
 describe("escapeArgForShell", () => {
@@ -76,9 +80,60 @@ describe("escapeArgForShell", () => {
 });
 
 describe("getTempPath", () => {
-  it("appends .tmp to path", () => {
-    expect(getTempPath("/tmp/file.mp3")).toBe("/tmp/file.mp3.tmp");
-    expect(getTempPath("out")).toBe("out.tmp");
+  it("places uniquely named temporary files beside the output", () => {
+    expect(
+      getTempPath({
+        outputPath: "/tmp/file.mp3",
+        id: "transfer-id",
+        type: "download",
+      }),
+    ).toBe(path.join("/tmp", ".podcast-dl-transfer-id.download.tmp"));
+    expect(
+      getTempPath({
+        outputPath: "/tmp/file.wav",
+        id: "ffmpeg-id",
+        type: "ffmpeg",
+        ext: ".mp3",
+      }),
+    ).toBe(path.join("/tmp", ".podcast-dl-ffmpeg-id.ffmpeg.mp3"));
+  });
+});
+
+describe("publishTempFile", () => {
+  it("atomically refuses to replace an existing output", () => {
+    const testDirectory = fs.mkdtempSync(path.join(os.tmpdir(), "podcast-dl-publish-"));
+    const tempPath = path.join(testDirectory, ".podcast-dl-transfer.download.tmp");
+    const outputPath = path.join(testDirectory, "episode.mp3");
+
+    try {
+      fs.writeFileSync(tempPath, "new audio");
+      fs.writeFileSync(outputPath, "existing audio");
+
+      expect(() => publishTempFile({ tempPath, outputPath })).toThrow(
+        expect.objectContaining({ code: "EEXIST" }),
+      );
+      expect(fs.readFileSync(outputPath, "utf8")).toBe("existing audio");
+      expect(fs.readFileSync(tempPath, "utf8")).toBe("new audio");
+    } finally {
+      fs.rmSync(testDirectory, { recursive: true, force: true });
+    }
+  });
+
+  it("replaces an existing output when override is enabled", () => {
+    const testDirectory = fs.mkdtempSync(path.join(os.tmpdir(), "podcast-dl-publish-"));
+    const tempPath = path.join(testDirectory, ".podcast-dl-transfer.download.tmp");
+    const outputPath = path.join(testDirectory, "episode.mp3");
+
+    try {
+      fs.writeFileSync(tempPath, "new audio");
+      fs.writeFileSync(outputPath, "existing audio");
+
+      publishTempFile({ tempPath, outputPath, override: true });
+      expect(fs.readFileSync(outputPath, "utf8")).toBe("new audio");
+      expect(fs.existsSync(tempPath)).toBe(false);
+    } finally {
+      fs.rmSync(testDirectory, { recursive: true, force: true });
+    }
   });
 });
 

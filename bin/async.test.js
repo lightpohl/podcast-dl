@@ -6,6 +6,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 let testDirectory;
 
+const getTempFiles = () =>
+  fs.readdirSync(testDirectory).filter((name) => name.startsWith(".podcast-dl-"));
+
 const loadDownload = async ({ content = "episode audio", contentType = "audio/mpeg" } = {}) => {
   vi.resetModules();
 
@@ -40,13 +43,15 @@ const loadDownloadItems = async () => {
     return finalOutputPath;
   });
   const runExec = vi.fn();
+  const writeItemMeta = vi.fn();
 
   vi.doMock("got", () => ({ default: got }));
   vi.doMock("./ffmpeg.js", () => ({ runFfmpeg }));
   vi.doMock("./exec.js", () => ({ runExec }));
+  vi.doMock("./meta.js", () => ({ writeItemMeta }));
 
   const { downloadItemsAsync } = await import("./async.js");
-  return { downloadItemsAsync, got, runExec, runFfmpeg };
+  return { downloadItemsAsync, got, runExec, runFfmpeg, writeItemMeta };
 };
 
 beforeEach(() => {
@@ -176,6 +181,69 @@ describe("download", () => {
     expect(got.stream).not.toHaveBeenCalled();
   });
 
+  it("only retries failed post-processing when explicitly requested", async () => {
+    const { download, got } = await loadDownload();
+    const outputPath = path.join(testDirectory, "episode.mp3");
+    const onAfterDownload = vi
+      .fn()
+      .mockRejectedValueOnce(new Error("post-processing failed"))
+      .mockResolvedValueOnce(outputPath);
+    const options = {
+      url: "https://example.com/episode.mp3",
+      outputPath,
+      onAfterDownload,
+    };
+
+    await expect(download(options)).rejects.toThrow("post-processing failed");
+
+    expect(fs.existsSync(outputPath)).toBe(true);
+    await expect(download(options)).resolves.toBe(outputPath);
+    expect(onAfterDownload).toHaveBeenCalledOnce();
+
+    await expect(download({ ...options, alwaysPostprocess: true })).resolves.toBe(outputPath);
+
+    expect(got.stream).toHaveBeenCalledOnce();
+    expect(onAfterDownload).toHaveBeenCalledTimes(2);
+    expect(getTempFiles()).toEqual([]);
+  });
+
+  it("does not overwrite a path created by a concurrent download", async () => {
+    const { download, got } = await loadDownload();
+    const outputPath = path.join(testDirectory, "episode.mp3");
+    got.stream
+      .mockImplementationOnce(() => Readable.from(["first download"]))
+      .mockImplementationOnce(() => Readable.from(["second download"]));
+
+    const results = await Promise.allSettled([
+      download({ url: "https://example.com/first.mp3", outputPath }),
+      download({ url: "https://example.com/second.mp3", outputPath }),
+    ]);
+
+    expect(results.filter(({ status }) => status === "fulfilled")).toHaveLength(1);
+    expect(results.filter(({ status }) => status === "rejected")).toHaveLength(1);
+    expect(results.find(({ status }) => status === "rejected").reason.message).toContain(
+      "Output path was created during download",
+    );
+    expect(["first download", "second download"]).toContain(fs.readFileSync(outputPath, "utf8"));
+    expect(fs.readdirSync(testDirectory).filter((name) => name.endsWith(".tmp"))).toEqual([]);
+  });
+
+  it("supports maximum-length output filenames", async () => {
+    const { download } = await loadDownload();
+    const outputPath = path.join(testDirectory, `${"a".repeat(251)}.mp3`);
+
+    await expect(
+      download({
+        url: "https://example.com/episode.mp3",
+        outputPath,
+        onAfterDownload: async (finalOutputPath) => finalOutputPath,
+      }),
+    ).resolves.toBe(outputPath);
+
+    expect(fs.readFileSync(outputPath, "utf8")).toBe("episode audio");
+    expect(getTempFiles()).toEqual([]);
+  });
+
   it("removes a partial file before retrying a failed stream", async () => {
     const { download, got } = await loadDownload();
     const outputPath = path.join(testDirectory, "episode.mp3");
@@ -273,5 +341,134 @@ describe("downloadItemsAsync", () => {
     expect(got.stream).toHaveBeenCalledOnce();
     expect(runFfmpeg).toHaveBeenCalledOnce();
     expect(runExec).toHaveBeenCalledOnce();
+  });
+
+  it("continues ffmpeg and exec when an episode artifact fails", async () => {
+    const { downloadItemsAsync, got, runExec, runFfmpeg } = await loadDownloadItems();
+    const archivePath = path.join(testDirectory, "archive.json");
+    const outputTranscriptPath = path.join(testDirectory, "An Episode.vtt");
+    const item = {
+      _archiveKeys: ["episode-key"],
+      _episodeTranscript: {
+        archiveKeys: ["transcript-key"],
+        outputPath: outputTranscriptPath,
+        url: "https://example.com/transcript.vtt",
+      },
+      _originalIndex: 0,
+      enclosure: {
+        type: "audio/wav",
+        url: "https://example.com/episode.wav",
+      },
+      title: "An Episode",
+    };
+    const feed = { items: [item], title: "Example Podcast" };
+    const options = {
+      archive: archivePath,
+      attempts: 1,
+      audioFormat: "mp3",
+      basePath: testDirectory,
+      episodeCustomTemplateOptions: [],
+      episodeDigits: 1,
+      episodeNumOffset: 0,
+      episodeSourceOrder: ["enclosure", "link"],
+      episodeTemplate: "{{title}}",
+      exec: "process {{episode_path}}",
+      feed,
+      targetItems: [item],
+    };
+    const outputPodcastPath = path.join(testDirectory, "An Episode.wav");
+    got.stream.mockImplementation((url) => {
+      if (url.includes("transcript")) {
+        return new Readable({
+          read() {
+            this.destroy(new Error("transcript unavailable"));
+          },
+        });
+      }
+
+      return Readable.from(["episode audio"]);
+    });
+
+    await expect(downloadItemsAsync(options)).resolves.toEqual({
+      numEpisodesDownloaded: 1,
+      hasErrors: true,
+    });
+    expect(fs.existsSync(outputPodcastPath)).toBe(false);
+    expect(getTempFiles()).toEqual([]);
+    expect(runFfmpeg).toHaveBeenCalledOnce();
+    expect(runExec).toHaveBeenCalledOnce();
+    expect(fs.existsSync(outputTranscriptPath)).toBe(false);
+    expect(JSON.parse(fs.readFileSync(archivePath, "utf8"))).toEqual(["episode-key"]);
+  });
+
+  it("continues ffmpeg and exec when metadata fails", async () => {
+    const { downloadItemsAsync, runExec, runFfmpeg, writeItemMeta } = await loadDownloadItems();
+    const item = {
+      _archiveKeys: [],
+      _originalIndex: 0,
+      enclosure: {
+        type: "audio/wav",
+        url: "https://example.com/episode.wav",
+      },
+      title: "An Episode",
+    };
+    const options = {
+      audioFormat: "mp3",
+      basePath: testDirectory,
+      episodeCustomTemplateOptions: [],
+      episodeDigits: 1,
+      episodeNumOffset: 0,
+      episodeSourceOrder: ["enclosure", "link"],
+      episodeTemplate: "{{title}}",
+      exec: "process {{episode_path}}",
+      feed: { items: [item], title: "Example Podcast" },
+      includeEpisodeMeta: true,
+      targetItems: [item],
+    };
+    writeItemMeta.mockImplementationOnce(() => {
+      throw new Error("metadata unavailable");
+    });
+
+    await expect(downloadItemsAsync(options)).resolves.toEqual({
+      numEpisodesDownloaded: 1,
+      hasErrors: true,
+    });
+    expect(writeItemMeta).toHaveBeenCalledOnce();
+    expect(runFfmpeg).toHaveBeenCalledOnce();
+    expect(runExec).toHaveBeenCalledOnce();
+    expect(getTempFiles()).toEqual([]);
+  });
+
+  it("rejects output path collisions before starting downloads", async () => {
+    const { downloadItemsAsync, got } = await loadDownloadItems();
+    const items = [0, 1].map((index) => ({
+      _archiveKeys: [],
+      _originalIndex: index,
+      enclosure: {
+        type: "audio/wav",
+        url: `https://example.com/episode-${index}.wav`,
+      },
+      title: "Same Episode",
+    }));
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
+
+    await expect(
+      downloadItemsAsync({
+        basePath: testDirectory,
+        episodeCustomTemplateOptions: [],
+        episodeDigits: 1,
+        episodeNumOffset: 0,
+        episodeSourceOrder: ["enclosure", "link"],
+        episodeTemplate: "{{title}}",
+        feed: { items, title: "Example Podcast" },
+        targetItems: items,
+        threads: 2,
+      }),
+    ).resolves.toEqual({ numEpisodesDownloaded: 0, hasErrors: true });
+
+    expect(got.stream).not.toHaveBeenCalled();
+    expect(consoleError).toHaveBeenCalledWith(
+      expect.stringContaining("Multiple episode artifacts resolve to the same output path"),
+    );
   });
 });
