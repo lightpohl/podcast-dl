@@ -128,7 +128,13 @@ export const download = async (options) => {
 
     await pipeline(
       got
-        .stream(url, { headers: { "user-agent": userAgent } })
+        .stream(url, {
+          headers: { "user-agent": userAgent },
+          timeout: {
+            response: 30000,
+            socket: 60000,
+          },
+        })
         .on("downloadProgress", onDownloadProgress),
       fs.createWriteStream(tempOutputPath),
     );

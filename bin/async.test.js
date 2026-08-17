@@ -80,7 +80,15 @@ describe("download", () => {
       "https://example.com/episode.mp3",
       expect.objectContaining({ method: "HEAD", timeout: 30000 }),
     );
-    expect(got.stream).toHaveBeenCalledOnce();
+    expect(got.stream).toHaveBeenCalledWith(
+      "https://example.com/episode.mp3",
+      expect.objectContaining({
+        timeout: {
+          response: 30000,
+          socket: 60000,
+        },
+      }),
+    );
   });
 
   it("uses the response MIME type when choosing the final extension", async () => {
