@@ -43,7 +43,9 @@ export const writeToArchive = ({ archiveKeys, archive }) => {
   });
 
   if (data.dirty) {
-    fs.writeFileSync(path.resolve(cwd, archive), JSON.stringify([...data.entries], null, 4));
+    const archivePath = path.resolve(cwd, archive);
+    fs.mkdirSync(path.dirname(archivePath), { recursive: true });
+    fs.writeFileSync(archivePath, JSON.stringify([...data.entries], null, 4));
     data.dirty = false;
   }
 };
