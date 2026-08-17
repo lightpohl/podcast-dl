@@ -1,5 +1,15 @@
 # Changelog
 
+## [12.1.4](https://github.com/lightpohl/podcast-dl/compare/v12.1.3...v12.1.4) (2026-08-17)
+
+
+### Bug Fixes
+
+* add streaming download timeouts ([d4df8ac](https://github.com/lightpohl/podcast-dl/commit/d4df8aca28e02edd298a320e354a97e3dd5cadde))
+* apply custom templates to transcripts ([a9d78f8](https://github.com/lightpohl/podcast-dl/commit/a9d78f83b412edce830bad9bad6aa057d13042d2))
+* create archive parent directories ([ce22d89](https://github.com/lightpohl/podcast-dl/commit/ce22d895d4b55cd55e59eb4ce4903850c1290c59))
+* make concurrent downloads collision-safe ([e0aa8ce](https://github.com/lightpohl/podcast-dl/commit/e0aa8ced52c75347d2a5d285a0b51c9beefbcaf8))
+
 ## [12.1.3](https://github.com/lightpohl/podcast-dl/compare/v12.1.2...v12.1.3) (2026-08-15)
 
 
