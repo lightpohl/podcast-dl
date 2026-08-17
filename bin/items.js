@@ -162,6 +162,7 @@ export const getItemsToDownload = ({
             url: episodeMediaUrl,
             ext: episodeTranscriptFileExt,
             template: episodeTemplate,
+            customTemplateOptions: episodeCustomTemplateOptions,
             width: episodeDigits,
             offset: episodeNumOffset,
           });
