@@ -1,16 +1,47 @@
 on:
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "List the assets that would be deleted without deleting them"
+        type: boolean
+        default: true
   release:
     types: [published]
 
 name: delete-old-assets
 
+permissions:
+  contents: write
+
 jobs:
   delete-assets:
     runs-on: ubuntu-latest
     steps:
-      - uses: tinoji/delete-older-release-assets@v1.0.1
-        with:
-          keep_latest: 3
+      - name: Delete assets from all but the latest releases
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          KEEP_LATEST: 3
+          # Release events have no inputs, so they always delete for real
+          DRY_RUN: ${{ inputs.dry_run || 'false' }}
+        run: |
+          set -euo pipefail
+
+          # Releases come back newest first; skip drafts and keep the latest ones
+          release_ids=$(gh api --paginate "repos/$GITHUB_REPOSITORY/releases" \
+            --jq '.[] | select(.draft | not) | .id' | tail -n +$((KEEP_LATEST + 1)))
+
+          for release_id in $release_ids; do
+            # Collect every asset ID before deleting, so deletes don't shift the pages
+            assets=$(gh api --paginate "repos/$GITHUB_REPOSITORY/releases/$release_id/assets" \
+              --jq '.[] | "\(.id) \(.name)"')
+
+            while read -r asset_id asset_name; do
+              [ -n "$asset_id" ] || continue
+              if [ "$DRY_RUN" = "true" ]; then
+                echo "Would delete $asset_name (release $release_id)"
+              else
+                echo "Deleting $asset_name (release $release_id)"
+                gh api -X DELETE "repos/$GITHUB_REPOSITORY/releases/assets/$asset_id"
+              fi
+            done <<< "$assets"
+          done
