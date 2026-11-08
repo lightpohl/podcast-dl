@@ -1,5 +1,12 @@
 # Changelog
 
+## [12.1.5](https://github.com/lightpohl/podcast-dl/compare/v12.1.4...v12.1.5) (2026-11-08)
+
+
+### Bug Fixes
+
+* explain how to retry failed post-processing ([c0722d2](https://github.com/lightpohl/podcast-dl/commit/c0722d278629a0f75468d5a3385049895f2c7f90))
+
 ## [12.1.4](https://github.com/lightpohl/podcast-dl/compare/v12.1.3...v12.1.4) (2026-08-17)
 
 
