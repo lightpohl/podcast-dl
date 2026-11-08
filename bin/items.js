@@ -7,11 +7,32 @@ import {
   getImageUrl,
   getLoopControls,
   getTranscriptUrl,
+  escapeArgForShell,
   getUrlExt,
   normalizeUrl,
 } from "./util.js";
 
 export const ITEM_LIST_FORMATS = ["table", "json"];
+
+const escapeRegex = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+/*
+  CLI filter args that select just this item in getItemsToDownload.
+  --offset starts the scan at the item, and the anchored title regex skips
+  past anything else, so the item is still found if newer episodes were
+  published since (which shifts indexes when not using --reverse).
+  Untitled items bypass --episode-regex, so they fall back to the offset alone.
+*/
+export const getItemFilterArgs = ({ item, feed, reverse }) => {
+  const offset = reverse ? feed.items.length - 1 - item._originalIndex : item._originalIndex;
+  const args = ["--offset", `${offset}`, "--limit", "1"];
+
+  if (item.title) {
+    args.push("--episode-regex", escapeArgForShell(`^${escapeRegex(item.title)}$`));
+  }
+
+  return args.join(" ");
+};
 
 export const getItemsToDownload = ({
   archive,

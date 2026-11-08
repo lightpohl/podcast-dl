@@ -16,6 +16,7 @@ import {
   logError,
 } from "./logger.js";
 import { writeItemMeta } from "./meta.js";
+import { getItemFilterArgs } from "./items.js";
 import { getItemFilename } from "./naming.js";
 import {
   AUDIO_FORMATS,
@@ -27,6 +28,13 @@ import {
 } from "./util.js";
 
 const pipeline = promisify(stream.pipeline);
+
+class PostprocessError extends Error {
+  constructor(outputPath, cause) {
+    super(cause?.toString() ?? String(cause), { cause });
+    this.outputPath = outputPath;
+  }
+}
 
 const BYTES_IN_MB = 1000000;
 const USER_AGENT =
@@ -355,6 +363,7 @@ export const downloadItemsAsync = async ({
   mono,
   override,
   alwaysPostprocess,
+  reverse,
   targetItems,
   threads = 1,
   trustExt,
@@ -441,7 +450,9 @@ export const downloadItemsAsync = async ({
                 override,
                 trustExt,
                 userAgent,
-                archiveKeys: item._episodeImage.archiveKeys || [],
+                // An image fetched only for embedding is deleted after ffmpeg, so
+                // archiving it would block re-fetching it when the episode is retried.
+                archiveKeys: includeEpisodeImages ? item._episodeImage.archiveKeys || [] : [],
                 marker: item._episodeImage.url,
                 maxAttempts: attempts,
                 outputPath: item._episodeImage.outputPath,
@@ -487,37 +498,43 @@ export const downloadItemsAsync = async ({
           const hasEpisodeImage =
             item._episodeImage && fs.existsSync(item._episodeImage.outputPath);
 
-          if (embedMetadataFlag || bitrate || mono || audioFormat) {
-            logMessage("Running ffmpeg...");
-            processedEpisodePath =
-              (await runFfmpeg({
-                audioFormat,
-                bitrate,
-                embedMetadata: embedMetadataFlag,
-                episodeImageOutputPath: hasEpisodeImage ? item._episodeImage.outputPath : undefined,
-                feed,
-                item,
-                itemIndex: item._originalIndex,
-                mono,
-                outputPath: processedEpisodePath,
-                override,
-              })) || processedEpisodePath;
-          }
+          try {
+            if (embedMetadataFlag || bitrate || mono || audioFormat) {
+              logMessage("Running ffmpeg...");
+              processedEpisodePath =
+                (await runFfmpeg({
+                  audioFormat,
+                  bitrate,
+                  embedMetadata: embedMetadataFlag,
+                  episodeImageOutputPath: hasEpisodeImage
+                    ? item._episodeImage.outputPath
+                    : undefined,
+                  feed,
+                  item,
+                  itemIndex: item._originalIndex,
+                  mono,
+                  outputPath: processedEpisodePath,
+                  override,
+                })) || processedEpisodePath;
+            }
 
-          if (!includeEpisodeImages && hasEpisodeImage) {
-            fs.unlinkSync(item._episodeImage.outputPath);
-          }
+            if (!includeEpisodeImages && hasEpisodeImage) {
+              fs.unlinkSync(item._episodeImage.outputPath);
+            }
 
-          if (exec) {
-            logMessage("Running exec...");
-            const processedEpisodeFilename = _path.relative(basePath, processedEpisodePath);
-            await runExec({
-              exec,
-              basePath,
-              outputPodcastPath: processedEpisodePath,
-              episodeFilename: processedEpisodeFilename,
-              episodeMediaUrl,
-            });
+            if (exec) {
+              logMessage("Running exec...");
+              const processedEpisodeFilename = _path.relative(basePath, processedEpisodePath);
+              await runExec({
+                exec,
+                basePath,
+                outputPodcastPath: processedEpisodePath,
+                episodeFilename: processedEpisodeFilename,
+                episodeMediaUrl,
+              });
+            }
+          } catch (error) {
+            throw new PostprocessError(processedEpisodePath, error);
           }
 
           if (includeEpisodeMeta) {
@@ -563,7 +580,15 @@ export const downloadItemsAsync = async ({
       });
     } catch (error) {
       hasErrors = true;
-      logError(`${marker} | Error downloading episode: ${error.toString()}`);
+      if (error instanceof PostprocessError) {
+        logError(
+          `${marker} | Downloaded to ${error.outputPath}, but post-processing failed: ${error.message}\n` +
+            `${marker} | To retry just this episode, re-run with: --always-postprocess ${getItemFilterArgs({ item, feed, reverse })}\n` +
+            `${marker} | (Use --override instead of --always-postprocess to download it again first.)`,
+        );
+      } else {
+        logError(`${marker} | Error downloading episode: ${error.toString()}`);
+      }
     }
   };
 

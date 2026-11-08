@@ -247,6 +247,7 @@ const main = async () => {
     mono,
     override,
     alwaysPostprocess,
+    reverse,
     targetItems,
     threads,
     trustExt,

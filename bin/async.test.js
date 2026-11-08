@@ -439,6 +439,103 @@ describe("downloadItemsAsync", () => {
     expect(getTempFiles()).toEqual([]);
   });
 
+  it("keeps the file and explains how to retry when post-processing fails", async () => {
+    const { downloadItemsAsync, runExec } = await loadDownloadItems();
+    const archivePath = path.join(testDirectory, "archive.json");
+    const item = {
+      _archiveKeys: ["episode-key"],
+      _originalIndex: 0,
+      enclosure: {
+        type: "audio/wav",
+        url: "https://example.com/episode.wav",
+      },
+      title: "An Episode",
+    };
+    const convertedPath = path.join(testDirectory, "An Episode.mp3");
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
+    runExec.mockRejectedValueOnce(new Error("exec failed"));
+
+    await expect(
+      downloadItemsAsync({
+        archive: archivePath,
+        audioFormat: "mp3",
+        basePath: testDirectory,
+        episodeCustomTemplateOptions: [],
+        episodeDigits: 1,
+        episodeNumOffset: 0,
+        episodeSourceOrder: ["enclosure", "link"],
+        episodeTemplate: "{{title}}",
+        exec: "process {{episode_path}}",
+        feed: { items: [item], title: "Example Podcast" },
+        targetItems: [item],
+      }),
+    ).resolves.toEqual({ numEpisodesDownloaded: 0, hasErrors: true });
+
+    expect(fs.existsSync(convertedPath)).toBe(true);
+    expect(fs.existsSync(archivePath)).toBe(false);
+    expect(getTempFiles()).toEqual([]);
+    const message = consoleError.mock.calls.map(([msg]) => msg).join("\n");
+    expect(message).toContain(`Downloaded to ${convertedPath}, but post-processing failed`);
+    expect(message).toContain("exec failed");
+    expect(message).toContain(
+      "re-run with: --always-postprocess --offset 0 --limit 1 --episode-regex '^An Episode$'",
+    );
+    expect(message).not.toContain("Error downloading episode");
+  });
+
+  it.each([
+    { includeEpisodeImages: false, expectedArchive: ["episode-key"], imageKept: false },
+    {
+      includeEpisodeImages: true,
+      expectedArchive: ["image-key", "episode-key"],
+      imageKept: true,
+    },
+  ])(
+    "archives the episode image only when it is kept (includeEpisodeImages: $includeEpisodeImages)",
+    async ({ includeEpisodeImages, expectedArchive, imageKept }) => {
+      const { downloadItemsAsync, runFfmpeg } = await loadDownloadItems();
+      const archivePath = path.join(testDirectory, "archive.json");
+      const outputImagePath = path.join(testDirectory, "An Episode.jpg");
+      const item = {
+        _archiveKeys: ["episode-key"],
+        _episodeImage: {
+          archiveKeys: ["image-key"],
+          outputPath: outputImagePath,
+          url: "https://example.com/image.jpg",
+        },
+        _originalIndex: 0,
+        enclosure: {
+          type: "audio/wav",
+          url: "https://example.com/episode.wav",
+        },
+        title: "An Episode",
+      };
+
+      await expect(
+        downloadItemsAsync({
+          archive: archivePath,
+          audioFormat: "mp3",
+          basePath: testDirectory,
+          embedMetadataFlag: true,
+          episodeCustomTemplateOptions: [],
+          episodeDigits: 1,
+          episodeNumOffset: 0,
+          episodeSourceOrder: ["enclosure", "link"],
+          episodeTemplate: "{{title}}",
+          feed: { items: [item], title: "Example Podcast" },
+          includeEpisodeImages,
+          targetItems: [item],
+        }),
+      ).resolves.toEqual({ numEpisodesDownloaded: 1, hasErrors: false });
+
+      expect(runFfmpeg).toHaveBeenCalledWith(
+        expect.objectContaining({ episodeImageOutputPath: outputImagePath }),
+      );
+      expect(fs.existsSync(outputImagePath)).toBe(imageKept);
+      expect(JSON.parse(fs.readFileSync(archivePath, "utf8"))).toEqual(expectedArchive);
+    },
+  );
+
   it("rejects output path collisions before starting downloads", async () => {
     const { downloadItemsAsync, got } = await loadDownloadItems();
     const items = [0, 1].map((index) => ({
