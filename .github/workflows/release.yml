@@ -37,7 +37,7 @@ jobs:
         include:
           - os: ubuntu-latest
             targets: linux-x64 win-x64
-          - os: macos-14
+          - os: macos-latest
             targets: macos-x64 macos-arm64
     runs-on: ${{ matrix.os }}
     steps:
@@ -61,5 +61,5 @@ jobs:
         run: |
           TAG="${{ inputs.tag_name || needs.release-please.outputs.tag_name }}"
           for file in ./binaries/*; do
-            gh release upload "$TAG" "$file"
+            gh release upload "$TAG" "$file" --clobber
           done
