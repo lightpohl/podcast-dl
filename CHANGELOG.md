@@ -1,5 +1,12 @@
 # Changelog
 
+## [12.1.6](https://github.com/lightpohl/podcast-dl/compare/v12.1.5...v12.1.6) (2026-11-19)
+
+
+### Bug Fixes
+
+* fall back to an exclusive copy when hard links are unsupported ([#171](https://github.com/lightpohl/podcast-dl/issues/171)) ([9919e5e](https://github.com/lightpohl/podcast-dl/commit/9919e5e29fb19b9c81de528d026350c74e6105a5))
+
 ## [12.1.5](https://github.com/lightpohl/podcast-dl/compare/v12.1.4...v12.1.5) (2026-11-08)
 
 
