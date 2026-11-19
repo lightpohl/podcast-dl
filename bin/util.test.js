@@ -135,6 +135,60 @@ describe("publishTempFile", () => {
       fs.rmSync(testDirectory, { recursive: true, force: true });
     }
   });
+
+  describe("when the filesystem does not support hard links", () => {
+    let testDirectory;
+    let tempPath;
+    let outputPath;
+
+    beforeEach(() => {
+      testDirectory = fs.mkdtempSync(path.join(os.tmpdir(), "podcast-dl-publish-"));
+      tempPath = path.join(testDirectory, ".podcast-dl-transfer.download.tmp");
+      outputPath = path.join(testDirectory, "episode.mp3");
+      fs.writeFileSync(tempPath, "new audio");
+    });
+
+    afterEach(() => {
+      vi.restoreAllMocks();
+      fs.rmSync(testDirectory, { recursive: true, force: true });
+    });
+
+    const mockLinkError = (code) => {
+      vi.spyOn(fs, "linkSync").mockImplementationOnce(() => {
+        throw Object.assign(new Error(`link failed: ${code}`), { code });
+      });
+    };
+
+    it.each(["ENOTSUP", "EOPNOTSUPP", "ENOSYS", "EPERM"])("falls back to copying on %s", (code) => {
+      mockLinkError(code);
+
+      publishTempFile({ tempPath, outputPath });
+
+      expect(fs.readFileSync(outputPath, "utf8")).toBe("new audio");
+      expect(fs.existsSync(tempPath)).toBe(false);
+    });
+
+    it("still refuses to replace an existing output", () => {
+      fs.writeFileSync(outputPath, "existing audio");
+      mockLinkError("ENOTSUP");
+
+      expect(() => publishTempFile({ tempPath, outputPath })).toThrow(
+        expect.objectContaining({ code: "EEXIST" }),
+      );
+      expect(fs.readFileSync(outputPath, "utf8")).toBe("existing audio");
+      expect(fs.readFileSync(tempPath, "utf8")).toBe("new audio");
+    });
+
+    it("rethrows other link errors without copying", () => {
+      mockLinkError("EACCES");
+
+      expect(() => publishTempFile({ tempPath, outputPath })).toThrow(
+        expect.objectContaining({ code: "EACCES" }),
+      );
+      expect(fs.existsSync(outputPath)).toBe(false);
+      expect(fs.readFileSync(tempPath, "utf8")).toBe("new audio");
+    });
+  });
 });
 
 describe("normalizeUrl", () => {
