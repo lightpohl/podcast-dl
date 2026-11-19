@@ -3,6 +3,7 @@ import os from "os";
 import path from "path";
 import { Readable } from "stream";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { getItemsToDownload } from "./items.js";
 
 let testDirectory;
 
@@ -26,13 +27,13 @@ const loadDownload = async ({ content = "episode audio", contentType = "audio/mp
   return { download, got };
 };
 
-const loadDownloadItems = async () => {
+const loadDownloadItems = async ({ getContentType = () => "audio/wav" } = {}) => {
   vi.resetModules();
 
-  const got = vi.fn(async () => ({
+  const got = vi.fn(async (url) => ({
     headers: {
       "content-length": "13",
-      "content-type": "audio/wav",
+      "content-type": getContentType(url),
     },
   }));
   got.stream = vi.fn(() => Readable.from(["episode audio"]));
@@ -535,6 +536,73 @@ describe("downloadItemsAsync", () => {
       expect(JSON.parse(fs.readFileSync(archivePath, "utf8"))).toEqual(expectedArchive);
     },
   );
+
+  it("downloads extensionless image and transcript URLs without a path collision", async () => {
+    const { downloadItemsAsync, got } = await loadDownloadItems({
+      getContentType: (url) => {
+        if (url.includes("/images/")) {
+          return "image/png";
+        }
+        if (url.includes("/transcripts/")) {
+          return "text/html";
+        }
+        return "audio/wav";
+      },
+    });
+    const feed = {
+      items: [
+        {
+          enclosure: {
+            type: "audio/wav",
+            url: "https://example.com/episode.wav",
+          },
+          image: { url: "https://example.com/images/abc" },
+          podcastTranscripts: [
+            {
+              $: {
+                type: "application/x-unknown",
+                url: "https://example.com/transcripts/abc",
+              },
+            },
+          ],
+          title: "Episode",
+        },
+      ],
+      title: "Example Podcast",
+    };
+    const options = {
+      basePath: testDirectory,
+      episodeCustomTemplateOptions: [],
+      episodeDigits: 1,
+      episodeNumOffset: 0,
+      episodeSourceOrder: ["enclosure", "link"],
+      episodeTemplate: "{{title}}",
+      feed,
+    };
+    const targetItems = getItemsToDownload({
+      ...options,
+      archivePrefix: "example",
+      episodeTranscriptTypes: ["application/x-unknown"],
+      includeEpisodeImages: true,
+      includeEpisodeTranscripts: true,
+      offset: 0,
+    });
+
+    await expect(
+      downloadItemsAsync({
+        ...options,
+        includeEpisodeImages: true,
+        targetItems,
+      }),
+    ).resolves.toEqual({ numEpisodesDownloaded: 1, hasErrors: false });
+
+    expect(got.stream).toHaveBeenCalledTimes(3);
+    expect(fs.readdirSync(testDirectory).sort()).toEqual([
+      "Episode.html",
+      "Episode.png",
+      "Episode.wav",
+    ]);
+  });
 
   it("rejects output path collisions before starting downloads", async () => {
     const { downloadItemsAsync, got } = await loadDownloadItems();

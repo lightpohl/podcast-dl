@@ -15,7 +15,7 @@ import {
   EPISODE_SOURCE_TYPES,
   resolveEpisodeMedia,
   getImageUrl,
-  getTranscriptUrl,
+  getTranscript,
   TRANSCRIPT_TYPES,
   VIDEO_EXTS,
   VIDEO_TYPES_TO_EXTS,
@@ -501,13 +501,13 @@ describe("getImageUrl", () => {
   });
 });
 
-describe("getTranscriptUrl", () => {
+describe("getTranscript", () => {
   it("returns null when no podcastTranscripts", () => {
-    expect(getTranscriptUrl({})).toBeNull();
-    expect(getTranscriptUrl({ podcastTranscripts: [] })).toBeNull();
+    expect(getTranscript({})).toBeNull();
+    expect(getTranscript({ podcastTranscripts: [] })).toBeNull();
   });
 
-  it("returns URL for first matching transcript type", () => {
+  it("returns the URL and type of the first matching transcript type", () => {
     const item = {
       podcastTranscripts: [
         { $: { type: "text/plain", url: "https://example.com/plain.txt" } },
@@ -515,14 +515,14 @@ describe("getTranscriptUrl", () => {
       ],
     };
     expect(
-      getTranscriptUrl(item, [TRANSCRIPT_TYPES["text/vtt"], TRANSCRIPT_TYPES["text/plain"]]),
-    ).toBe("https://example.com/cc.vtt");
+      getTranscript(item, [TRANSCRIPT_TYPES["text/vtt"], TRANSCRIPT_TYPES["text/plain"]]),
+    ).toEqual({ type: "text/vtt", url: "https://example.com/cc.vtt" });
   });
 
   it("returns null when type does not match", () => {
     const item = {
       podcastTranscripts: [{ $: { type: "text/plain", url: "https://example.com/plain.txt" } }],
     };
-    expect(getTranscriptUrl(item, ["text/vtt"])).toBeNull();
+    expect(getTranscript(item, ["text/vtt"])).toBeNull();
   });
 });
