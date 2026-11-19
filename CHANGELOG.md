@@ -1,5 +1,12 @@
 # Changelog
 
+## [12.1.7](https://github.com/lightpohl/podcast-dl/compare/v12.1.6...v12.1.7) (2026-11-19)
+
+
+### Bug Fixes
+
+* avoid path collisions for extensionless image and transcript URLs ([#173](https://github.com/lightpohl/podcast-dl/issues/173)) ([f4d7bcf](https://github.com/lightpohl/podcast-dl/commit/f4d7bcf964be39c5270f2705fdd67682b624c26b))
+
 ## [12.1.6](https://github.com/lightpohl/podcast-dl/compare/v12.1.5...v12.1.6) (2026-11-19)
 
 
