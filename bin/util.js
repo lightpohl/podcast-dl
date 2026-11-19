@@ -403,7 +403,7 @@ export const TRANSCRIPT_TYPES = {
 };
 
 // @see https://github.com/Podcastindex-org/podcast-namespace/blob/main/docs/1.0.md#transcript
-export const getTranscriptUrl = (item, transcriptTypes = []) => {
+export const getTranscript = (item, transcriptTypes = []) => {
   if (!item.podcastTranscripts?.length) {
     return null;
   }
@@ -414,7 +414,8 @@ export const getTranscriptUrl = (item, transcriptTypes = []) => {
     );
 
     if (matchingTranscriptType) {
-      return matchingTranscriptType?.["$"]?.url;
+      const { url, type } = matchingTranscriptType["$"];
+      return { url, type };
     }
   }
 

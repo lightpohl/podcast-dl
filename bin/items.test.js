@@ -62,6 +62,61 @@ describe("getItemsToDownload", () => {
       path.resolve("/downloads", "S01E02-Episode S01E02.vtt"),
     );
   });
+
+  const getArtifactFilenames = ({ imageUrl, transcriptType, transcriptUrl }) => {
+    const item = {
+      title: "Episode",
+      enclosure: { type: "audio/mpeg", url: "https://example.com/episode.mp3" },
+      image: imageUrl ? { url: imageUrl } : undefined,
+      podcastTranscripts: transcriptUrl
+        ? [{ $: { type: transcriptType, url: transcriptUrl } }]
+        : undefined,
+    };
+    const [result] = getItemsToDownload({
+      archivePrefix: "example",
+      basePath: "/downloads",
+      episodeDigits: 1,
+      episodeNumOffset: 0,
+      episodeTemplate: "{{title}}",
+      episodeTranscriptTypes: [transcriptType],
+      feed: { items: [item], title: "Example Podcast" },
+      includeEpisodeImages: Boolean(imageUrl),
+      includeEpisodeTranscripts: Boolean(transcriptUrl),
+      offset: 0,
+    });
+
+    return {
+      image: result._episodeImage && path.basename(result._episodeImage.outputPath),
+      transcript: result._episodeTranscript && path.basename(result._episodeTranscript.outputPath),
+    };
+  };
+
+  it.each([
+    ["https://example.com/image.jpg", "Episode.jpg"],
+    ["https://example.com/resize/300/?url=image.png", "Episode.image"],
+  ])("plans image URL %s as %s", (imageUrl, expected) => {
+    expect(getArtifactFilenames({ imageUrl }).image).toBe(expected);
+  });
+
+  it.each([
+    ["text/vtt", "https://example.com/transcript.vtt", "Episode.vtt"],
+    ["text/plain", "https://example.com/transcript.vtt", "Episode.vtt"],
+    ["text/html", "https://example.com/transcripts/abc", "Episode.html"],
+    ["text/plain", "https://example.com/transcripts/abc", "Episode.txt"],
+    ["application/x-unknown", "https://example.com/transcripts/abc", "Episode.transcript"],
+  ])("plans a %s transcript at %s as %s", (transcriptType, transcriptUrl, expected) => {
+    expect(getArtifactFilenames({ transcriptType, transcriptUrl }).transcript).toBe(expected);
+  });
+
+  it("plans extensionless image and transcript URLs at different paths", () => {
+    const { image, transcript } = getArtifactFilenames({
+      imageUrl: "https://example.com/images/abc",
+      transcriptType: "application/x-unknown",
+      transcriptUrl: "https://example.com/transcripts/abc",
+    });
+
+    expect(image).not.toBe(transcript);
+  });
 });
 
 describe.skipIf(process.platform === "win32")("getItemFilterArgs", () => {
