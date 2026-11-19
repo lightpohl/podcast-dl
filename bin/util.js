@@ -49,13 +49,28 @@ export const getTempPath = ({ outputPath, id, type, ext = ".tmp" }) => {
   return path.join(path.dirname(outputPath), `.podcast-dl-${id}.${type}${ext}`);
 };
 
+// Errors from fs.linkSync meaning the filesystem can't create hard links
+// (e.g. exFAT/FAT drives, some network mounts and container volumes).
+const LINK_UNSUPPORTED_CODES = new Set(["ENOTSUP", "EOPNOTSUPP", "ENOSYS", "EPERM"]);
+
 export const publishTempFile = ({ tempPath, outputPath, override = false }) => {
   if (override) {
     fs.renameSync(tempPath, outputPath);
     return;
   }
 
-  fs.linkSync(tempPath, outputPath);
+  // Hard-linking publishes without ever replacing an existing output (EEXIST).
+  // If links aren't supported, an exclusive copy keeps that same guarantee.
+  try {
+    fs.linkSync(tempPath, outputPath);
+  } catch (error) {
+    if (!LINK_UNSUPPORTED_CODES.has(error?.code)) {
+      throw error;
+    }
+
+    fs.copyFileSync(tempPath, outputPath, fs.constants.COPYFILE_EXCL);
+  }
+
   fs.unlinkSync(tempPath);
 };
 
